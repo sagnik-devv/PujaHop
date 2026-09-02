@@ -174,3 +174,4 @@ PUJAHOP was conceptualized, designed, and built with ❤️ for the city of Kolk
 This project is created to celebrate the UNESCO Intangible Cultural Heritage of Humanity — **Durga Puja in Kolkata**. All puja imagery and committee themes remain the cultural and intellectual heritage of their respective clubs, artists, and organizers.
 
 Built with dedication for Kolkata. **শুভ শারদীয়া! Happy Pandal Hopping!**
+# PujaHop
