@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <radialGradient id="grad6" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#661414" />
+      <stop offset="100%" stop-color="#260606" />
+    </radialGradient>
+    <linearGradient id="goldGrad6" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff4d0" />
+      <stop offset="50%" stop-color="#f7d070" />
+      <stop offset="100%" stop-color="#8c6820" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#grad6)" />
+  
+  <circle cx="400" cy="270" r="180" fill="none" stroke="#f7d070" stroke-opacity="0.15" stroke-width="1.5" />
+  <circle cx="400" cy="270" r="140" fill="none" stroke="#f7d070" stroke-opacity="0.25" stroke-width="1" stroke-dasharray="6,6" />
+  <circle cx="400" cy="270" r="90" fill="none" stroke="#f7d070" stroke-opacity="0.3" stroke-width="1.5" />
+  
+  <path d="M 330 270 Q 400 210 470 270 Q 400 330 330 270 Z" fill="none" stroke="url(#goldGrad6)" stroke-width="3.5" />
+  <circle cx="400" cy="270" r="14" fill="#f7d070" />
+  <circle cx="400" cy="270" r="5" fill="#FAF7F2" />
+  <path d="M 400 215 Q 400 240 400 245" stroke="#f7d070" stroke-width="2.5" stroke-linecap="round" />
+  <circle cx="400" cy="208" r="4" fill="#B3261E" />
+  
+  <line x1="400" y1="50" x2="400" y2="120" stroke="#f7d070" stroke-opacity="0.2" stroke-width="1" />
+  <line x1="180" y1="270" x2="250" y2="270" stroke="#f7d070" stroke-opacity="0.2" stroke-width="1" />
+  <line x1="550" y1="270" x2="620" y2="270" stroke="#f7d070" stroke-opacity="0.2" stroke-width="1" />
+  
+  <rect x="180" y="470" width="440" height="42" rx="4" fill="#17130F" fill-opacity="0.75" stroke="#f7d070" stroke-opacity="0.3" stroke-width="1" />
+  <text x="400" y="497" font-family="Georgia, serif" font-size="16" fill="#FAF7F2" text-anchor="middle" letter-spacing="2">SINDOOR KHELA & FESTIVE VERMILION</text>
+  <text x="400" y="545" font-family="sans-serif" font-size="12" fill="#D4B77A" text-anchor="middle" letter-spacing="1.5">Festive Vermilion & Cultural Glory</text>
+</svg>

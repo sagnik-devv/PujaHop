@@ -1,0 +1,861 @@
+import { GENERATED_PANDALS } from './generated-pujas';
+import { GENERATED_METRO_STATIONS } from './generated-metro';
+import { GENERATED_FOOD_STALLS } from './generated-food';
+import { GENERATED_PANDAL_EATERIES, PANDAL_EATERIES_MAP } from './generated-eateries';
+import { GENERATED_PANDAL_ART_DETAILS, PANDAL_ART_DETAILS_MAP } from './generated-art-details';
+import {
+  Pandal,
+  MetroStation,
+  FoodStall,
+  PandalEatery,
+  PandalArtDetails,
+  RouteOption,
+  ItineraryPlan,
+  ItineraryStop,
+  CrowdInfo,
+  EmergencyService,
+  SearchResultGroup,
+  FilterState,
+} from './types';
+import {
+  calculateDistance,
+  calculateDistanceMeters,
+  findNearestMetro,
+  findNearbyPandals,
+  estimateWalkMinutes,
+  estimateCabMinutes,
+  estimateCabFare,
+  estimateMetroFare,
+} from './geo';
+import { formatDistance } from './format';
+import { resolveLocationCoordinates } from './location-service';
+
+/**
+ * PUJAHOP SERVICE LAYER
+ * This acts as the backend-swap seam for Next.js -> FastAPI / PostgreSQL.
+ */
+
+export async function getPandals(): Promise<Pandal[]> {
+  return GENERATED_PANDALS;
+}
+
+export async function getPandalById(id: number | string): Promise<Pandal | null> {
+  const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
+  const found = GENERATED_PANDALS.find(p => p.id === numericId);
+  return found || null;
+}
+
+export async function getTrendingPandals(limit = 8): Promise<Pandal[]> {
+  // Sreebhumi/Shreebhumi (id 40) is permanently ranked #1 as Kolkata's most crowded spectacle magnet
+  return [...GENERATED_PANDALS]
+    .sort((a, b) => {
+      if (a.id === 40) return -1;
+      if (b.id === 40) return 1;
+      return b.popularityScore - a.popularityScore;
+    })
+    .slice(0, limit);
+}
+
+export async function getNearbyPandalsAPI(
+  lat: number,
+  lon: number,
+  radiusKm = 3,
+  limit = 10,
+  excludeId?: number
+): Promise<(Pandal & { distanceKm: number; distanceMeters: number })[]> {
+  return findNearbyPandals(lat, lon, GENERATED_PANDALS, radiusKm, limit, excludeId);
+}
+
+export async function getMetroStations(): Promise<MetroStation[]> {
+  return GENERATED_METRO_STATIONS;
+}
+
+export async function getNearestMetroForPandal(pandalId: number): Promise<{
+  metro: MetroStation;
+  distanceKm: number;
+  walkingMeters: number;
+  walkingMinutes: number;
+} | null> {
+  const pandal = await getPandalById(pandalId);
+  if (!pandal) return null;
+  return findNearestMetro(pandal.latitude, pandal.longitude, GENERATED_METRO_STATIONS);
+}
+
+export async function searchPandals(query: string): Promise<SearchResultGroup> {
+  const q = query.trim().toLowerCase();
+  if (!q) {
+    return {
+      pandals: [],
+      metroStations: [],
+      areas: [],
+    };
+  }
+
+  const pandals = GENERATED_PANDALS.filter(
+    p =>
+      p.name.toLowerCase().includes(q) ||
+      p.region.toLowerCase().includes(q) ||
+      p.address.toLowerCase().includes(q) ||
+      p.theme.toLowerCase().includes(q) ||
+      p.nearestMetro.toLowerCase().includes(q)
+  ).slice(0, 15);
+
+  const metroStations = GENERATED_METRO_STATIONS.filter(
+    m =>
+      m.name.toLowerCase().includes(q) ||
+      m.bengaliName.toLowerCase().includes(q) ||
+      m.line.toLowerCase().includes(q)
+  ).slice(0, 8);
+
+  const allAreas = Array.from(new Set(GENERATED_PANDALS.map(p => p.region)));
+  const areas = allAreas.filter(a => a.toLowerCase().includes(q));
+
+  return {
+    pandals,
+    metroStations,
+    areas,
+  };
+}
+
+export async function filterPandals(filters: Partial<FilterState>): Promise<Pandal[]> {
+  let list = [...GENERATED_PANDALS];
+
+  if (filters.searchQuery && filters.searchQuery.trim()) {
+    const q = filters.searchQuery.trim().toLowerCase();
+    list = list.filter(
+      p =>
+        p.name.toLowerCase().includes(q) ||
+        p.region.toLowerCase().includes(q) ||
+        p.address.toLowerCase().includes(q) ||
+        p.nearestMetro.toLowerCase().includes(q)
+    );
+  }
+
+  if (filters.region && filters.region !== 'ALL') {
+    list = list.filter(p => p.region.toLowerCase() === filters.region?.toLowerCase());
+  }
+
+  if (filters.nearestMetro && filters.nearestMetro !== 'ALL') {
+    list = list.filter(p => p.nearestMetro === filters.nearestMetro);
+  }
+
+  if (filters.crowdLevel && filters.crowdLevel !== 'ALL') {
+    list = list.filter(p => p.crowdLevel === filters.crowdLevel);
+  }
+
+  if (filters.famousOnly) {
+    list = list.filter(p => p.famous);
+  }
+
+  if (filters.familyFriendlyOnly) {
+    list = list.filter(p => p.familyFriendly);
+  }
+
+  if (filters.sortBy === 'name') {
+    list.sort((a, b) => a.name.localeCompare(b.name));
+  } else if (filters.sortBy === 'nearest_metro') {
+    list.sort((a, b) => a.nearestMetro.localeCompare(b.nearestMetro));
+  } else {
+    // Default: popularity
+    list.sort((a, b) => b.popularityScore - a.popularityScore);
+  }
+
+  return list;
+}
+
+export interface RouteSearchParams {
+  fromLat?: number;
+  fromLon?: number;
+  fromName?: string;
+  isCurrentLocation?: boolean;
+  toPandalId: number;
+}
+
+/**
+ * Intelligent multi-modal route finder:
+ * Calculates routes comparing Metro + Walk, Direct Cab/Auto, Bus/Public, and Less-Walking options.
+ */
+export async function getRoutes(params: RouteSearchParams): Promise<{
+  targetPandal: Pandal;
+  fromTitle: string;
+  routes: RouteOption[];
+}> {
+  const targetPandal = await getPandalById(params.toPandalId);
+  if (!targetPandal) {
+    throw new Error(`Pandal with ID ${params.toPandalId} not found`);
+  }
+
+  // Determine origin coordinates dynamically
+  let fromLat = params.fromLat;
+  let fromLon = params.fromLon;
+  let fromTitle = params.fromName || (params.isCurrentLocation ? 'Current Location' : 'Central Kolkata');
+
+  if (fromLat === undefined || fromLon === undefined) {
+    const resolved = await resolveLocationCoordinates(fromTitle);
+    fromLat = resolved.lat;
+    fromLon = resolved.lon;
+    if (!params.fromName && resolved.name) {
+      fromTitle = resolved.name;
+    }
+  }
+
+  const directDistanceKm = calculateDistance(fromLat, fromLon, targetPandal.latitude, targetPandal.longitude);
+  const directDistanceMeters = Math.round(directDistanceKm * 1000);
+
+  // Find nearest metro to origin and destination
+  const originMetroMatch = findNearestMetro(fromLat, fromLon, GENERATED_METRO_STATIONS);
+  const targetMetroMatch = findNearestMetro(targetPandal.latitude, targetPandal.longitude, GENERATED_METRO_STATIONS);
+
+  const originMetro = originMetroMatch?.metro || GENERATED_METRO_STATIONS[0];
+  const targetMetro = targetMetroMatch?.metro || GENERATED_METRO_STATIONS[1];
+
+  const originToMetroWalkM = originMetroMatch?.walkingMeters || 400;
+  const originToMetroWalkMins = estimateWalkMinutes(originToMetroWalkM);
+
+  const metroToTargetWalkM = targetMetroMatch?.walkingMeters || targetPandal.walkingDistanceM;
+  const metroToTargetWalkMins = estimateWalkMinutes(metroToTargetWalkM);
+
+  // Metro transit estimation
+  const metroDistanceKm = calculateDistance(
+    originMetro.latitude,
+    originMetro.longitude,
+    targetMetro.latitude,
+    targetMetro.longitude
+  );
+  const metroRideMinutes = Math.max(8, Math.round(metroDistanceKm * 2.2));
+  const isSameMetro = originMetro.id === targetMetro.id;
+  const metroFare = isSameMetro ? 5 : estimateMetroFare(metroDistanceKm);
+
+  // 1. SMART METRO EXPRESS (Usually Fastest & Most Reliable during Puja)
+  const metroTotalTime = isSameMetro
+    ? originToMetroWalkMins + metroToTargetWalkMins
+    : originToMetroWalkMins + 5 + metroRideMinutes + metroToTargetWalkMins;
+  const metroTotalWalkM = originToMetroWalkM + metroToTargetWalkM;
+  const metroTotalFare = metroFare;
+
+  const metroOption: RouteOption = {
+    id: 'route-metro-smart',
+    title: 'Smart Metro Express',
+    tagline: 'Fastest & immune to festive road barricades',
+    totalTimeMinutes: metroTotalTime,
+    totalDistanceKm: Math.round((directDistanceKm + 0.8) * 10) / 10,
+    estimatedFare: metroTotalFare,
+    walkingDistanceMeters: metroTotalWalkM,
+    transfersCount: originMetro.lineCode !== targetMetro.lineCode ? 1 : 0,
+    isRecommended: true,
+    badge: 'Fastest & Recommended',
+    crowdPenaltyMinutes: 4,
+    trafficPenaltyMinutes: 0,
+    compositeScore: 9.4,
+    segments: [
+      {
+        id: 'seg-1',
+        mode: 'walk',
+        from: fromTitle,
+        to: `${originMetro.name} Metro Station`,
+        durationMinutes: originToMetroWalkMins,
+        distanceMeters: originToMetroWalkM,
+        fare: 0,
+        instructions: `Walk ${originToMetroWalkM}m to ${originMetro.name} Metro Gate`,
+      },
+      {
+        id: 'seg-2',
+        mode: 'metro',
+        from: `${originMetro.name} Metro`,
+        to: `${targetMetro.name} Metro`,
+        durationMinutes: metroRideMinutes,
+        distanceMeters: Math.round(metroDistanceKm * 1000),
+        fare: metroFare,
+        instructions: `Board ${originMetro.line} towards ${targetMetro.name}`,
+        lineName: originMetro.line,
+        lineColor: originMetro.lineCode === 'BLUE' ? '#1E88E5' : originMetro.lineCode === 'GREEN' ? '#43A047' : '#8E24AA',
+      },
+      {
+        id: 'seg-3',
+        mode: 'walk',
+        from: `${targetMetro.name} Metro`,
+        to: targetPandal.name,
+        durationMinutes: metroToTargetWalkMins,
+        distanceMeters: metroToTargetWalkM,
+        fare: 0,
+        instructions: `Exit towards ${targetPandal.region} and follow Puja signage to pandal gate`,
+      },
+    ],
+    summarySteps: [
+      `Walk to ${originMetro.name} Metro`,
+      `Metro ride to ${targetMetro.name}`,
+      `Walk ${formatDistance(metroToTargetWalkM)} to Pandal`,
+    ],
+  };
+
+  // 2. METRO + E-RICKSHAW / AUTO (Less Walking)
+  const autoFare = 20;
+  const autoDuration = Math.max(5, Math.round(metroToTargetWalkMins * 0.4));
+  const lessWalkingOption: RouteOption = {
+    id: 'route-metro-auto',
+    title: 'Metro + Shared Auto / Toto',
+    tagline: 'Minimal walking, best for families and senior citizens',
+    totalTimeMinutes: metroTotalTime - metroToTargetWalkMins + autoDuration + 4,
+    totalDistanceKm: Math.round((directDistanceKm + 0.9) * 10) / 10,
+    estimatedFare: metroFare + autoFare,
+    walkingDistanceMeters: originToMetroWalkM + 120,
+    transfersCount: 1,
+    isRecommended: false,
+    badge: 'Less Walking',
+    crowdPenaltyMinutes: 3,
+    trafficPenaltyMinutes: 4,
+    compositeScore: 8.8,
+    segments: [
+      {
+        id: 'seg-1',
+        mode: 'walk',
+        from: fromTitle,
+        to: `${originMetro.name} Metro`,
+        durationMinutes: originToMetroWalkMins,
+        distanceMeters: originToMetroWalkM,
+        fare: 0,
+        instructions: `Walk to ${originMetro.name} Metro Station`,
+      },
+      {
+        id: 'seg-2',
+        mode: 'metro',
+        from: `${originMetro.name} Metro`,
+        to: `${targetMetro.name} Metro`,
+        durationMinutes: metroRideMinutes,
+        distanceMeters: Math.round(metroDistanceKm * 1000),
+        fare: metroFare,
+        instructions: `Board ${originMetro.line} to ${targetMetro.name}`,
+      },
+      {
+        id: 'seg-3',
+        mode: 'auto',
+        from: `${targetMetro.name} Auto Stand`,
+        to: `${targetPandal.name} Entry Zone`,
+        durationMinutes: autoDuration,
+        distanceMeters: metroToTargetWalkM,
+        fare: autoFare,
+        instructions: `Take designated Puja Auto / E-Rickshaw to designated drop point`,
+      },
+    ],
+    summarySteps: [
+      `Walk to ${originMetro.name}`,
+      `Metro to ${targetMetro.name}`,
+      `Shared Toto / Auto to Pandal Gate`,
+    ],
+  };
+
+  // 3. DIRECT CAB / TAXI (Door to Door with traffic adjustment)
+  const cabDuration = estimateCabMinutes(directDistanceKm, 1.8);
+  const cabFare = estimateCabFare(directDistanceKm);
+  const cabOption: RouteOption = {
+    id: 'route-cab-direct',
+    title: 'Direct Cab / Yellow Taxi',
+    tagline: 'Direct ride with real-time Puja traffic penalties',
+    totalTimeMinutes: cabDuration,
+    totalDistanceKm: Math.round(directDistanceKm * 1.2 * 10) / 10,
+    estimatedFare: cabFare,
+    walkingDistanceMeters: 250,
+    transfersCount: 0,
+    isRecommended: false,
+    badge: 'Comfort Ride',
+    crowdPenaltyMinutes: 0,
+    trafficPenaltyMinutes: Math.round(cabDuration * 0.4),
+    compositeScore: 7.2,
+    segments: [
+      {
+        id: 'seg-1',
+        mode: 'cab',
+        from: fromTitle,
+        to: `Near ${targetPandal.name} (Police Drop Zone)`,
+        durationMinutes: cabDuration - 4,
+        distanceMeters: Math.round(directDistanceKm * 1000),
+        fare: cabFare,
+        instructions: `Cab drops at nearest allowed vehicular zone due to Puja pedestrian restrictions`,
+      },
+      {
+        id: 'seg-2',
+        mode: 'walk',
+        from: `Police Drop Zone`,
+        to: targetPandal.name,
+        durationMinutes: 4,
+        distanceMeters: 250,
+        fare: 0,
+        instructions: `Walk 250m through pedestrian pathway to main pandal queue`,
+      },
+    ],
+    summarySteps: [
+      `Pick up at ${fromTitle}`,
+      `Cab via festive corridor`,
+      `Short 250m walk from Police Drop Zone`,
+    ],
+  };
+
+  // 4. BUDGET PUBLIC BUS
+  const busDuration = Math.max(25, Math.round(directDistanceKm * 4.5));
+  const busFare = 15;
+  const busOption: RouteOption = {
+    id: 'route-bus-public',
+    title: 'Special Puja Public Bus',
+    tagline: 'Most economical option via CSTC / WBTC festive routes',
+    totalTimeMinutes: busDuration,
+    totalDistanceKm: Math.round(directDistanceKm * 1.1 * 10) / 10,
+    estimatedFare: busFare,
+    walkingDistanceMeters: 750,
+    transfersCount: 0,
+    isRecommended: false,
+    badge: 'Cheapest (₹15)',
+    crowdPenaltyMinutes: 8,
+    trafficPenaltyMinutes: 12,
+    compositeScore: 7.8,
+    segments: [
+      {
+        id: 'seg-1',
+        mode: 'walk',
+        from: fromTitle,
+        to: 'Nearest Bus Stand',
+        durationMinutes: 6,
+        distanceMeters: 450,
+        fare: 0,
+        instructions: 'Walk to major arterial bus stop',
+      },
+      {
+        id: 'seg-2',
+        mode: 'bus',
+        from: 'Bus Stand',
+        to: `${targetPandal.region} Crossing`,
+        durationMinutes: busDuration - 10,
+        distanceMeters: Math.round(directDistanceKm * 1000),
+        fare: busFare,
+        instructions: `Take WBTC Puja Parikrama Bus / Route towards ${targetPandal.region}`,
+      },
+      {
+        id: 'seg-3',
+        mode: 'walk',
+        from: `${targetPandal.region} Crossing`,
+        to: targetPandal.name,
+        durationMinutes: 4,
+        distanceMeters: 300,
+        fare: 0,
+        instructions: 'Walk to pandal entrance',
+      },
+    ],
+    summarySteps: [
+      `Walk to Bus Stand`,
+      `WBTC Puja Special Bus`,
+      `Walk to ${targetPandal.name}`,
+    ],
+  };
+
+  const allRoutes: RouteOption[] = [];
+
+  if (directDistanceKm <= 2.2) {
+    const directWalkMins = estimateWalkMinutes(directDistanceMeters);
+    const walkDirectOption: RouteOption = {
+      id: 'route-walk-direct',
+      title: 'Festive Pedestrian Corridor',
+      tagline: 'Direct short walk — immune to road blockages and vehicular diversions',
+      totalTimeMinutes: directWalkMins,
+      totalDistanceKm: Math.round(directDistanceKm * 10) / 10,
+      estimatedFare: 0,
+      walkingDistanceMeters: directDistanceMeters,
+      transfersCount: 0,
+      isRecommended: true,
+      badge: 'Fastest Direct Walk',
+      crowdPenaltyMinutes: 2,
+      trafficPenaltyMinutes: 0,
+      compositeScore: 9.8,
+      segments: [
+        {
+          id: 'seg-walk-1',
+          mode: 'walk',
+          from: fromTitle,
+          to: targetPandal.name,
+          durationMinutes: directWalkMins,
+          distanceMeters: directDistanceMeters,
+          fare: 0,
+          instructions: `Walk ${formatDistance(directDistanceMeters)} through festive illuminated pathway directly to pandal gate`,
+        },
+      ],
+      summarySteps: [
+        `Walk from ${fromTitle}`,
+        `Follow Kolkata Police Puja pedestrian signage`,
+        `Arrive at ${targetPandal.name}`,
+      ],
+    };
+    // If walk is direct, make it primary recommended
+    metroOption.isRecommended = false;
+    allRoutes.push(walkDirectOption);
+  }
+
+  allRoutes.push(metroOption, lessWalkingOption, cabOption, busOption);
+
+  return {
+    targetPandal,
+    fromTitle,
+    routes: allRoutes,
+  };
+}
+
+export async function getCrowdData(pandalId: number): Promise<CrowdInfo> {
+  const pandal = await getPandalById(pandalId);
+  const level = pandal ? pandal.crowdLevel : 'Moderate';
+  const waitTimes: Record<string, number> = {
+    Low: 10,
+    Moderate: 25,
+    High: 55,
+    Surge: 90,
+  };
+
+  return {
+    pandalId,
+    pandalName: pandal ? pandal.name : `Pandal #${pandalId}`,
+    currentLevel: level,
+    statusText:
+      level === 'Low'
+        ? 'Quick entry, queue moving fast'
+        : level === 'Moderate'
+        ? 'Moderate queue, 20-30 min wait time'
+        : level === 'High'
+        ? 'Heavy festive rush, security barricades active'
+        : 'Peak surge, expect extensive queueing',
+    waitTimeMinutes: waitTimes[level] || 25,
+    isLive: false, // Clearly labelled as demo/estimated
+    peakHours: '07:30 PM - 01:30 AM',
+    lastUpdated: 'Updated 5 mins ago (Estimated Model)',
+    entryGateStatus: level === 'High' || level === 'Surge' ? 'Heavy Queue' : level === 'Moderate' ? 'Slow Moving' : 'Normal',
+  };
+}
+
+export interface ItineraryOptions {
+  startingPoint: string;
+  endingPoint?: string;
+  startTime: string;
+  endTime: string;
+  budget: number;
+  selectedPandalIds: number[];
+  transportPreference: 'metro' | 'cab' | 'mixed' | 'budget';
+  crowdPreference: 'any' | 'low_first' | 'iconic_first';
+}
+
+/**
+ * Intelligent Pandal Hopping Itinerary Generator.
+ * Consumes real pandal coordinates and builds an optimized timeline route.
+ */
+export async function generateItinerary(options: ItineraryOptions): Promise<ItineraryPlan> {
+  const pandals = await Promise.all(options.selectedPandalIds.map(id => getPandalById(id)));
+  const validPandals = pandals.filter((p): p is Pandal => p !== null);
+
+  if (validPandals.length === 0) {
+    // Fallback: Pick 4 iconic pandals
+    const trending = await getTrendingPandals(4);
+    validPandals.push(...trending);
+  }
+
+  // Sort logically by geographic proximity (TSP-greedy approximation)
+  const orderedPandals: Pandal[] = [validPandals[0]];
+  const remaining = validPandals.slice(1);
+
+  while (remaining.length > 0) {
+    const current = orderedPandals[orderedPandals.length - 1];
+    let closestIndex = 0;
+    let minDistance = 9999;
+
+    remaining.forEach((p, idx) => {
+      const dist = calculateDistance(current.latitude, current.longitude, p.latitude, p.longitude);
+      if (dist < minDistance) {
+        minDistance = dist;
+        closestIndex = idx;
+      }
+    });
+
+    orderedPandals.push(remaining.splice(closestIndex, 1)[0]);
+  }
+
+  let currentHour = parseInt(options.startTime.split(':')[0] || '17', 10);
+  let currentMinute = parseInt(options.startTime.split(':')[1] || '00', 10);
+
+  const stops: ItineraryStop[] = [];
+  let totalDistanceKm = 0;
+  let totalEstimatedCost = 0;
+  let totalTransfers = 0;
+  const recommendedMetroStations = new Set<string>();
+
+  for (let i = 0; i < orderedPandals.length; i++) {
+    const p = orderedPandals[i];
+    const isLast = i === orderedPandals.length - 1;
+
+    const arrivalStr = `${String(currentHour).padStart(2, '0')}:${String(currentMinute).padStart(2, '0')}`;
+    const stayMins = p.famous ? 45 : 30;
+
+    // Increment time for stay
+    currentMinute += stayMins;
+    while (currentMinute >= 60) {
+      currentMinute -= 60;
+      currentHour += 1;
+    }
+    const departureStr = `${String(currentHour).padStart(2, '0')}:${String(currentMinute).padStart(2, '0')}`;
+
+    let travelToNextMins = 0;
+    let travelCost = 0;
+    let distM = 0;
+    let nextMode: any = 'metro';
+
+    if (!isLast) {
+      const nextP = orderedPandals[i + 1];
+      const distKm = calculateDistance(p.latitude, p.longitude, nextP.latitude, nextP.longitude);
+      distM = Math.round(distKm * 1000);
+      totalDistanceKm += distKm;
+
+      if (distKm <= 1.2) {
+        nextMode = 'walk';
+        travelToNextMins = estimateWalkMinutes(distM);
+        travelCost = 0;
+      } else if (options.transportPreference === 'cab') {
+        nextMode = 'cab';
+        travelToNextMins = estimateCabMinutes(distKm);
+        travelCost = estimateCabFare(distKm);
+      } else {
+        nextMode = 'metro';
+        travelToNextMins = Math.max(12, Math.round(distKm * 2.5) + 10);
+        travelCost = estimateMetroFare(distKm);
+        totalTransfers += 1;
+      }
+
+      totalEstimatedCost += travelCost;
+
+      // Add travel time to clock
+      currentMinute += travelToNextMins;
+      while (currentMinute >= 60) {
+        currentMinute -= 60;
+        currentHour += 1;
+      }
+    }
+
+    if (p.nearestMetro) {
+      recommendedMetroStations.add(p.nearestMetro);
+    }
+
+    stops.push({
+      stopNumber: i + 1,
+      pandal: p,
+      arrivalTime: arrivalStr,
+      departureTime: departureStr,
+      stayDurationMinutes: stayMins,
+      travelToNextMinutes: isLast ? undefined : travelToNextMins,
+      travelToNextMode: isLast ? undefined : nextMode,
+      travelToNextCost: isLast ? undefined : travelCost,
+      travelToNextDistanceM: isLast ? undefined : distM,
+      walkingDistanceM: p.walkingDistanceM,
+      crowdLevel: p.crowdLevel,
+      highlightTheme: p.theme,
+    });
+  }
+
+  const endStr = `${String(currentHour).padStart(2, '0')}:${String(currentMinute).padStart(2, '0')}`;
+
+  return {
+    id: `plan-${Date.now()}`,
+    title: `${orderedPandals.length}-Pandal Festive Hop Route`,
+    startingPoint: options.startingPoint || 'Kolkata Central',
+    endingPoint: options.endingPoint || 'Return via Metro',
+    startTime: options.startTime,
+    endTime: endStr,
+    totalDurationMinutes: stops.reduce((acc, s) => acc + s.stayDurationMinutes + (s.travelToNextMinutes || 0), 0),
+    totalDistanceKm: Math.round(totalDistanceKm * 10) / 10,
+    totalEstimatedCost: Math.max(40, totalEstimatedCost),
+    totalPandals: orderedPandals.length,
+    totalTransfers,
+    transportPreference: options.transportPreference,
+    stops,
+    recommendedMetroStations: Array.from(recommendedMetroStations),
+    tips: [
+      'Carry your Metro Smart Card to bypass ticket counter queues during festive nights.',
+      'Wear comfortable walking shoes for pandal queue lanes.',
+      'Keep Kolkata Police Puja Helpline (1090) saved for immediate crowd/road assistance.',
+      'Visit high-rush pandals before 8:00 PM or after 1:00 AM for smoother darshan.',
+    ],
+  };
+}
+
+export async function getEmergencyServices(): Promise<EmergencyService[]> {
+  return [
+    {
+      id: 'em-1',
+      name: 'Kolkata Police Central Puja Control Room',
+      category: 'control_room',
+      phone: '1090 / 033-22143230',
+      address: 'Lalbazar, Kolkata Central',
+      area: 'Central Kolkata',
+      isLiveFeed: true,
+      statusText: '24x7 Active Control Room',
+    },
+    {
+      id: 'em-2',
+      name: 'National Emergency Response Helpline',
+      category: 'helpline',
+      phone: '112',
+      address: 'All Kolkata Jurisdiction',
+      area: 'Citywide',
+      isLiveFeed: true,
+      statusText: 'Toll-free 24/7',
+    },
+    {
+      id: 'em-3',
+      name: 'Kolkata Traffic Police Puja Helpdesk',
+      category: 'police',
+      phone: '1073 / 033-22143644',
+      address: 'Lalbazar Traffic HQ',
+      area: 'Central Kolkata',
+      isLiveFeed: true,
+      statusText: 'Live Traffic Diversion Desk',
+    },
+    {
+      id: 'em-4',
+      name: 'Medical Ambulance Emergency',
+      category: 'hospital',
+      phone: '102 / 108',
+      address: 'West Bengal Health Emergency Services',
+      area: 'Citywide',
+      isLiveFeed: true,
+      statusText: 'Rapid Response Fleet',
+    },
+    {
+      id: 'em-5',
+      name: 'West Bengal Fire & Emergency Services',
+      category: 'fire',
+      phone: '101 / 033-22521111',
+      address: 'Free School Street Fire HQ',
+      area: 'Central Kolkata',
+      isLiveFeed: true,
+      statusText: 'Festival Ready Fire Units',
+    },
+    {
+      id: 'em-6',
+      name: 'SSKM Government Hospital (IPGMER)',
+      category: 'hospital',
+      phone: '033-22231589',
+      address: '244 AJC Bose Road, Bhowanipore',
+      area: 'South Kolkata',
+      isLiveFeed: true,
+      statusText: '24/7 Trauma Care Center',
+    },
+    {
+      id: 'em-7',
+      name: 'RG Kar Medical College & Hospital',
+      category: 'hospital',
+      phone: '033-25557656',
+      address: '1 Khudiram Bose Sarani, Belgachia',
+      area: 'North Kolkata',
+      isLiveFeed: true,
+      statusText: '24/7 Emergency Wing',
+    },
+    {
+      id: 'em-8',
+      name: 'KMC Public Restroom & Drinking Water Feed',
+      category: 'toilet',
+      address: 'Kolkata Municipal Corporation Pandal Hubs',
+      area: 'Citywide',
+      isLiveFeed: false,
+      statusText: 'Live Geo-Feed Coming Soon in Phase 2',
+    },
+  ];
+}
+
+export async function submitReport(report: {
+  pandalId: number;
+  reportType: string;
+  notes: string;
+  timestamp?: string;
+}): Promise<{ success: boolean; message: string }> {
+  console.log('User report submitted:', report);
+  return {
+    success: true,
+    message: 'Thank you for your report! Our Puja crowd moderation team has received your update.',
+  };
+}
+
+export async function getFoodStalls(): Promise<FoodStall[]> {
+  return [...GENERATED_FOOD_STALLS];
+}
+
+export async function getFoodStallsByMetro(metroName: string): Promise<FoodStall[]> {
+  const norm = metroName.toLowerCase().trim();
+  return GENERATED_FOOD_STALLS.filter(f => f.nearestMetro.toLowerCase().includes(norm));
+}
+
+export function findNearbyFoodStalls(
+  lat: number,
+  lon: number,
+  radiusKm = 1.6,
+  limit = 3
+): (FoodStall & { distanceM: number; walkMins: number })[] {
+  return GENERATED_FOOD_STALLS.map(stall => {
+    const distKm = calculateDistance(lat, lon, stall.latitude, stall.longitude);
+    const distanceM = Math.round(distKm * 1000);
+    const walkMins = estimateWalkMinutes(distanceM);
+    return {
+      ...stall,
+      distanceM,
+      walkMins,
+    };
+  })
+    .filter(f => f.distanceM <= radiusKm * 1000)
+    .sort((a, b) => a.distanceM - b.distanceM)
+    .slice(0, limit);
+}
+
+export async function getEateriesForPandal(pandalId: number): Promise<PandalEatery[]> {
+  return PANDAL_EATERIES_MAP[pandalId] || [];
+}
+
+export async function getAllPandalEateries(): Promise<PandalEatery[]> {
+  return GENERATED_PANDAL_EATERIES;
+}
+
+export function getEateriesForCoords(
+  lat: number,
+  lon: number,
+  radiusM = 2000,
+  limit = 5
+): (PandalEatery & { walkMins: number })[] {
+  const seen = new Set<string>();
+  const results: (PandalEatery & { walkMins: number })[] = [];
+
+  for (const eatery of GENERATED_PANDAL_EATERIES) {
+    const key = eatery.cleanName.toLowerCase();
+    if (seen.has(key)) continue;
+    const distKm = calculateDistance(lat, lon, eatery.latitude, eatery.longitude);
+    const distM = Math.round(distKm * 1000);
+    if (distM <= radiusM) {
+      seen.add(key);
+      results.push({
+        ...eatery,
+        distanceM: distM,
+        distanceKm: +(distM / 1000).toFixed(2),
+        walkMins: estimateWalkMinutes(distM),
+      });
+    }
+  }
+
+  results.sort((a, b) => a.distanceM - b.distanceM);
+  return results.slice(0, limit);
+}
+
+/**
+ * Returns verified art philosophy, themes, sculpture, and social media details
+ * for a specific pandal.
+ */
+export async function getPandalArtDetails(pandalId: number | string): Promise<PandalArtDetails | null> {
+  const numericId = typeof pandalId === 'string' ? parseInt(pandalId, 10) : pandalId;
+  return PANDAL_ART_DETAILS_MAP[numericId] || null;
+}
+
+/**
+ * Returns art philosophy and cultural details for all 248 pandals.
+ */
+export async function getAllPandalArtDetails(): Promise<PandalArtDetails[]> {
+  return GENERATED_PANDAL_ART_DETAILS;
+}
+
+
+

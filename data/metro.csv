@@ -1,0 +1,46 @@
+station_id,name,bengali_name,line,line_code,latitude,longitude,is_interchange,interchange_lines,opens_at,closes_at
+1,Dakshineswar,দক্ষিণেশ্বর,Blue Line (North-South),BLUE,22.653900,88.364800,false,,06:30 AM,10:30 PM
+2,Baranagar,বরানগর,Blue Line (North-South),BLUE,22.641700,88.375200,false,,06:30 AM,10:30 PM
+3,Noapara,নোয়াপাড়া,Blue Line (North-South),BLUE,22.637500,88.384700,false,,06:30 AM,10:30 PM
+4,Dum Dum,দমদম,Blue Line (North-South),BLUE,22.622500,88.378300,true,Eastern Railway,06:30 AM,11:00 PM
+5,Belgachia,বেলগাছিয়া,Blue Line (North-South),BLUE,22.606200,88.380400,false,,06:30 AM,10:45 PM
+6,Shyambazar,শ্যামবাজার,Blue Line (North-South),BLUE,22.600800,88.370500,false,,06:30 AM,11:00 PM
+7,Shobhabazar Sutanuti,শোভাবাজার সুতানুটি,Blue Line (North-South),BLUE,22.595600,88.362100,false,,06:30 AM,11:00 PM
+8,Girish Park,গিরিশ পার্ক,Blue Line (North-South),BLUE,22.585500,88.359800,false,,06:30 AM,11:00 PM
+9,Mahatma Gandhi Road,মহাত্মা গান্ধী রোড,Blue Line (North-South),BLUE,22.580400,88.358900,false,,06:30 AM,11:00 PM
+10,Central,সেন্ট্রাল,Blue Line (North-South),BLUE,22.568400,88.357400,false,,06:30 AM,11:00 PM
+11,Chandni Chowk,চাঁদনী চক,Blue Line (North-South),BLUE,22.563800,88.354700,false,,06:30 AM,11:00 PM
+12,Esplanade,এসপ্ল্যানেড,Blue Line (North-South),BLUE,22.564900,88.351700,true,Green Line / Purple Line,06:30 AM,11:30 PM
+13,Park Street,পার্ক স্ট্রিট,Blue Line (North-South),BLUE,22.553900,88.351900,false,,06:30 AM,11:30 PM
+14,Maidan,ময়দান,Blue Line (North-South),BLUE,22.545100,88.349600,false,,06:30 AM,11:00 PM
+15,Rabindra Sadan,রবীন্দ্র সদন,Blue Line (North-South),BLUE,22.539100,88.347500,false,,06:30 AM,11:30 PM
+16,Netaji Bhavan,নেতাজি ভবন,Blue Line (North-South),BLUE,22.533200,88.346800,false,,06:30 AM,11:00 PM
+17,Jatin Das Park,যতীন দাস পার্ক,Blue Line (North-South),BLUE,22.526200,88.346200,false,,06:30 AM,11:00 PM
+18,Kalighat,কালীঘাট,Blue Line (North-South),BLUE,22.520800,88.345800,false,,06:30 AM,11:30 PM
+19,Rabindra Sarobar,রবীন্দ্র সরোবর,Blue Line (North-South),BLUE,22.510600,88.346300,true,Eastern Railway,06:30 AM,11:00 PM
+20,Mahanayak Uttam Kumar,মহানায়ক উত্তম কুমার,Blue Line (North-South),BLUE,22.496500,88.346500,false,,06:30 AM,11:00 PM
+21,Netaji,নেতাজি,Blue Line (North-South),BLUE,22.483100,88.347100,false,,06:30 AM,10:45 PM
+22,Masterda Surya Sen,মাস্টারদা সূর্য সেন,Blue Line (North-South),BLUE,22.470500,88.351400,false,,06:30 AM,10:45 PM
+23,Gitanjali,গীতাঞ্জলি,Blue Line (North-South),BLUE,22.461900,88.359900,false,,06:30 AM,10:45 PM
+24,Kavi Nazrul,কবি নজরুল,Blue Line (North-South),BLUE,22.451900,88.371200,false,,06:30 AM,10:45 PM
+25,Shahid Khudiram,শহীদ ক্ষুদিরাম,Blue Line (North-South),BLUE,22.443900,88.384200,false,,06:30 AM,10:45 PM
+26,Kavi Subhash,কবি সুভাষ,Blue Line (North-South),BLUE,22.441100,88.396200,true,Orange Line / Eastern Railway,06:30 AM,11:00 PM
+27,Salt Lake Sector V,সল্টলেক সেক্টর ফাইভ,Green Line (East-West),GREEN,22.581500,88.432600,true,Orange Line,06:30 AM,10:30 PM
+28,Karunamoyee,করুণাময়ী,Green Line (East-West),GREEN,22.586700,88.418500,false,,06:30 AM,10:30 PM
+29,Central Park,সেন্ট্রাল পার্ক,Green Line (East-West),GREEN,22.589100,88.412400,false,,06:30 AM,10:30 PM
+30,City Centre,সিটি সেন্টার,Green Line (East-West),GREEN,22.589200,88.408900,false,,06:30 AM,10:30 PM
+31,Bengal Chemical,বেঙ্গল কেমিক্যাল,Green Line (East-West),GREEN,22.576800,88.401200,false,,06:30 AM,10:30 PM
+32,Stadium,স্টেডিয়াম,Green Line (East-West),GREEN,22.571400,88.404800,false,,06:30 AM,10:30 PM
+33,Phoolbagan,ফুলবাগান,Green Line (East-West),GREEN,22.569400,88.390200,false,,06:30 AM,10:30 PM
+34,Sealdah,শিয়ালদহ,Green Line (East-West),GREEN,22.567000,88.371000,true,Eastern Railway,06:30 AM,11:00 PM
+35,Howrah,হাওড়া,Green Line (East-West),GREEN,22.584100,88.341800,true,Howrah Railway Division,06:30 AM,11:00 PM
+36,Howrah Maidan,হাওড়া ময়দান,Green Line (East-West),GREEN,22.586200,88.330800,false,,06:30 AM,10:30 PM
+37,Joka,জোকা,Purple Line,PURPLE,22.435400,88.307200,false,,07:00 AM,09:30 PM
+38,Thakurpukur,ঠাকুরপুকুর,Purple Line,PURPLE,22.451200,88.306100,false,,07:00 AM,09:30 PM
+39,Sakherbazar,সখেরবাজার,Purple Line,PURPLE,22.468200,88.308900,false,,07:00 AM,09:30 PM
+40,Behala Chowrasta,বেহালা চৌরাস্তা,Purple Line,PURPLE,22.484200,88.311500,false,,07:00 AM,10:00 PM
+41,Behala Bazar,বেহালা বাজার,Purple Line,PURPLE,22.495200,88.318400,false,,07:00 AM,10:00 PM
+42,Taratala,তারাতলা,Purple Line,PURPLE,22.507400,88.321600,false,,07:00 AM,10:00 PM
+43,Majerhat,মাঝেরহাট,Purple Line,PURPLE,22.517500,88.324000,true,Eastern Railway (Majerhat),07:00 AM,10:00 PM
+44,Ruby Hospital (Hemanta Mukhopadhyay),হেমন্ত মুখোপাধ্যায় (রুবি),Orange Line,ORANGE,22.513400,88.401100,false,,07:00 AM,09:30 PM
+45,VIP Bazar,ভিআইপি বাজার,Orange Line,ORANGE,22.527600,88.401500,false,,07:00 AM,09:30 PM

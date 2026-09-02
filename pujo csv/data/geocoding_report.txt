@@ -1,0 +1,23 @@
+==================================================
+PUJAPATH PANDAL LOCATION PIPELINE DATA REPORT
+==================================================
+
+Total pandals: 248
+Successful geocoding: 248
+Existing coordinates: 0
+Not found: 0
+Errors: 0
+Needs review: 0
+Valid coordinates: 248
+Invalid coordinates: 0
+Missing addresses: 0
+Duplicate IDs: 0
+Duplicate/suspicious names: 0
+
+==================================================
+FILE ARTIFACTS GENERATED:
+- Geocoded CSV: data/kolkata_durga_puja_pandals_geocoded.csv
+- Needs Review CSV: data/kolkata_pandals_needs_review.csv
+- Duplicates Audit: data/pandal_duplicates.csv
+- PostgreSQL Ready CSV: data/pandals_postgresql_ready.csv
+==================================================
