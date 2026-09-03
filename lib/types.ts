@@ -57,6 +57,8 @@ export interface BusRoute {
   listedStopCount: number;
   pandalIds: number[];
   matchedBusStops: string[];
+  famousPandalCount?: number;
+  isHotRoute?: boolean;
 }
 
 export interface BusStop {

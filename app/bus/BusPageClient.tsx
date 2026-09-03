@@ -34,7 +34,9 @@ export default function BusPageClient({
   initialStopName,
 }: BusPageClientProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [operatorFilter, setOperatorFilter] = useState<'ALL' | 'AC' | 'WBTC' | 'PRIVATE' | 'MINI'>('ALL');
+  const [operatorFilter, setOperatorFilter] = useState<'ALL' | 'HOT' | 'AC' | 'WBTC' | 'PRIVATE' | 'MINI'>('ALL');
+  const [sortBy, setSortBy] = useState<'HOT' | 'TOTAL' | 'NUMBER'>('HOT');
+  const [showIconicOnly, setShowIconicOnly] = useState(false);
   const [activeTab, setActiveTab] = useState<'routes' | 'stops' | 'map'>('routes');
 
   // Selected bus state
@@ -43,7 +45,7 @@ export default function BusPageClient({
       const found = busRoutes.find(b => b.busNumber.toLowerCase() === initialBusNumber.toLowerCase());
       if (found) return found.busNumber;
     }
-    return busRoutes[0]?.busNumber || '30A';
+    return busRoutes[0]?.busNumber || '47B';
   });
 
   // Selected stop state
@@ -63,9 +65,20 @@ export default function BusPageClient({
   const [mobileRouteView, setMobileRouteView] = useState<'list' | 'detail'>('detail');
   const [mobileStopView, setMobileStopView] = useState<'list' | 'detail'>('detail');
 
+  // Top Hot Bus lines (ranked by iconic pandal count)
+  const hotBuses = useMemo(() => {
+    return [...busRoutes]
+      .filter(r => (r.famousPandalCount || 0) > 0)
+      .sort((a, b) => (b.famousPandalCount || 0) - (a.famousPandalCount || 0) || b.pandalIds.length - a.pandalIds.length)
+      .slice(0, 12);
+  }, [busRoutes]);
+
   // Filtered bus routes
   const filteredRoutes = useMemo(() => {
-    return busRoutes.filter(route => {
+    const list = busRoutes.filter(route => {
+      // Hot routes filter (buses with 8+ iconic pujas)
+      if (operatorFilter === 'HOT' && !route.isHotRoute && (route.famousPandalCount || 0) < 8) return false;
+
       // Operator / AC filter
       if (operatorFilter === 'AC' && !route.isAc) return false;
       if (operatorFilter === 'WBTC' && !route.operatorType.toUpperCase().includes('WBTC')) return false;
@@ -83,7 +96,18 @@ export default function BusPageClient({
         route.matchedBusStops.some(s => s.toLowerCase().includes(q))
       );
     });
-  }, [busRoutes, operatorFilter, searchQuery]);
+
+    // Sort order
+    if (sortBy === 'HOT') {
+      list.sort((a, b) => (b.famousPandalCount || 0) - (a.famousPandalCount || 0) || b.pandalIds.length - a.pandalIds.length);
+    } else if (sortBy === 'TOTAL') {
+      list.sort((a, b) => b.pandalIds.length - a.pandalIds.length);
+    } else if (sortBy === 'NUMBER') {
+      list.sort((a, b) => a.busNumber.localeCompare(b.busNumber, undefined, { numeric: true }));
+    }
+
+    return list;
+  }, [busRoutes, operatorFilter, searchQuery, sortBy]);
 
   // Selected route object
   const activeRoute = useMemo(() => {
@@ -96,6 +120,14 @@ export default function BusPageClient({
     const pandalIdSet = new Set(activeRoute.pandalIds);
     return pandals.filter(p => pandalIdSet.has(p.id));
   }, [activeRoute, pandals]);
+
+  // Filtered displayed pandals (Iconic only or all)
+  const displayedPandals = useMemo(() => {
+    if (showIconicOnly) {
+      return activeRoutePandals.filter(p => p.famous);
+    }
+    return activeRoutePandals;
+  }, [activeRoutePandals, showIconicOnly]);
 
   // Filtered stops
   const filteredStops = useMemo(() => {
@@ -230,6 +262,10 @@ export default function BusPageClient({
               <div style={{ fontSize: '0.74rem', color: 'var(--stone)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Bus Routes</div>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.06)', padding: '12px 16px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#FF7043' }}>🔥 {hotBuses.length}+</div>
+              <div style={{ fontSize: '0.74rem', color: 'var(--stone)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Hot Hop Lines</div>
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.06)', padding: '12px 16px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)' }}>
               <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#81C784' }}>54</div>
               <div style={{ fontSize: '0.74rem', color: 'var(--stone)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Bus Stop Hubs</div>
             </div>
@@ -237,10 +273,122 @@ export default function BusPageClient({
               <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#FFB74D' }}>248</div>
               <div style={{ fontSize: '0.74rem', color: 'var(--stone)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pandals Connected</div>
             </div>
-            <div style={{ background: 'rgba(255,255,255,0.06)', padding: '12px 16px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#64B5F6' }}>₹10 – ₹25</div>
-              <div style={{ fontSize: '0.74rem', color: 'var(--stone)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Affordable Fares</div>
+          </div>
+        </div>
+      </section>
+
+      {/* 1.5. HOT BUS ROUTES SHOWCASE TRACK */}
+      <section className="container" style={{ marginTop: '24px' }}>
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #FFFDF9 0%, #FFF8F5 100%)',
+            border: '1px solid rgba(212, 183, 122, 0.45)',
+            borderRadius: '10px',
+            padding: '20px 22px',
+            boxShadow: '0 4px 18px rgba(179, 38, 30, 0.05)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ background: '#FFF3E0', color: '#D84315', padding: '6px 10px', borderRadius: '8px', fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                🔥
+              </div>
+              <div>
+                <h2 style={{ fontSize: '1.05rem', fontWeight: 800, margin: 0, color: 'var(--foreground)' }}>
+                  Hot Bus Routes • Top Iconic Durga Puja Hopping Lines
+                </h2>
+                <p style={{ fontSize: '0.78rem', color: 'var(--taupe)', margin: '2px 0 0' }}>
+                  Routes connecting the highest density of famous, award-winning pandals. Tap any line to inspect route stops & puja pandals.
+                </p>
+              </div>
             </div>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setOperatorFilter(operatorFilter === 'HOT' ? 'ALL' : 'HOT');
+                  setActiveTab('routes');
+                }}
+                style={{
+                  background: operatorFilter === 'HOT' ? '#B3261E' : '#FFF',
+                  color: operatorFilter === 'HOT' ? '#FFF' : '#B3261E',
+                  border: '1.5px solid #B3261E',
+                  borderRadius: '20px',
+                  padding: '6px 14px',
+                  fontSize: '0.76rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <span>{operatorFilter === 'HOT' ? 'Showing Hot Routes ✓' : 'Filter All Hot Buses (8+ Iconic)'}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Horizontal Scroll Track of Top Hot Buses */}
+          <div
+            className="touch-scroll-track"
+            style={{
+              display: 'flex',
+              gap: '12px',
+              overflowX: 'auto',
+              paddingBottom: '6px',
+              paddingTop: '2px',
+            }}
+          >
+            {hotBuses.map((route, idx) => {
+              const isSelected = activeRoute?.busNumber === route.busNumber && activeTab === 'routes';
+              const rankIcons = ['🥇', '🥈', '🥉'];
+              const rankBadge = idx < 3 ? rankIcons[idx] : `#${idx + 1}`;
+              return (
+                <button
+                  key={route.busNumber}
+                  type="button"
+                  onClick={() => {
+                    setSelectedBusNumber(route.busNumber);
+                    setActiveTab('routes');
+                    setMobileRouteView('detail');
+                  }}
+                  style={{
+                    flex: '0 0 auto',
+                    width: '215px',
+                    background: isSelected ? '#FDF3F2' : '#FFF',
+                    border: isSelected ? '1.5px solid #B3261E' : '1px solid var(--border)',
+                    borderRadius: '8px',
+                    padding: '12px 14px',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    boxShadow: isSelected ? '0 4px 12px rgba(179,38,30,0.15)' : '0 1px 4px rgba(0,0,0,0.03)',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ fontSize: '0.9rem' }}>{rankBadge}</span>
+                      <span style={{ fontWeight: 800, fontSize: '0.94rem', color: isSelected ? '#B3261E' : 'var(--foreground)' }}>
+                        Bus {route.busNumber}
+                      </span>
+                    </div>
+                    {route.isAc && (
+                      <span style={{ fontSize: '0.62rem', background: '#E0F2FE', color: '#0284C7', padding: '1px 5px', borderRadius: '3px', fontWeight: 700 }}>
+                        AC
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#FFF3E0', color: '#D84315', padding: '2px 7px', borderRadius: '12px', fontSize: '0.72rem', fontWeight: 700, marginBottom: '6px' }}>
+                    <span>🔥 {route.famousPandalCount || 0} Iconic</span>
+                    <span style={{ color: '#777', fontWeight: 500 }}>• {route.pandalIds.length} total</span>
+                  </div>
+                  <div style={{ fontSize: '0.73rem', color: 'var(--taupe)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {route.origin} ➔ {route.destination}
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -267,7 +415,7 @@ export default function BusPageClient({
               </span>
               <input
                 type="text"
-                placeholder="Search bus number (e.g. 30A, 47B, AC54) or stop (Shyambazar, Esplanade)..."
+                placeholder="Search bus number (e.g. 47B, 234/1, 21/1, AC54) or stop (Shyambazar, Esplanade)..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 style={{
@@ -337,34 +485,67 @@ export default function BusPageClient({
             </div>
           </div>
 
-          {/* Filter Pills for Route Tab */}
+          {/* Filter Pills & Sort for Route Tab */}
           {activeTab === 'routes' && (
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center', fontSize: '0.78rem' }}>
-              <span style={{ color: 'var(--taupe)', fontWeight: 600, marginRight: '4px' }}>Filter:</span>
-              {[
-                { label: 'All Buses', val: 'ALL' },
-                { label: '❄️ AC Buses Only', val: 'AC' },
-                { label: 'WBTC (Govt)', val: 'WBTC' },
-                { label: 'Private Standard', val: 'PRIVATE' },
-                { label: 'Private Mini', val: 'MINI' },
-              ].map(f => (
-                <button
-                  key={f.val}
-                  type="button"
-                  onClick={() => setOperatorFilter(f.val as any)}
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.78rem' }}>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                <span style={{ color: 'var(--taupe)', fontWeight: 600, marginRight: '4px' }}>Filter:</span>
+                {[
+                  { label: '🔥 Hot Buses Only', val: 'HOT' },
+                  { label: 'All Buses', val: 'ALL' },
+                  { label: '❄️ AC Buses Only', val: 'AC' },
+                  { label: 'WBTC (Govt)', val: 'WBTC' },
+                  { label: 'Private Standard', val: 'PRIVATE' },
+                  { label: 'Private Mini', val: 'MINI' },
+                ].map(f => (
+                  <button
+                    key={f.val}
+                    type="button"
+                    onClick={() => setOperatorFilter(f.val as any)}
+                    style={{
+                      padding: '4px 11px',
+                      borderRadius: '16px',
+                      border: operatorFilter === f.val 
+                        ? f.val === 'HOT' ? '1.5px solid #B3261E' : '1px solid #1B5E20' 
+                        : '1px solid var(--border)',
+                      background: operatorFilter === f.val 
+                        ? f.val === 'HOT' ? '#B3261E' : '#E8F5E9' 
+                        : '#FFF',
+                      color: operatorFilter === f.val 
+                        ? f.val === 'HOT' ? '#FFF' : '#1B5E20' 
+                        : 'var(--foreground)',
+                      fontWeight: operatorFilter === f.val ? 700 : 500,
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Sort selector */}
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ color: 'var(--taupe)', fontWeight: 600 }}>Sort by:</span>
+                <select
+                  value={sortBy}
+                  onChange={e => setSortBy(e.target.value as any)}
                   style={{
-                    padding: '4px 10px',
-                    borderRadius: '16px',
-                    border: operatorFilter === f.val ? '1px solid #1B5E20' : '1px solid var(--border)',
-                    background: operatorFilter === f.val ? '#E8F5E9' : '#FFF',
-                    color: operatorFilter === f.val ? '#1B5E20' : 'var(--foreground)',
-                    fontWeight: operatorFilter === f.val ? 700 : 500,
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    border: '1px solid var(--border)',
+                    background: '#FFF',
+                    fontSize: '0.78rem',
+                    fontWeight: 600,
+                    color: 'var(--foreground)',
                     cursor: 'pointer',
                   }}
                 >
-                  {f.label}
-                </button>
-              ))}
+                  <option value="HOT">🔥 Most Iconic Pujas First</option>
+                  <option value="TOTAL">Most Total Pandals</option>
+                  <option value="NUMBER">Bus Number (A-Z)</option>
+                </select>
+              </div>
             </div>
           )}
         </div>
@@ -441,7 +622,12 @@ export default function BusPageClient({
                         >
                           Bus {route.busNumber}
                         </span>
-                        <div style={{ display: 'flex', gap: '4px' }}>
+                        <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                          {(route.famousPandalCount || 0) > 0 && (
+                            <span style={{ fontSize: '0.66rem', background: '#FFF3E0', color: '#D84315', padding: '1px 5px', borderRadius: '3px', fontWeight: 700 }}>
+                              🔥 {route.famousPandalCount}
+                            </span>
+                          )}
                           {route.isAc && (
                             <span style={{ fontSize: '0.66rem', background: '#E0F2FE', color: '#0284C7', padding: '1px 5px', borderRadius: '3px', fontWeight: 700 }}>
                               AC
@@ -491,7 +677,7 @@ export default function BusPageClient({
                   >
                     {filteredRoutes.map(r => (
                       <option key={r.busNumber} value={r.busNumber}>
-                        Bus {r.busNumber} ({r.origin} ➔ {r.destination}) • {r.pandalIds.length} pujas
+                        Bus {r.busNumber} {(r.famousPandalCount || 0) > 0 ? `• 🔥 ${r.famousPandalCount} Iconic ` : ''}({r.origin} ➔ {r.destination}) • {r.pandalIds.length} pujas
                       </option>
                     ))}
                   </select>
@@ -531,6 +717,11 @@ export default function BusPageClient({
                             ❄️ Air Conditioned
                           </span>
                         )}
+                        {(activeRoute.famousPandalCount || 0) >= 8 && (
+                          <span className="badge" style={{ background: '#FFF3E0', color: '#D84315', border: '1px solid #FFE0B2', fontWeight: 700 }}>
+                            🔥 Hot Route
+                          </span>
+                        )}
                       </div>
 
                       <h2 style={{ fontSize: '1.35rem', margin: '4px 0', fontFamily: 'var(--font-serif)' }}>
@@ -538,12 +729,24 @@ export default function BusPageClient({
                       </h2>
                     </div>
 
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#1B5E20' }}>
-                        {activeRoutePandals.length} Pandals
-                      </div>
-                      <div style={{ fontSize: '0.74rem', color: 'var(--taupe)', textTransform: 'uppercase' }}>
-                        Directly Reachable
+                    <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                      {(activeRoute.famousPandalCount || 0) > 0 && (
+                        <div style={{ textAlign: 'right' }}>
+                          <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#D84315', display: 'flex', alignItems: 'center', gap: '3px', justifyContent: 'flex-end' }}>
+                            <span>🔥</span> {activeRoute.famousPandalCount}
+                          </div>
+                          <div style={{ fontSize: '0.7rem', color: '#D84315', textTransform: 'uppercase', fontWeight: 700 }}>
+                            Iconic Pujas
+                          </div>
+                        </div>
+                      )}
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1B5E20' }}>
+                          {activeRoutePandals.length}
+                        </div>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--taupe)', textTransform: 'uppercase', fontWeight: 600 }}>
+                          Total Pandals
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -579,21 +782,92 @@ export default function BusPageClient({
 
                 {/* Accessible Pandals Grid */}
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                    <h3 style={{ fontSize: '1.15rem', margin: 0, fontWeight: 700 }}>
-                      Pandals along Bus {activeRoute.busNumber} ({activeRoutePandals.length})
-                    </h3>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', marginBottom: '16px' }}>
+                    <div>
+                      <h3 style={{ fontSize: '1.15rem', margin: 0, fontWeight: 700 }}>
+                        Pandals along Bus {activeRoute.busNumber} ({displayedPandals.length})
+                      </h3>
+                      {showIconicOnly && (
+                        <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: '#D84315', fontWeight: 600 }}>
+                          Showing only iconic, award-winning Kolkata Durga Pujas on this bus corridor.
+                        </p>
+                      )}
+                    </div>
+
+                    {(activeRoute.famousPandalCount || 0) > 0 && (
+                      <div style={{ display: 'flex', gap: '6px', background: 'var(--background)', padding: '3px', borderRadius: '6px', border: '1px solid var(--border-subtle)' }}>
+                        <button
+                          type="button"
+                          onClick={() => setShowIconicOnly(false)}
+                          style={{
+                            padding: '5px 10px',
+                            borderRadius: '4px',
+                            border: 'none',
+                            fontSize: '0.74rem',
+                            fontWeight: !showIconicOnly ? 700 : 500,
+                            background: !showIconicOnly ? '#FFF' : 'transparent',
+                            color: !showIconicOnly ? '#1B5E20' : 'var(--taupe)',
+                            boxShadow: !showIconicOnly ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          All Pandals ({activeRoutePandals.length})
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setShowIconicOnly(true)}
+                          style={{
+                            padding: '5px 10px',
+                            borderRadius: '4px',
+                            border: 'none',
+                            fontSize: '0.74rem',
+                            fontWeight: showIconicOnly ? 700 : 500,
+                            background: showIconicOnly ? '#FFF3E0' : 'transparent',
+                            color: showIconicOnly ? '#D84315' : 'var(--taupe)',
+                            boxShadow: showIconicOnly ? '0 1px 3px rgba(216,67,21,0.15)' : 'none',
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                          }}
+                        >
+                          <span>🔥 Iconic Only ({activeRoute.famousPandalCount})</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
-                    {activeRoutePandals.map(pandal => (
+                    {displayedPandals.map(pandal => (
                       <PandalCard key={pandal.id} pandal={pandal} />
                     ))}
                   </div>
 
-                  {activeRoutePandals.length === 0 && (
+                  {displayedPandals.length === 0 && (
                     <div style={{ padding: '32px', textAlign: 'center', background: '#FFF', borderRadius: '8px', border: '1px solid var(--border)', color: 'var(--taupe)' }}>
-                      No pandal records directly mapped to this specific bus corridor.
+                      {showIconicOnly ? (
+                        <div>
+                          <p style={{ margin: '0 0 10px', fontSize: '0.9rem' }}>No iconic pandals specifically tagged on this corridor.</p>
+                          <button
+                            type="button"
+                            onClick={() => setShowIconicOnly(false)}
+                            style={{
+                              padding: '6px 14px',
+                              background: '#1B5E20',
+                              color: '#FFF',
+                              borderRadius: '4px',
+                              border: 'none',
+                              fontSize: '0.8rem',
+                              fontWeight: 700,
+                              cursor: 'pointer',
+                            }}
+                          >
+                            Show All {activeRoutePandals.length} Pandals
+                          </button>
+                        </div>
+                      ) : (
+                        'No pandal records directly mapped to this specific bus corridor.'
+                      )}
                     </div>
                   )}
                 </div>

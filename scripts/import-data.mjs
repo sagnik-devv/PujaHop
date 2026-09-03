@@ -208,6 +208,24 @@ async function runImport() {
   }
 
   // 2. Parse Bus CSV
+  // Pre-scan famous pandal IDs for Hot Bus rankings
+  const prePujaContent = fs.readFileSync(targetPujaPath, 'utf8');
+  const prePujaRows = parseCSV(prePujaContent);
+  const prePujaHeaders = prePujaRows[0].map(h => h.trim());
+  const famousPandalIdSet = new Set();
+  for (let i = 1; i < prePujaRows.length; i++) {
+    const row = prePujaRows[i];
+    if (!row || row.length === 0) continue;
+    const raw = {};
+    prePujaHeaders.forEach((h, idx) => { raw[h] = row[idx] ? row[idx].trim() : ''; });
+    const id = parseInt(raw.pandal_id || raw.id || `${i}`, 10);
+    const pop = parseFloat(raw.popularity_score || raw.popularity || '7.5');
+    const isFamous = raw.famous === 'True' || raw.famous === 'true' || pop >= 8.5;
+    if (isFamous && !isNaN(id)) {
+      famousPandalIdSet.add(id);
+    }
+  }
+
   const busContent = fs.readFileSync(targetBusPath, 'utf8');
   const busRows = parseCSV(busContent);
   const busHeaders = busRows[0].map(h => h.trim());
@@ -300,18 +318,24 @@ async function runImport() {
   }
 
   // Convert bus routes to serializable array
-  const busRoutes = Array.from(busRoutesMap.values()).map(r => ({
-    busNumber: r.busNumber,
-    operatorType: r.operatorType,
-    serviceVariant: r.serviceVariant,
-    isAc: r.isAc,
-    origin: r.origin,
-    destination: r.destination,
-    routeStops: r.routeStops,
-    listedStopCount: r.listedStopCount || r.routeStops.length,
-    pandalIds: Array.from(r.pandalIdsSet).sort((a, b) => a - b),
-    matchedBusStops: Array.from(r.matchedBusStopsSet),
-  })).sort((a, b) => a.busNumber.localeCompare(b.busNumber, undefined, { numeric: true }));
+  const busRoutes = Array.from(busRoutesMap.values()).map(r => {
+    const pandalIds = Array.from(r.pandalIdsSet).sort((a, b) => a - b);
+    const famousCount = pandalIds.filter(id => famousPandalIdSet.has(id)).length;
+    return {
+      busNumber: r.busNumber,
+      operatorType: r.operatorType,
+      serviceVariant: r.serviceVariant,
+      isAc: r.isAc,
+      origin: r.origin,
+      destination: r.destination,
+      routeStops: r.routeStops,
+      listedStopCount: r.listedStopCount || r.routeStops.length,
+      pandalIds,
+      matchedBusStops: Array.from(r.matchedBusStopsSet),
+      famousPandalCount: famousCount,
+      isHotRoute: famousCount >= 8,
+    };
+  }).sort((a, b) => (b.famousPandalCount || 0) - (a.famousPandalCount || 0) || b.pandalIds.length - a.pandalIds.length);
 
   // Convert bus stops to serializable array
   const busStops = Array.from(busStopsMap.values()).map(s => {

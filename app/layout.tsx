@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import MobileBottomNav from '../components/MobileBottomNav';
 import { FavoritesProvider } from '../lib/favorites-context';
 import { ToastProvider } from '../lib/toast-context';
+import { AuthProvider } from '../lib/auth-context';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://pujonavigation.in'),
@@ -68,14 +69,16 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/images/logo.png" />
       </head>
       <body>
-        <ToastProvider>
-          <FavoritesProvider>
-            <Navbar />
-            <main style={{ flex: 1 }}>{children}</main>
-            <MobileBottomNav />
-            <Footer />
-          </FavoritesProvider>
-        </ToastProvider>
+        <AuthProvider>
+          <ToastProvider>
+            <FavoritesProvider>
+              <Navbar />
+              <main style={{ flex: 1 }}>{children}</main>
+              <MobileBottomNav />
+              <Footer />
+            </FavoritesProvider>
+          </ToastProvider>
+        </AuthProvider>
       </body>
     </html>
   );

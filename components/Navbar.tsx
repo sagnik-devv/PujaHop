@@ -67,6 +67,7 @@ export default function Navbar() {
 
   const navLinks = [
     { name: 'Home', href: '/' },
+    { name: 'Hop Room 📡', href: '/hop' },
     { name: 'Explore Pandals', href: '/explore' },
     { name: 'Smart Route', href: '/route' },
     { name: 'Hop Planner', href: '/planner' },

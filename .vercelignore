@@ -1,0 +1,15 @@
+# Assets and offline raw data
+assets/
+pujo csv/
+scripts/
+data/
+
+# Next.js & build
+.next/
+out/
+build/
+node_modules/
+
+# OS & Logs
+.DS_Store
+*.log

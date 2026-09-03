@@ -97,6 +97,13 @@ export async function getBusRouteByNumber(busNumber: string): Promise<BusRoute |
   return route || null;
 }
 
+export async function getHotBusRoutes(limit?: number): Promise<BusRoute[]> {
+  const hot = GENERATED_BUS_ROUTES
+    .filter(r => (r.famousPandalCount || 0) > 0)
+    .sort((a, b) => (b.famousPandalCount || 0) - (a.famousPandalCount || 0) || b.pandalIds.length - a.pandalIds.length);
+  return limit ? hot.slice(0, limit) : hot;
+}
+
 export async function getBusStops(): Promise<BusStop[]> {
   return GENERATED_BUS_STOPS;
 }
