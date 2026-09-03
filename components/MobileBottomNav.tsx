@@ -8,7 +8,7 @@ import {
   IconRoute,
   IconMetro,
   IconBus,
-  IconMapPin,
+  IconUsers,
 } from './Icons';
 
 export default function MobileBottomNav() {
@@ -19,7 +19,7 @@ export default function MobileBottomNav() {
     { label: 'Route', href: '/route', icon: <IconRoute size={20} /> },
     { label: 'Metro', href: '/metro', icon: <IconMetro size={20} /> },
     { label: 'Bus', href: '/bus', icon: <IconBus size={20} /> },
-    { label: 'Near Me', href: '/nearby', icon: <IconMapPin size={20} /> },
+    { label: 'Hop', href: '/hop', icon: <IconUsers size={20} /> },
   ];
 
   return (
@@ -30,7 +30,7 @@ export default function MobileBottomNav() {
           (item.href === '/bus' && pathname.startsWith('/bus')) ||
           (item.href === '/metro' && pathname.startsWith('/metro')) ||
           (item.href === '/explore' && pathname.startsWith('/explore')) ||
-          (item.href === '/nearby' && pathname.startsWith('/nearby')) ||
+          (item.href === '/hop' && pathname.startsWith('/hop')) ||
           (item.href === '/route' && pathname.startsWith('/route'));
 
         return (

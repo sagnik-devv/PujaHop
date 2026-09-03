@@ -17,6 +17,7 @@ interface HopMapProps {
   selectedMemberId?: string | null;
   onSelectMember?: (member: HopMember) => void;
   height?: string;
+  active?: boolean;
 }
 
 /**
@@ -43,6 +44,7 @@ export default function HopMap({
   selectedMemberId,
   onSelectMember,
   height = '100%',
+  active = true,
 }: HopMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
@@ -51,6 +53,28 @@ export default function HopMap({
   const prevCoordsRef = useRef<Map<string, [number, number]>>(new Map());
   const [mapReady, setMapReady] = useState(false);
   const fitBoundsTimeoutRef = useRef<any>(null);
+
+  // ResizeObserver & active tab invalidateSize handler
+  useEffect(() => {
+    if (!mapReady || !mapInstance.current || !mapContainerRef.current) return;
+
+    const timer = setTimeout(() => {
+      mapInstance.current?.invalidateSize();
+    }, 80);
+
+    let resizeObserver: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(() => {
+        mapInstance.current?.invalidateSize();
+      });
+      resizeObserver.observe(mapContainerRef.current);
+    }
+
+    return () => {
+      clearTimeout(timer);
+      resizeObserver?.disconnect();
+    };
+  }, [mapReady, active]);
 
   // Expose global navigator function for popup buttons
   useEffect(() => {

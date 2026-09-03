@@ -44,8 +44,19 @@ export default function HopRoomPage() {
   const [showQR, setShowQR] = useState(false);
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
   const [mobileTab, setMobileTab] = useState<'map' | 'members'>('map');
+  const [isMobile, setIsMobile] = useState(false);
 
   const locationManagerRef = useRef<RealtimeLocationManager | null>(null);
+
+  // Detect Mobile Viewport
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // 1. Initialize persistent User ID (guest or auth)
   useEffect(() => {
@@ -328,70 +339,69 @@ export default function HopRoomPage() {
   const minsLeft = Math.floor((msLeft % (1000 * 60 * 60)) / (1000 * 60));
 
   return (
-    <div style={{ background: 'var(--background)', minHeight: 'calc(100vh - var(--header-height))', display: 'flex', flexDirection: 'column' }}>
+    <div className="hop-room-wrapper">
       {/* Top Header Bar */}
       <div
         style={{
           background: '#FFFDF9',
           borderBottom: '1px solid var(--border)',
-          padding: '12px 20px',
+          padding: isMobile ? '8px 14px' : '12px 20px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+          flexShrink: 0,
         }}
       >
-        <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
           {/* Room Title & Code */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <h1 style={{ fontSize: '1.2rem', fontFamily: 'var(--font-serif)', margin: 0, color: 'var(--foreground)' }}>
-                  {room.room_name}
-                </h1>
-                <span
-                  style={{
-                    fontSize: '11px',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    padding: '2px 8px',
-                    borderRadius: '12px',
-                    background: isConnected ? 'rgba(47, 125, 74, 0.1)' : 'rgba(217, 154, 37, 0.1)',
-                    color: isConnected ? '#2F7D4A' : '#D99A25',
-                    fontWeight: 700,
-                  }}
-                >
-                  {isConnected ? '● Live Connected' : '○ Syncing'}
-                </span>
-              </div>
-              <div style={{ fontSize: '11px', color: 'var(--taupe)', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span>Code: <strong style={{ letterSpacing: '1px' }}>{room.room_code}</strong></span>
-                <span>•</span>
-                <span>Expires in {hoursLeft}h {minsLeft}m</span>
-              </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <h1 style={{ fontSize: isMobile ? '1.05rem' : '1.25rem', fontFamily: 'var(--font-serif)', margin: 0, color: 'var(--foreground)' }}>
+                {room.room_name}
+              </h1>
+              <span
+                style={{
+                  fontSize: '10px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '2px 7px',
+                  borderRadius: '12px',
+                  background: isConnected ? 'rgba(47, 125, 74, 0.1)' : 'rgba(217, 154, 37, 0.1)',
+                  color: isConnected ? '#2F7D4A' : '#D99A25',
+                  fontWeight: 700,
+                }}
+              >
+                {isConnected ? '● Live' : '○ Syncing'}
+              </span>
+            </div>
+            <div style={{ fontSize: '11px', color: 'var(--taupe)', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span>Code: <strong style={{ letterSpacing: '1px', color: 'var(--vermilion)' }}>{room.room_code}</strong></span>
+              <span>•</span>
+              <span>Expires {hoursLeft}h {minsLeft}m</span>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             {/* Sharing Toggle */}
             <button
               type="button"
               onClick={handleToggleSharing}
               style={{
-                padding: '8px 14px',
+                padding: isMobile ? '6px 10px' : '7px 12px',
                 borderRadius: '6px',
                 border: isSharing ? '1px solid #2F7D4A' : '1px solid var(--border)',
                 background: isSharing ? 'var(--success-bg)' : '#FFF',
                 color: isSharing ? '#2F7D4A' : 'var(--taupe)',
                 fontWeight: 700,
-                fontSize: '12px',
+                fontSize: isMobile ? '11px' : '12px',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px',
+                gap: '5px',
               }}
             >
               <span>{isSharing ? '●' : '○'}</span>
-              <span>{isSharing ? 'Stop Sharing' : 'Start Sharing'}</span>
+              <span>{isSharing ? (isMobile ? 'Sharing' : 'Stop Sharing') : 'Share GPS'}</span>
             </button>
 
             {/* QR Code Modal Button */}
@@ -399,22 +409,22 @@ export default function HopRoomPage() {
               type="button"
               onClick={() => setShowQR(true)}
               style={{
-                padding: '8px 14px',
+                padding: isMobile ? '6px 10px' : '7px 12px',
                 borderRadius: '6px',
                 border: 'none',
                 background: 'var(--gold-gradient)',
                 color: '#17120F',
                 fontWeight: 700,
-                fontSize: '12px',
+                fontSize: isMobile ? '11px' : '12px',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px',
+                gap: '4px',
                 boxShadow: 'var(--shadow-gold)',
               }}
             >
               <span>📲</span>
-              <span>Invite (QR)</span>
+              <span>Invite</span>
             </button>
 
             {/* Leave Room Button */}
@@ -422,13 +432,13 @@ export default function HopRoomPage() {
               type="button"
               onClick={handleLeaveRoom}
               style={{
-                padding: '8px 12px',
+                padding: isMobile ? '6px 8px' : '7px 12px',
                 borderRadius: '6px',
                 border: '1px solid var(--border)',
                 background: 'transparent',
                 color: 'var(--taupe)',
                 fontWeight: 600,
-                fontSize: '12px',
+                fontSize: isMobile ? '11px' : '12px',
                 cursor: 'pointer',
               }}
             >
@@ -439,28 +449,21 @@ export default function HopRoomPage() {
       </div>
 
       {/* Mobile Tab Switcher */}
-      <div
-        className="mobile-only"
-        style={{
-          display: 'none',
-          background: 'var(--warm-cream)',
-          padding: '4px',
-          borderBottom: '1px solid var(--border)',
-        }}
-      >
+      <div className="hop-mobile-tabs">
         <button
           type="button"
           onClick={() => setMobileTab('map')}
           style={{
             flex: 1,
             padding: '8px',
-            borderRadius: '4px',
-            border: 'none',
+            borderRadius: '6px',
+            border: mobileTab === 'map' ? '1.5px solid var(--border-gold)' : '1px solid transparent',
             background: mobileTab === 'map' ? '#FFF' : 'transparent',
             fontWeight: 700,
             fontSize: '12px',
             color: mobileTab === 'map' ? 'var(--foreground)' : 'var(--taupe)',
             cursor: 'pointer',
+            boxShadow: mobileTab === 'map' ? '0 2px 6px rgba(0,0,0,0.06)' : 'none',
           }}
         >
           🗺️ Live Map
@@ -471,13 +474,14 @@ export default function HopRoomPage() {
           style={{
             flex: 1,
             padding: '8px',
-            borderRadius: '4px',
-            border: 'none',
+            borderRadius: '6px',
+            border: mobileTab === 'members' ? '1.5px solid var(--border-gold)' : '1px solid transparent',
             background: mobileTab === 'members' ? '#FFF' : 'transparent',
             fontWeight: 700,
             fontSize: '12px',
             color: mobileTab === 'members' ? 'var(--foreground)' : 'var(--taupe)',
             cursor: 'pointer',
+            boxShadow: mobileTab === 'members' ? '0 2px 6px rgba(0,0,0,0.06)' : 'none',
           }}
         >
           👥 Members ({members.length})
@@ -485,26 +489,13 @@ export default function HopRoomPage() {
       </div>
 
       {/* Main Workspace: Split View */}
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          maxWidth: '1600px',
-          width: '100%',
-          margin: '0 auto',
-          height: 'calc(100vh - var(--header-height) - 62px)',
-          overflow: 'hidden',
-        }}
-      >
+      <div className="hop-workspace">
         {/* Map Column */}
         <div
+          className="hop-map-col"
           style={{
-            flex: '1 1 62%',
-            height: '100%',
-            position: 'relative',
-            display: mobileTab === 'members' ? 'none' : 'block',
+            display: isMobile ? (mobileTab === 'map' ? 'block' : 'none') : 'block',
           }}
-          className="hop-map-container"
         >
           <HopMap
             members={members}
@@ -519,23 +510,16 @@ export default function HopRoomPage() {
             selectedMemberId={selectedMemberId}
             onSelectMember={m => setSelectedMemberId(m.user_id)}
             height="100%"
+            active={!isMobile || mobileTab === 'map'}
           />
         </div>
 
         {/* Members & Meetup Sidebar Column */}
         <div
+          className="hop-sidebar-col"
           style={{
-            flex: '0 0 38%',
-            maxWidth: '460px',
-            minWidth: '320px',
-            height: '100%',
-            overflowY: 'auto',
-            background: 'var(--background)',
-            borderLeft: '1px solid var(--border)',
-            padding: '20px',
-            display: mobileTab === 'map' ? 'block' : 'block',
+            display: isMobile ? (mobileTab === 'members' ? 'block' : 'none') : 'block',
           }}
-          className="hop-sidebar-container"
         >
           <HopMemberList
             members={members}
@@ -551,7 +535,9 @@ export default function HopRoomPage() {
             selectedMemberId={selectedMemberId}
             onSelectMember={m => {
               setSelectedMemberId(m.user_id);
-              setMobileTab('map');
+              if (isMobile) {
+                setMobileTab('map');
+              }
             }}
             onSetMeetup={handleSetMeetup}
             onClearMeetup={handleClearMeetup}
@@ -566,24 +552,6 @@ export default function HopRoomPage() {
         isOpen={showQR}
         onClose={() => setShowQR(false)}
       />
-
-      <style jsx>{`
-        @media (max-width: 768px) {
-          .mobile-only {
-            display: flex !important;
-          }
-          .hop-map-container {
-            display: ${mobileTab === 'map' ? 'block' : 'none'} !important;
-            flex: 1 1 100% !important;
-          }
-          .hop-sidebar-container {
-            display: ${mobileTab === 'members' ? 'block' : 'none'} !important;
-            flex: 1 1 100% !important;
-            max-width: 100% !important;
-            border-left: none !important;
-          }
-        }
-      `}</style>
     </div>
   );
 }

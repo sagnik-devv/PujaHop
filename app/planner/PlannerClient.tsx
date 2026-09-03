@@ -53,7 +53,7 @@ export default function PlannerClient({
     if (initialIds && initialIds.length > 0) {
       return initialIds;
     }
-    return [1, 4, 120, 87]; // Default iconic 4
+    return []; // No dummy placeholders! Empty by default.
   }, [initialIds]);
 
   const [selectedPandalIds, setSelectedPandalIds] = useState<number[]>(effectiveInitialIds);
@@ -61,11 +61,9 @@ export default function PlannerClient({
     Boolean(initialFromSaved && initialIds && initialIds.length > 0)
   );
   const [startingPoint, setStartingPoint] = useState<string>(() =>
-    getInitialStartingPoint(effectiveInitialIds, pandals)
+    effectiveInitialIds.length > 0 ? getInitialStartingPoint(effectiveInitialIds, pandals) : ''
   );
   const [startTime, setStartTime] = useState('17:00');
-  const [budget, setBudget] = useState(250);
-  const [transportPref, setTransportPref] = useState<'metro' | 'cab' | 'mixed' | 'budget'>('metro');
   const [searchPandalQuery, setSearchPandalQuery] = useState('');
   const [plan, setPlan] = useState<ItineraryPlan | null>(null);
   const [generating, setGenerating] = useState(false);
@@ -81,28 +79,28 @@ export default function PlannerClient({
       const coords = { lat: loc.lat, lon: loc.lon };
       setStartCoords(coords);
 
-      const label = loc.landmark;
-      setStartingPoint(label);
-
       if (!loc.isKolkata) {
-        handleGenerate(undefined, label, { lat: 22.5649, lon: 88.3517 });
-        showToast(`📍 Detected: ${label}. Itinerary anchored from Central Kolkata (Esplanade Metro).`, 'success');
+        setStartingPoint('Central Kolkata (Esplanade)');
+        setStartCoords({ lat: 22.5649, lon: 88.3517 });
+        showToast('📍 You appear to be outside Kolkata. Starting point set to Central Kolkata (Esplanade).', 'info');
       } else {
-        handleGenerate(undefined, label, coords);
-        showToast(`📍 Live location detected: ${label}! Starting point pinned.`, 'success');
+        setStartingPoint(loc.landmark);
+        showToast(`📍 Live location detected: ${loc.landmark}!`, 'success');
       }
     } catch (err: any) {
       console.warn('Geolocation detection error:', err);
-      showToast('Could not access live GPS. Please enable location permissions or enter your starting point.', 'warning');
+      showToast('Could not access live GPS. Please enter your starting point manually.', 'warning');
     } finally {
       setDetectingPlannerLoc(false);
     }
   };
 
-  // Generate initial plan on load
+  // Generate initial plan on load ONLY if initialIds were provided (e.g. from Saved Favorites)
   useEffect(() => {
-    const initialStart = getInitialStartingPoint(effectiveInitialIds, pandals);
-    handleGenerate(effectiveInitialIds, initialStart);
+    if (effectiveInitialIds.length > 0) {
+      const initialStart = getInitialStartingPoint(effectiveInitialIds, pandals);
+      handleGenerate(effectiveInitialIds, initialStart);
+    }
   }, []);
 
   // Sync if navigated with ?fromSaved=true but ids was not in searchParams
@@ -144,16 +142,16 @@ export default function PlannerClient({
         startCoords: coordsToUse,
         startTime,
         endTime: '23:00',
-        budget,
+        budget: 500,
         selectedPandalIds: idsToUse,
-        transportPreference: transportPref,
+        transportPreference: 'metro',
         crowdPreference: 'any',
       });
       setPlan(generated);
       if (isPlanningFromSaved || (overrideIds && overrideIds.length === favorites.length && favorites.length > 0)) {
-        showToast(`✨ Planned your day route with ${idsToUse.length} saved pandals!`, 'success');
+        showToast(`✨ Planned your route with ${idsToUse.length} saved pandals!`, 'success');
       } else {
-        showToast('✨ Smart Puja Hop Itinerary Generated!', 'success');
+        showToast('✨ Pujo Hopping Route Generated!', 'success');
       }
     } catch (e) {
       console.error(e);
@@ -168,12 +166,6 @@ export default function PlannerClient({
       if (prev.includes(id)) {
         return prev.filter(pId => pId !== id);
       } else {
-        if (prev.length >= 15) {
-          showToast('Maximum 15 pandals recommended for a single festive hopping route', 'warning');
-          return prev;
-        } else if (prev.length >= 8) {
-          showToast('Hopping tip: 8+ pandals can cause fatigue with night crowd barricades', 'info');
-        }
         return [...prev, id];
       }
     });
@@ -181,7 +173,7 @@ export default function PlannerClient({
 
   const handleApplySavedPandals = () => {
     if (favorites.length === 0) {
-      showToast('You have no saved pandals yet. Explore and save your favorite pandals first.', 'info');
+      showToast('You have no saved pandals in your wishlist yet', 'info');
       return;
     }
     setSelectedPandalIds(favorites);
@@ -189,7 +181,7 @@ export default function PlannerClient({
     const newStart = getInitialStartingPoint(favorites, pandals);
     setStartingPoint(newStart);
     handleGenerate(favorites, newStart);
-    showToast(`Loaded ${favorites.length} saved pandals into your itinerary planner!`, 'success');
+    showToast(`Loaded ${favorites.length} saved pandals!`, 'success');
   };
 
   const handleSharePlan = () => {
@@ -221,7 +213,6 @@ export default function PlannerClient({
     );
 
     if (!query) {
-      // Prioritize user's saved favorites at the top
       return [...matches].sort((a, b) => {
         const aFav = isFavorite(a.id) ? 1 : 0;
         const bFav = isFavorite(b.id) ? 1 : 0;
@@ -231,19 +222,38 @@ export default function PlannerClient({
     return matches;
   }, [pandals, searchPandalQuery, isFavorite]);
 
-  // Google Maps Multi-Stop Directions URL
+  // Google Maps Multi-Stop Directions URL (Uses precise coordinates, URL-safe pipe delimiter, and explicit travel mode)
   const googleMapsMultiStopUrl = useMemo(() => {
     if (!plan || plan.stops.length === 0) return null;
-    const dest = plan.stops[plan.stops.length - 1].pandal;
-    const origin = startingPoint ? `${startingPoint}, Kolkata` : `${plan.stops[0].pandal.name}, Kolkata`;
-    const waypoints = plan.stops.length > 1
-      ? plan.stops
-          .slice(0, -1)
-          .map(s => encodeURIComponent(`${s.pandal.name}, Kolkata`))
-          .join('|')
-      : '';
-    return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(`${dest.name}, Kolkata`)}${waypoints ? `&waypoints=${waypoints}` : ''}`;
-  }, [plan, startingPoint]);
+
+    const stops = plan.stops.map(s => s.pandal);
+    const lastPandal = stops[stops.length - 1];
+    const destParam = `${lastPandal.latitude.toFixed(6)},${lastPandal.longitude.toFixed(6)}`;
+
+    let originParam = '';
+    const hasCustomStart = Boolean(startingPoint && startingPoint.trim());
+
+    if (startCoords?.lat && startCoords?.lon) {
+      originParam = `${startCoords.lat.toFixed(6)},${startCoords.lon.toFixed(6)}`;
+    } else if (hasCustomStart) {
+      originParam = encodeURIComponent(`${startingPoint.trim()}, Kolkata`);
+    } else {
+      originParam = `${stops[0].latitude.toFixed(6)},${stops[0].longitude.toFixed(6)}`;
+    }
+
+    const isFirstPandalOrigin = !hasCustomStart || startingPoint.toLowerCase().includes(stops[0].name.toLowerCase());
+    const intermediatePandals = isFirstPandalOrigin ? stops.slice(1, -1) : stops.slice(0, -1);
+
+    const waypointsParam = intermediatePandals
+      .map(p => `${p.latitude.toFixed(6)},${p.longitude.toFixed(6)}`)
+      .join('%7C');
+
+    let url = `https://www.google.com/maps/dir/?api=1&origin=${originParam}&destination=${destParam}&travelmode=walking`;
+    if (waypointsParam) {
+      url += `&waypoints=${waypointsParam}`;
+    }
+    return url;
+  }, [plan, startingPoint, startCoords]);
 
   // Automatically discover famous food stalls/eateries around the planned/saved pandals
   const routeFoodStalls = useMemo(() => {
@@ -383,61 +393,15 @@ export default function PlannerClient({
               </div>
             </div>
 
-            {/* Start Time & Budget */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '16px' }}>
-              <div className="input-field-group">
-                <label className="input-field-label">Start Time</label>
-                <div className="input-field-wrapper" style={{ background: '#FFF' }}>
-                  <input
-                    type="time"
-                    value={startTime}
-                    onChange={e => setStartTime(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div className="input-field-group">
-                <label className="input-field-label">Budget Limit (₹)</label>
-                <div className="input-field-wrapper" style={{ background: '#FFF' }}>
-                  <input
-                    type="number"
-                    value={budget}
-                    onChange={e => setBudget(parseInt(e.target.value, 10) || 100)}
-                    min={50}
-                    step={50}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Transport Preference */}
+            {/* Start Time */}
             <div className="input-field-group" style={{ marginBottom: '20px' }}>
-              <label className="input-field-label">Transit Preference</label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                {[
-                  { id: 'metro', label: '🚇 Metro First (Fastest)' },
-                  { id: 'mixed', label: '🚶 Metro + Toto' },
-                  { id: 'budget', label: '🚌 Budget Public' },
-                  { id: 'cab', label: '🚗 Cab / Taxi' },
-                ].map(opt => (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    onClick={() => setTransportPref(opt.id as any)}
-                    style={{
-                      padding: '8px 10px',
-                      borderRadius: '4px',
-                      border: transportPref === opt.id ? '1.5px solid #B3261E' : '1px solid var(--border)',
-                      background: transportPref === opt.id ? 'var(--warm-cream)' : '#FFF',
-                      fontWeight: 600,
-                      fontSize: '0.75rem',
-                      textAlign: 'left',
-                      color: transportPref === opt.id ? '#7F1712' : 'var(--foreground)',
-                    }}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
+              <label className="input-field-label">Preferred Start Time</label>
+              <div className="input-field-wrapper" style={{ background: '#FFF' }}>
+                <input
+                  type="time"
+                  value={startTime}
+                  onChange={e => setStartTime(e.target.value)}
+                />
               </div>
             </div>
 
@@ -453,33 +417,36 @@ export default function PlannerClient({
                       type="button"
                       onClick={handleApplySavedPandals}
                       style={{
-                        fontSize: '0.72rem',
-                        color: '#B3261E',
+                        fontSize: '0.74rem',
+                        color: '#FFF',
                         fontWeight: 700,
-                        background: 'rgba(179,38,30,0.08)',
-                        border: '1px solid rgba(179,38,30,0.25)',
+                        background: 'var(--vermilion)',
+                        border: 'none',
                         borderRadius: '4px',
-                        padding: '2px 8px',
+                        padding: '4px 10px',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         gap: '4px',
+                        boxShadow: '0 2px 6px rgba(179,38,30,0.2)',
                       }}
                       title="Plan route with all your saved wishlisted pandals"
                     >
-                      <IconHeart size={11} fill="#B3261E" /> Use Saved ({favorites.length})
+                      <IconHeart size={12} fill="#FFF" /> Plan With Saved ({favorites.length})
                     </button>
                   )}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelectedPandalIds([1, 4, 120, 87, 101]);
-                      setIsPlanningFromSaved(false);
-                    }}
-                    style={{ fontSize: '0.72rem', color: 'var(--antique-gold)', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer' }}
-                  >
-                    Pick Iconic 5
-                  </button>
+                  {selectedPandalIds.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedPandalIds([]);
+                        setPlan(null);
+                      }}
+                      style={{ fontSize: '0.72rem', color: 'var(--taupe)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+                    >
+                      Clear
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -565,12 +532,24 @@ export default function PlannerClient({
             <button
               type="button"
               onClick={() => handleGenerate()}
-              disabled={generating}
+              disabled={generating || selectedPandalIds.length === 0}
               className="btn btn-vermilion"
-              style={{ width: '100%', justifyContent: 'center', padding: '14px' }}
+              style={{
+                width: '100%',
+                justifyContent: 'center',
+                padding: '14px',
+                opacity: selectedPandalIds.length === 0 ? 0.65 : 1,
+                cursor: selectedPandalIds.length === 0 ? 'not-allowed' : 'pointer',
+              }}
             >
               <IconSparkles size={18} />
-              <span>{generating ? 'Calculating Itinerary...' : 'Generate My Puja Plan'}</span>
+              <span>
+                {generating
+                  ? 'Planning Route...'
+                  : selectedPandalIds.length === 0
+                  ? 'Select Pandals to Plan Route'
+                  : `Plan Route (${selectedPandalIds.length} Pandals)`}
+              </span>
             </button>
           </div>
 
@@ -615,7 +594,7 @@ export default function PlannerClient({
                           Custom Day Plan for Your {plan.totalPandals} Saved Pandals
                         </div>
                         <div style={{ fontSize: '0.78rem', color: 'var(--taupe)' }}>
-                          Optimized for shortest Kolkata transit hops, crowd windows, and minimum fatigue!
+                          Optimized pandal hopping sequence for Kolkata Durga Puja!
                         </div>
                       </div>
                     </div>
@@ -646,7 +625,10 @@ export default function PlannerClient({
                       <div className="eyebrow" style={{ margin: 0 }}>Generated Day Itinerary</div>
                       <h2 style={{ fontSize: '1.4rem', marginTop: '4px' }}>{plan.title}</h2>
                       <div style={{ fontSize: '0.82rem', color: 'var(--taupe)', marginTop: '2px' }}>
-                        Start: <strong>{plan.startTime}</strong> • Est. Finish: <strong>{plan.endTime}</strong> • From: <strong>{startingPoint}</strong>
+                        {startingPoint ? (
+                          <>From: <strong>{startingPoint}</strong> • </>
+                        ) : null}
+                        <span><strong>{plan.totalPandals} Pandals</strong> in Hopping Sequence</span>
                       </div>
                     </div>
 
@@ -671,53 +653,28 @@ export default function PlannerClient({
                     </div>
                   </div>
 
-                  {/* Summary Metric Chips */}
+                  {/* Summary Metric Strip (Without confusing time or distance numbers) */}
                   <div
                     style={{
-                      display: 'grid',
-                      gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
-                      gap: '12px',
-                      marginTop: '20px',
-                      paddingTop: '16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      marginTop: '16px',
+                      paddingTop: '12px',
                       borderTop: '1px solid var(--border-subtle)',
-                      textAlign: 'center',
+                      flexWrap: 'wrap',
+                      gap: '8px',
                     }}
                   >
-                    <div>
-                      <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.3rem', fontWeight: 700 }}>
-                        {plan.totalPandals}
-                      </div>
-                      <div style={{ fontSize: '0.68rem', textTransform: 'uppercase', color: 'var(--taupe)' }}>
-                        Pandals
-                      </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '18px' }}>🪷</span>
+                      <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--foreground)' }}>
+                        {plan.totalPandals} Planned Pandals
+                      </span>
                     </div>
-
-                    <div>
-                      <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.3rem', fontWeight: 700, color: 'var(--vermilion)' }}>
-                        {formatDuration(plan.totalDurationMinutes)}
-                      </div>
-                      <div style={{ fontSize: '0.68rem', textTransform: 'uppercase', color: 'var(--taupe)' }}>
-                        Total Time
-                      </div>
-                    </div>
-
-                    <div>
-                      <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.3rem', fontWeight: 700 }}>
-                        {plan.totalDistanceKm} km
-                      </div>
-                      <div style={{ fontSize: '0.68rem', textTransform: 'uppercase', color: 'var(--taupe)' }}>
-                        Total Distance
-                      </div>
-                    </div>
-
-                    <div>
-                      <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.3rem', fontWeight: 700, color: 'var(--antique-gold)' }}>
-                        {formatCurrency(plan.totalEstimatedCost)}
-                      </div>
-                      <div style={{ fontSize: '0.68rem', textTransform: 'uppercase', color: 'var(--taupe)' }}>
-                        Est. Transit Cost
-                      </div>
-                    </div>
+                    <span style={{ fontSize: '12px', color: 'var(--taupe)' }}>
+                      Tap "Full Route in Maps" for turn-by-turn walking directions
+                    </span>
                   </div>
                 </div>
 
@@ -853,11 +810,9 @@ export default function PlannerClient({
                         border: '1px dashed #D0C3B4',
                       }}
                     >
-                      {plan.initialTravel.mode === 'walk' && <IconWalk size={14} color="#756D65" />}
-                      {plan.initialTravel.mode === 'metro' && <IconMetro size={14} color="#155799" />}
-                      {plan.initialTravel.mode === 'cab' && <IconCab size={14} color="#D99A25" />}
+                      <IconWalk size={14} color="#756D65" />
                       <span>
-                        Starting from <strong>{plan.initialTravel.from}</strong> • Travel to Stop 1: <strong>{formatDuration(plan.initialTravel.durationMinutes)}</strong> (~{formatDistance(plan.initialTravel.distanceM)}) • Est. Cost: {formatCurrency(plan.initialTravel.cost)}
+                        Starting from <strong>{plan.initialTravel.from}</strong> • Heading to Stop 1: <strong>{plan.stops[0]?.pandal.name}</strong>
                       </span>
                     </div>
                   )}
@@ -911,7 +866,7 @@ export default function PlannerClient({
                           <CrowdBadge level={stop.crowdLevel} />
                           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                             <a
-                              href={`https://www.google.com/maps/dir/?api=1&destination=${stop.pandal.latitude},${stop.pandal.longitude}`}
+                              href={`https://www.google.com/maps/dir/?api=1&destination=${stop.pandal.latitude},${stop.pandal.longitude}&travelmode=walking`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="btn btn-secondary btn-sm"
@@ -957,7 +912,7 @@ export default function PlannerClient({
                           } : null;
 
                           if (!activeFood) return null;
-                          const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${stop.pandal.latitude},${stop.pandal.longitude}&destination=${activeFood.latitude},${activeFood.longitude}`;
+                          const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${stop.pandal.latitude},${stop.pandal.longitude}&destination=${activeFood.latitude},${activeFood.longitude}&travelmode=walking`;
 
                           return (
                             <div
@@ -1025,11 +980,9 @@ export default function PlannerClient({
                             width: 'fit-content',
                           }}
                         >
-                          {stop.travelToNextMode === 'walk' && <IconWalk size={14} color="#756D65" />}
-                          {stop.travelToNextMode === 'metro' && <IconMetro size={14} color="#155799" />}
-                          {stop.travelToNextMode === 'cab' && <IconCab size={14} color="#D99A25" />}
+                          <IconWalk size={14} color="#756D65" />
                           <span>
-                            Travel to Next: <strong>{formatDuration(stop.travelToNextMinutes)}</strong> (~{formatDistance(stop.travelToNextDistanceM || 0)}) • Est. Cost: {formatCurrency(stop.travelToNextCost || 0)}
+                            Next in sequence: <strong>{plan.stops[stop.stopNumber]?.pandal.name || 'Next Pandal'}</strong>
                           </span>
                         </div>
                       )}
@@ -1108,7 +1061,7 @@ export default function PlannerClient({
                           </div>
 
                           <a
-                            href={`https://www.google.com/maps/dir/?api=1&destination=${stall.latitude},${stall.longitude}`}
+                            href={`https://www.google.com/maps/dir/?api=1&destination=${stall.latitude},${stall.longitude}&travelmode=walking`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="btn btn-vermilion btn-sm"
@@ -1138,8 +1091,43 @@ export default function PlannerClient({
                 )}
               </div>
             ) : (
-              <div style={{ padding: '60px', textAlign: 'center', background: '#FFF', borderRadius: '8px', border: '1px dashed var(--border)' }}>
-                <h3>Configure parameters and click Generate</h3>
+              <div
+                style={{
+                  padding: '60px 24px',
+                  textAlign: 'center',
+                  background: '#FFFDF9',
+                  borderRadius: '12px',
+                  border: '1.5px dashed var(--border-gold)',
+                  boxShadow: '0 8px 30px rgba(23,18,15,0.04)',
+                }}
+              >
+                <div style={{ fontSize: '42px', marginBottom: '14px' }}>🪷</div>
+                <h3 style={{ fontSize: '1.4rem', fontFamily: 'var(--font-serif)', margin: '0 0 10px', color: 'var(--foreground)' }}>
+                  Plan Your Puja Hopping Route
+                </h3>
+                <p style={{ fontSize: '0.9rem', color: 'var(--taupe)', maxWidth: '460px', margin: '0 auto 24px', lineHeight: 1.6 }}>
+                  Select pandals from the left, or save your favorite pandals while exploring and tap <strong>"Plan With Saved"</strong> to generate your optimized hopping route.
+                </p>
+
+                {favorites.length > 0 ? (
+                  <button
+                    type="button"
+                    onClick={handleApplySavedPandals}
+                    className="btn btn-vermilion"
+                    style={{ margin: '0 auto', padding: '12px 24px', fontSize: '0.9rem' }}
+                  >
+                    <IconHeart size={16} fill="#FFF" /> Plan Route With Saved ({favorites.length} Pandals)
+                  </button>
+                ) : (
+                  <Link
+                    href="/explore"
+                    className="btn btn-secondary"
+                    style={{ margin: '0 auto', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                  >
+                    <span>🔍</span>
+                    <span>Explore & Wishlist Pandals</span>
+                  </Link>
+                )}
               </div>
             )}
           </div>
