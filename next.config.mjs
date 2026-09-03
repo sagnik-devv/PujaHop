@@ -8,6 +8,15 @@ const nextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/near-me',
+        destination: '/nearby',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

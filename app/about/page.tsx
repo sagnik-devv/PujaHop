@@ -73,7 +73,7 @@ export default function AboutPage() {
             Inspired by the expressive eyes of Maa Durga, authentic vermilion sindoor, antique gold ornamentation, and the sacred artistry of Kumartuli clay masters.
           </p>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px', margin: '20px 0 32px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', gap: '14px', margin: '20px 0 32px' }}>
             {['/images/durga/durga-1.png', '/images/durga/durga-2.png', '/images/durga/durga-3.jpg', '/images/durga/durga-4.png', '/images/durga/durga-5.jpg', '/images/durga/durga-6.jpg'].map((img, idx) => (
               <div
                 key={idx}

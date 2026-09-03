@@ -218,7 +218,7 @@ export default function RouteClient({
             marginBottom: '32px',
           }}
         >
-          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr auto', gap: '16px', alignItems: 'flex-end' }}>
+          <div className="search-inputs-grid" style={{ alignItems: 'flex-end' }}>
             {/* FROM: Dynamic Autocomplete & GPS */}
             <div className="input-field-group" style={{ position: 'relative' }} ref={dropdownRef}>
               <label className="input-field-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -355,7 +355,7 @@ export default function RouteClient({
                 onClick={handleResolveCustomOrigin}
                 disabled={loading}
                 className="btn btn-vermilion"
-                style={{ height: '46px', whiteSpace: 'nowrap', padding: '0 20px' }}
+                style={{ height: '46px', width: '100%', whiteSpace: 'nowrap', padding: '0 20px', justifyContent: 'center' }}
               >
                 <IconSparkles size={16} /> Find Route
               </button>
@@ -512,7 +512,7 @@ export default function RouteClient({
         </div>
 
         {/* Results Layout: Split comparison + Leaflet Map */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '36px', alignItems: 'flex-start' }}>
+        <div className="route-responsive-layout">
           {/* Left Column: Route comparison cards */}
           <div>
             {loading ? (

@@ -89,7 +89,7 @@ export default async function HomePage() {
 
       {/* 2. STATS & CULTURAL METRICS BAR */}
       <section style={{ background: '#FFF', borderBottom: '1px solid var(--border)', padding: '28px 0' }}>
-        <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', textAlign: 'center' }}>
+        <div className="container home-stats-grid">
           <div>
             <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2.2rem', fontWeight: 700, color: 'var(--foreground)' }}>
               248+
@@ -412,7 +412,7 @@ export default async function HomePage() {
         />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(23,18,15,0.95) 0%, rgba(23,18,15,0.85) 60%, rgba(23,18,15,0.95) 100%)' }} />
         
-        <div className="container" style={{ position: 'relative', zIndex: 10, display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '48px', alignItems: 'center' }}>
+        <div className="container responsive-split-grid" style={{ position: 'relative', zIndex: 10, alignItems: 'center' }}>
           <div>
             <div className="eyebrow" style={{ color: 'var(--soft-gold)' }}>
               Intelligent Itinerary Generator

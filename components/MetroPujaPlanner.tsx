@@ -684,15 +684,7 @@ export default function MetroPujaPlanner({ metroStations, pandals, compact = fal
                 )}
               </div>
             ) : (
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: compact
-                    ? 'repeat(auto-fit, minmax(260px, 1fr))'
-                    : 'repeat(auto-fit, minmax(320px, 1fr))',
-                  gap: compact ? '16px' : '24px',
-                }}
-              >
+              <div className={`metro-cards-grid ${compact ? 'compact' : ''}`}>
                 {displayedPandals.map(p => {
                   const isShortWalk = p.distanceM <= 900;
                   const googleMapsNavUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(
@@ -842,15 +834,7 @@ export default function MetroPujaPlanner({ metroStations, pandals, compact = fal
                 </p>
               </div>
             ) : (
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: compact
-                    ? 'repeat(auto-fit, minmax(260px, 1fr))'
-                    : 'repeat(auto-fit, minmax(320px, 1fr))',
-                  gap: compact ? '16px' : '24px',
-                }}
-              >
+              <div className={`metro-cards-grid ${compact ? 'compact' : ''}`}>
                 {displayedFoodStalls.map(stall => {
                   const googleMapsFoodUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(
                     selectedStation.name + ' Metro Station, Kolkata'

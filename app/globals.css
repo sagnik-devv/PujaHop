@@ -546,6 +546,14 @@ button {
   color: var(--vermilion);
 }
 
+.desktop-only {
+  display: flex !important;
+}
+
+.mobile-only {
+  display: none !important;
+}
+
 /* MOBILE BOTTOM NAV */
 .mobile-bottom-nav {
   display: none;
@@ -1285,7 +1293,80 @@ button {
   color: var(--taupe-light);
 }
 
-/* RESPONSIVENESS */
+/* RESPONSIVE LAYOUT SYSTEM */
+.route-responsive-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 36px;
+  align-items: flex-start;
+}
+
+.planner-responsive-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 36px;
+  align-items: flex-start;
+}
+
+.planner-config-card {
+  padding: 28px;
+}
+
+.nearby-responsive-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 36px;
+  align-items: flex-start;
+}
+
+.pandal-hero-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 40px;
+  align-items: center;
+}
+
+.pandal-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.pandal-map-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 32px;
+}
+
+.responsive-split-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 40px;
+}
+
+.home-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  text-align: center;
+}
+
+.philosophy-quote-banner {
+  padding: 36px 40px;
+}
+
+.metro-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.metro-cards-grid.compact {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+/* RESPONSIVENESS BREAKPOINTS */
 @media (max-width: 1024px) {
   .explore-layout {
     grid-template-columns: 1fr;
@@ -1294,29 +1375,50 @@ button {
   }
 
   .explore-map-panel {
-    height: 420px;
+    height: 480px;
   }
 
   .footer-grid {
     grid-template-columns: 1fr 1fr;
   }
+
+  .pandal-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .home-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 820px) {
   .navbar-links {
-    display: none;
+    display: none !important;
   }
 
   .mobile-menu-toggle {
-    display: flex;
+    display: flex !important;
   }
 
   .mobile-bottom-nav {
-    display: flex;
+    display: flex !important;
   }
 
   body {
-    padding-bottom: var(--mobile-nav-height);
+    padding-bottom: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom, 0px));
+  }
+
+  .navbar-inner {
+    padding: 0 14px;
+  }
+
+  .navbar-actions {
+    gap: 8px;
+  }
+
+  .nav-action-btn {
+    width: 36px;
+    height: 36px;
   }
 
   .search-inputs-grid {
@@ -1327,31 +1429,177 @@ button {
     padding: 16px;
   }
 
-  .ai-fab {
-    bottom: calc(var(--mobile-nav-height) + 16px);
-    right: 16px;
-    padding: 10px 16px;
+  /* All 2-column split views collapse to fluid single column on mobile */
+  .route-responsive-layout,
+  .planner-responsive-layout,
+  .nearby-responsive-layout,
+  .pandal-hero-grid,
+  .pandal-map-grid,
+  .responsive-split-grid {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
   }
 
-  .ai-drawer {
-    bottom: calc(var(--mobile-nav-height) + 70px);
-    right: 16px;
-    left: 16px;
-    width: auto;
+  .pandal-metrics-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 14px !important;
+    padding: 18px 16px !important;
+  }
+
+  .home-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 14px !important;
+  }
+
+  .explore-layout {
+    display: block;
+    height: auto;
+  }
+
+  .explore-mobile-switcher {
+    display: flex !important;
+    position: sticky;
+    top: var(--header-height);
+    z-index: 120;
+    background: rgba(250, 247, 242, 0.96);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-gold);
+    box-shadow: 0 2px 10px rgba(23,18,15,0.05);
+  }
+
+  .explore-toggle-pill {
+    display: flex;
+    width: 100%;
+    background: var(--warm-cream);
+    padding: 4px;
+    border-radius: 8px;
+    border: 1px solid var(--border-gold);
+  }
+
+  .explore-toggle-btn {
+    flex: 1;
+    padding: 9px 12px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.82rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    color: var(--taupe);
+    background: transparent;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .explore-toggle-btn.active {
+    background: var(--dark-bg);
+    color: #FFF;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  }
+
+  .explore-list-panel.mobile-hidden {
+    display: none !important;
+  }
+
+  .explore-map-panel {
+    width: 100% !important;
+    height: calc(100vh - var(--header-height) - var(--mobile-nav-height) - 58px) !important;
+    min-height: 480px;
+    position: relative;
+    border-radius: 0;
+  }
+
+  .explore-map-panel.mobile-hidden {
+    display: none !important;
+  }
+}
+
+@media (min-width: 821px) {
+  .explore-mobile-switcher {
+    display: none !important;
+  }
+  .explore-list-panel,
+  .explore-map-panel {
+    display: block !important;
   }
 }
 
 @media (max-width: 600px) {
+  .container {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .container-narrow {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .hero-title {
+    font-size: clamp(2rem, 8vw, 2.6rem);
+  }
+
+  .hero-subtitle {
+    font-size: 0.88rem;
+  }
+
+  .hero-section {
+    padding: 50px 0 70px;
+    min-height: auto;
+  }
+
   .footer-grid {
     grid-template-columns: 1fr;
+    gap: 32px;
   }
 
   .pandal-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
   }
 
   .route-stats-row {
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 12px;
+    padding: 12px 14px;
+  }
+
+  .route-stat-item {
+    min-width: 70px;
+  }
+
+  .pandal-metrics-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .planner-config-card {
+    padding: 18px 14px !important;
+  }
+
+  .philosophy-quote-banner {
+    padding: 20px 16px !important;
+  }
+
+  .metro-cards-grid,
+  .metro-cards-grid.compact {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* Safe tap targets */
+  .btn-lg {
+    padding: 12px 18px;
+    font-size: 0.9rem;
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Touch scrolling containers */
+  .touch-scroll-track {
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
   }
 }

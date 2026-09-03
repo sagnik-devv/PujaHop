@@ -311,14 +311,14 @@ export default function PlannerClient({
         </div>
 
         {/* 2-Column Planner Layout */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.3fr', gap: '36px', alignItems: 'flex-start' }}>
+        <div className="planner-responsive-layout">
           {/* Left Column: Configuration Controls */}
           <div
+            className="planner-config-card"
             style={{
               background: '#FFFDF9',
               border: '1px solid var(--border-gold)',
               borderRadius: '8px',
-              padding: '28px',
               boxShadow: '0 8px 24px rgba(23,18,15,0.06)',
             }}
           >

@@ -148,7 +148,7 @@ export default function Navbar() {
             {/* Account / Login */}
             <Link
               href="/login"
-              className="nav-action-btn"
+              className="nav-action-btn desktop-only"
               title="Sign In / Account"
               aria-label="Account"
             >
@@ -285,6 +285,12 @@ export default function Navbar() {
           <li>
             <Link href="/about" className="mobile-nav-link">
               <span>About PujaHop</span>
+              <IconChevronRight size={18} color="#B08D57" />
+            </Link>
+          </li>
+          <li>
+            <Link href="/login" className="mobile-nav-link">
+              <span>Sign In / My Account</span>
               <IconChevronRight size={18} color="#B08D57" />
             </Link>
           </li>

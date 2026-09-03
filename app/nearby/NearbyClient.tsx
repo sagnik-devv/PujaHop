@@ -177,7 +177,7 @@ export default function NearbyClient({
         </div>
 
         {/* Results Layout: Split List + Map */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '36px' }}>
+        <div className="nearby-responsive-layout">
           {/* List */}
           <div>
             <div style={{ marginBottom: '16px', fontSize: '0.88rem', color: 'var(--taupe)' }}>

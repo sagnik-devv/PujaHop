@@ -74,7 +74,7 @@ export default async function PandalDetailPage({ params }: PageProps) {
             <span>{pandal.region}</span>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '40px', alignItems: 'center' }}>
+          <div className="pandal-hero-grid">
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginBottom: '12px' }}>
                 <span className="badge badge-region" style={{ background: 'rgba(255,255,255,0.12)', color: 'var(--soft-gold)', borderColor: 'rgba(176,141,87,0.3)' }}>
@@ -197,15 +197,12 @@ export default async function PandalDetailPage({ params }: PageProps) {
       {/* 2. PANDAL CORE METRICS & THEME DETAILS */}
       <section className="container" style={{ marginTop: '-24px', position: 'relative', zIndex: 10 }}>
         <div
+          className="pandal-metrics-grid"
           style={{
             background: '#FFFDF9',
             border: '1px solid var(--border-gold)',
             borderRadius: '8px',
-            padding: '24px 32px',
             boxShadow: '0 8px 32px rgba(23,18,15,0.08)',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: '24px',
           }}
         >
           <div>
@@ -326,10 +323,10 @@ export default async function PandalDetailPage({ params }: PageProps) {
 
           {/* Artistic Philosophy Highlight Banner */}
           <div
+            className="philosophy-quote-banner"
             style={{
               background: 'linear-gradient(135deg, #2B1810 0%, #17120F 100%)',
               borderRadius: '12px',
-              padding: '36px 40px',
               color: '#FFF',
               border: '1px solid rgba(176,141,87,0.35)',
               boxShadow: '0 12px 40px rgba(0,0,0,0.18)',
@@ -555,7 +552,7 @@ export default async function PandalDetailPage({ params }: PageProps) {
 
       {/* 4. INTERACTIVE MAP & SURROUNDINGS */}
       <section className="container" style={{ marginTop: '64px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '32px' }}>
+        <div className="pandal-map-grid">
           {/* Map Container */}
           <div>
             <div className="eyebrow">Spatial Coordinates</div>

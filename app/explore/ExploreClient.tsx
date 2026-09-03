@@ -169,8 +169,28 @@ export default function ExploreClient({
 
   return (
     <div className="explore-layout">
+      {/* Sticky Mobile View Switcher Dock - Always Accessible */}
+      <div className="explore-mobile-switcher">
+        <div className="explore-toggle-pill">
+          <button
+            type="button"
+            onClick={() => setMobileView('list')}
+            className={`explore-toggle-btn ${mobileView === 'list' ? 'active' : ''}`}
+          >
+            📋 List View ({filteredPandals.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileView('map')}
+            className={`explore-toggle-btn ${mobileView === 'map' ? 'active' : ''}`}
+          >
+            🗺️ Interactive Map
+          </button>
+        </div>
+      </div>
+
       {/* Left List & Filter Panel */}
-      <div className="explore-list-panel" style={{ display: mobileView === 'map' ? 'none' : 'block' }}>
+      <div className={`explore-list-panel ${mobileView === 'map' ? 'mobile-hidden' : ''}`}>
         {/* Campaign Banner */}
         <div
           style={{
@@ -331,47 +351,6 @@ export default function ExploreClient({
             </div>
           </div>
         )}
-
-        {/* Mobile View Toggle Switch */}
-        <div
-          style={{
-            display: 'flex',
-            background: 'var(--warm-cream)',
-            padding: '4px',
-            borderRadius: '6px',
-            marginBottom: '16px',
-          }}
-          className="mobile-menu-toggle"
-        >
-          <button
-            onClick={() => setMobileView('list')}
-            style={{
-              flex: 1,
-              padding: '8px',
-              borderRadius: '4px',
-              background: mobileView === 'list' ? 'var(--dark-bg)' : 'transparent',
-              color: mobileView === 'list' ? '#FFF' : 'var(--foreground)',
-              fontWeight: 600,
-              fontSize: '0.8rem',
-            }}
-          >
-            📋 List View ({filteredPandals.length})
-          </button>
-          <button
-            onClick={() => setMobileView('map')}
-            style={{
-              flex: 1,
-              padding: '8px',
-              borderRadius: '4px',
-              background: mobileView === 'map' ? 'var(--dark-bg)' : 'transparent',
-              color: mobileView === 'map' ? '#FFF' : 'var(--foreground)',
-              fontWeight: 600,
-              fontSize: '0.8rem',
-            }}
-          >
-            🗺️ Map View
-          </button>
-        </div>
 
         {/* Search Input */}
         <div className="input-field-wrapper" style={{ background: '#FFF', padding: '10px 14px', marginBottom: '14px' }}>
@@ -630,7 +609,7 @@ export default function ExploreClient({
       </div>
 
       {/* Right Map Panel */}
-      <div className="explore-map-panel" style={{ display: mobileView === 'list' && typeof window !== 'undefined' && window.innerWidth <= 820 ? 'none' : 'block' }}>
+      <div className={`explore-map-panel ${mobileView === 'list' ? 'mobile-hidden' : ''}`}>
         <LeafletMap
           pandals={filteredPandals}
           metroStations={metroStations}
