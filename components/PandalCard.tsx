@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Pandal } from '../lib/types';
 import { formatDistance, formatDuration } from '../lib/format';
-import { IconMetro, IconWalk, IconRoute, IconSparkles } from './Icons';
+import { IconMetro, IconBus, IconWalk, IconRoute, IconSparkles } from './Icons';
 import CrowdBadge from './CrowdBadge';
 import FavoriteButton from './FavoriteButton';
 
@@ -79,27 +79,62 @@ export default function PandalCard({ pandal, distanceUserKm }: PandalCardProps) 
           {pandal.theme || pandal.description}
         </p>
 
-        {/* Nearest Metro Transit Chip */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            background: 'var(--warm-cream)',
-            padding: '8px 12px',
-            borderRadius: '4px',
-            fontSize: '0.78rem',
-            margin: '8px 0 16px',
-            color: '#3B3026',
-          }}
-        >
-          <IconMetro size={16} color="#155799" />
-          <span style={{ fontWeight: 600 }}>{pandal.nearestMetro}</span>
-          <span style={{ color: '#8C8178' }}>•</span>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-            <IconWalk size={13} color="#756D65" />
-            {formatDistance(pandal.walkingDistanceM)} ({formatDuration(pandal.walkingTimeMinutes)})
-          </span>
+        {/* Transit Connectivity: Metro & Bus */}
+        <div style={{ margin: '8px 0 14px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+          {/* Nearest Metro */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '7px',
+              background: 'var(--warm-cream)',
+              padding: '6px 10px',
+              borderRadius: '4px',
+              fontSize: '0.76rem',
+              color: '#3B3026',
+            }}
+          >
+            <IconMetro size={15} color="#155799" />
+            <span style={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {pandal.nearestMetro}
+            </span>
+            <span style={{ color: '#8C8178' }}>•</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', whiteSpace: 'nowrap', color: '#666' }}>
+              <IconWalk size={12} color="#756D65" />
+              {pandal.walkingTimeMinutes}m ({formatDistance(pandal.walkingDistanceM)})
+            </span>
+          </div>
+
+          {/* Nearest Bus Stop & Routes */}
+          {pandal.nearestBusStop && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '7px',
+                background: '#F1F8F4',
+                padding: '6px 10px',
+                borderRadius: '4px',
+                fontSize: '0.74rem',
+                color: '#1B5E20',
+                border: '1px solid rgba(47, 125, 74, 0.15)',
+              }}
+            >
+              <IconBus size={15} color="#2F7D4A" />
+              <span style={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {pandal.nearestBusStop}
+              </span>
+              {pandal.topBuses && pandal.topBuses.length > 0 && (
+                <>
+                  <span style={{ color: '#A5D6A7' }}>•</span>
+                  <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#2E7D32', whiteSpace: 'nowrap' }}>
+                    {pandal.topBuses.slice(0, 3).join(', ')}
+                    {pandal.availableBusesCount && pandal.availableBusesCount > 3 ? ` +${pandal.availableBusesCount - 3}` : ''}
+                  </span>
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="pandal-card-footer">

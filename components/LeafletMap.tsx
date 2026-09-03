@@ -2,18 +2,20 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Pandal, MetroStation } from '../lib/types';
+import { Pandal, MetroStation, BusStop } from '../lib/types';
 import { formatDistance } from '../lib/format';
 import { detectUserLocation } from '../lib/location-service';
 
 interface LeafletMapProps {
   pandals: Pandal[];
   metroStations?: MetroStation[];
+  busStops?: BusStop[];
   center?: [number, number];
   zoom?: number;
   selectedPandalId?: number;
   userLocation?: [number, number];
   showMetro?: boolean;
+  showBusStops?: boolean;
   onPandalSelect?: (pandal: Pandal) => void;
   className?: string;
   height?: string;
@@ -22,11 +24,13 @@ interface LeafletMapProps {
 export default function LeafletMap({
   pandals,
   metroStations = [],
+  busStops = [],
   center = [22.5726, 88.3639], // Default Kolkata Central
   zoom = 13,
   selectedPandalId,
   userLocation,
   showMetro = true,
+  showBusStops = true,
   onPandalSelect,
   className = '',
   height = '100%',
@@ -37,6 +41,16 @@ export default function LeafletMap({
   const pandalMarkersRef = useRef<Map<number, any>>(new Map());
   const [mapLoaded, setMapLoaded] = useState(false);
   const [locatingMap, setLocatingMap] = useState(false);
+  const [enableMetro, setEnableMetro] = useState(showMetro);
+  const [enableBus, setEnableBus] = useState(showBusStops);
+
+  useEffect(() => {
+    setEnableMetro(showMetro);
+  }, [showMetro]);
+
+  useEffect(() => {
+    setEnableBus(showBusStops);
+  }, [showBusStops]);
 
   const handleMapLocateMe = async () => {
     if (!mapInstance.current) return;
@@ -216,6 +230,32 @@ export default function LeafletMap({
         });
       };
 
+      const createBusIcon = () => {
+        return L.divIcon({
+          className: 'custom-bus-pin',
+          html: `
+            <div style="
+              width: 22px;
+              height: 22px;
+              background: #1B5E20;
+              border: 2px solid #FFF;
+              border-radius: 4px;
+              box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: #FFF;
+              font-size: 11px;
+              font-weight: 800;
+              cursor: pointer;
+            ">🚌</div>
+          `,
+          iconSize: [22, 22],
+          iconAnchor: [11, 11],
+          popupAnchor: [0, -11],
+        });
+      };
+
       const createUserIcon = () => {
         return L.divIcon({
           className: 'custom-user-pin',
@@ -242,7 +282,7 @@ export default function LeafletMap({
       }
 
       // Add metro stations if enabled
-      if (showMetro && metroStations.length > 0) {
+      if (enableMetro && metroStations.length > 0) {
         metroStations.forEach(m => {
           const marker = L.marker([m.latitude, m.longitude], {
             icon: createMetroIcon(),
@@ -250,9 +290,45 @@ export default function LeafletMap({
 
           marker.bindPopup(`
             <div style="padding: 10px; font-family: sans-serif;">
-              <div style="font-weight: bold; font-size: 13px; color: #155799;">${m.name} Metro</div>
+              <div style="font-weight: bold; font-size: 13px; color: #155799;">🚇 ${m.name} Metro</div>
               <div style="font-size: 11px; color: #555;">${m.bengaliName} • ${m.line}</div>
               <div style="font-size: 10px; color: #777; margin-top: 4px;">Opens: ${m.opensAt} | Closes: ${m.closesAt}</div>
+            </div>
+          `);
+          marker.addTo(markersLayer.current);
+        });
+      }
+
+      // Add bus stops if enabled
+      if (enableBus && busStops.length > 0) {
+        busStops.forEach(b => {
+          const marker = L.marker([b.latitude, b.longitude], {
+            icon: createBusIcon(),
+          });
+
+          const topBusesPills = b.busNumbers
+            .slice(0, 8)
+            .map(
+              no =>
+                `<span style="background: #E8F5E9; color: #1B5E20; border: 1px solid #C8E6C9; padding: 2px 5px; border-radius: 3px; font-size: 10px; font-weight: 700;">${no}</span>`
+            )
+            .join(' ');
+
+          marker.bindPopup(`
+            <div style="padding: 10px; font-family: sans-serif; max-width: 260px;">
+              <div style="font-size: 10px; text-transform: uppercase; font-weight: bold; color: #1B5E20; letter-spacing: 0.5px;">🚌 Kolkata Bus Stop Hub</div>
+              <div style="font-weight: bold; font-size: 13px; color: #1B5E20; margin: 3px 0;">${b.cleanName}</div>
+              ${b.nearestMetro ? `<div style="font-size: 11px; color: #666; margin-bottom: 4px;">🚇 Near ${b.nearestMetro} Metro</div>` : ''}
+              <div style="font-size: 11px; color: #333; margin-top: 6px; font-weight: 600;">
+                Buses Serving Stop (${b.busNumbers.length}):
+              </div>
+              <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px;">
+                ${topBusesPills}
+                ${b.busNumbers.length > 8 ? `<span style="font-size: 10px; color: #666; align-self: center;">+${b.busNumbers.length - 8} more</span>` : ''}
+              </div>
+              <div style="margin-top: 8px; padding-top: 6px; border-top: 1px solid #E0E0E0; font-size: 11px; color: #555;">
+                🪔 <strong>${b.pandalIds.length}</strong> Puja Pandals reachable
+              </div>
             </div>
           `);
           marker.addTo(markersLayer.current);
@@ -271,6 +347,7 @@ export default function LeafletMap({
             <div style="font-size: 10px; text-transform: uppercase; font-weight: bold; color: #B08D57; letter-spacing: 0.5px;">${p.region}</div>
             <div class="custom-popup-title">${p.name}</div>
             <div class="custom-popup-meta">🚇 ${p.nearestMetro} (${formatDistance(p.walkingDistanceM)} walk)</div>
+            ${p.nearestBusStop ? `<div class="custom-popup-meta" style="color: #1B5E20;">🚌 ${p.nearestBusStop} ${p.topBuses && p.topBuses.length > 0 ? `(${p.topBuses.join(', ')})` : ''}</div>` : ''}
             <div style="font-size: 11px; color: #555; margin-bottom: 8px;">Theme: ${p.theme || 'Traditional Sabeki'}</div>
             <div style="display: flex; gap: 6px;">
               <a href="/pandal/${p.id}" class="custom-popup-btn" style="flex: 1; text-decoration: none;">View Pandal</a>
@@ -316,7 +393,7 @@ export default function LeafletMap({
     }
 
     renderMarkers();
-  }, [pandals, metroStations, userLocation, showMetro, mapLoaded, onPandalSelect]);
+  }, [pandals, metroStations, busStops, userLocation, enableMetro, enableBus, mapLoaded, onPandalSelect]);
 
   return (
     <div
@@ -331,6 +408,71 @@ export default function LeafletMap({
       className={className}
     >
       <div ref={mapRef} style={{ width: '100%', height: '100%' }} />
+
+      {/* Transit Layer Toggles */}
+      {mapLoaded && (metroStations.length > 0 || busStops.length > 0) && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '12px',
+            left: '12px',
+            zIndex: 400,
+            display: 'flex',
+            gap: '6px',
+            flexWrap: 'wrap',
+          }}
+        >
+          {metroStations.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setEnableMetro(!enableMetro)}
+              style={{
+                background: enableMetro ? '#155799' : '#FFF',
+                color: enableMetro ? '#FFF' : '#155799',
+                border: '1.5px solid #155799',
+                borderRadius: '16px',
+                padding: '4px 10px',
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <span>🚇</span>
+              <span>Metro ({metroStations.length})</span>
+            </button>
+          )}
+
+          {busStops.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setEnableBus(!enableBus)}
+              style={{
+                background: enableBus ? '#1B5E20' : '#FFF',
+                color: enableBus ? '#FFF' : '#1B5E20',
+                border: '1.5px solid #1B5E20',
+                borderRadius: '16px',
+                padding: '4px 10px',
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <span>🚌</span>
+              <span>Bus Stops ({busStops.length})</span>
+            </button>
+          )}
+        </div>
+      )}
 
       {mapLoaded && (
         <button

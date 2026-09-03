@@ -34,7 +34,7 @@ export default async function HomePage() {
           loop
           muted
           playsInline
-          preload="metadata"
+          preload="auto"
           className="hero-video"
           poster="/images/pandals/pandal-40.jpg"
         >

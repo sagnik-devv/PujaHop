@@ -15,6 +15,9 @@ export interface Pandal {
   walkingDistanceM: number;
   walkingTimeMinutes: number;
   nearestRailwayStation?: string;
+  nearestBusStop?: string;
+  availableBusesCount?: number;
+  topBuses?: string[];
   popularityScore: number;
   crowdLevel: CrowdLevel;
   famous: boolean;
@@ -41,6 +44,47 @@ export interface MetroStation {
   interchangeLines?: string;
   opensAt: string;
   closesAt: string;
+}
+
+export interface BusRoute {
+  busNumber: string;
+  operatorType: string;
+  serviceVariant: string;
+  isAc: boolean;
+  origin: string;
+  destination: string;
+  routeStops: string[];
+  listedStopCount: number;
+  pandalIds: number[];
+  matchedBusStops: string[];
+}
+
+export interface BusStop {
+  id: string;
+  name: string;
+  cleanName: string;
+  latitude: number;
+  longitude: number;
+  nearestMetro?: string;
+  busNumbers: string[];
+  pandalIds: number[];
+}
+
+export interface PandalBusRouteItem {
+  busNumber: string;
+  isAc: boolean;
+  operatorType: string;
+  origin: string;
+  destination: string;
+}
+
+export interface PandalBusConnectivity {
+  pandalId: number;
+  pandalName: string;
+  matchedStop: string;
+  cleanStopName: string;
+  busCount: number;
+  buses: PandalBusRouteItem[];
 }
 
 export interface FoodStall {

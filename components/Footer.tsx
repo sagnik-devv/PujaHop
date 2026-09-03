@@ -60,11 +60,12 @@ export default function Footer() {
           <div>
             <div className="footer-column-title">Smart Transit</div>
             <ul className="footer-links-list">
+              <li><Link href="/metro" className="footer-link">Kolkata Metro Guide</Link></li>
+              <li><Link href="/bus" className="footer-link">Kolkata Bus Routes (180+ Lines)</Link></li>
               <li><Link href="/route" className="footer-link">Smart Route Finder</Link></li>
               <li><Link href="/planner" className="footer-link">Pandal Hopping Planner</Link></li>
               <li><Link href="/nearby" className="footer-link">Puja Near My Location</Link></li>
               <li><Link href="/explore?sort=nearest_metro" className="footer-link">Metro-Connected Pandals</Link></li>
-              <li><Link href="/emergency" className="footer-link">Traffic & Road Advisory</Link></li>
             </ul>
           </div>
 

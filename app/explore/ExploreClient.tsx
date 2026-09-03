@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { Pandal, MetroStation } from '../../lib/types';
+import { Pandal, MetroStation, BusStop } from '../../lib/types';
 import PandalCard from '../../components/PandalCard';
 import LeafletMap from '../../components/LeafletMap';
 import {
@@ -22,11 +22,13 @@ import { formatDistance } from '../../lib/format';
 interface ExploreClientProps {
   initialPandals: Pandal[];
   metroStations: MetroStation[];
+  busStops?: BusStop[];
 }
 
 export default function ExploreClient({
   initialPandals,
   metroStations,
+  busStops = [],
 }: ExploreClientProps) {
   // Main view toggle: Standard View vs Metro Reference View
   const [metroReferenceMode, setMetroReferenceMode] = useState(false);
@@ -81,7 +83,9 @@ export default function ExploreClient({
           p.region.toLowerCase().includes(q) ||
           p.address.toLowerCase().includes(q) ||
           p.theme.toLowerCase().includes(q) ||
-          p.nearestMetro.toLowerCase().includes(q)
+          p.nearestMetro.toLowerCase().includes(q) ||
+          (p.nearestBusStop && p.nearestBusStop.toLowerCase().includes(q)) ||
+          (p.topBuses && p.topBuses.some(b => b.toLowerCase().includes(q)))
       );
     }
 
@@ -613,6 +617,7 @@ export default function ExploreClient({
         <LeafletMap
           pandals={filteredPandals}
           metroStations={metroStations}
+          busStops={busStops}
           selectedPandalId={selectedPandalId}
           onPandalSelect={p => setSelectedPandalId(p.id)}
           height="100%"

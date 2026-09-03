@@ -71,6 +71,7 @@ export default function Navbar() {
     { name: 'Smart Route', href: '/route' },
     { name: 'Hop Planner', href: '/planner' },
     { name: 'Metro Guide', href: '/metro' },
+    { name: 'Bus Routes', href: '/bus' },
     { name: 'Near Me', href: '/nearby' },
   ];
 

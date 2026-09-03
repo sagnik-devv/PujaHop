@@ -7,6 +7,8 @@ import {
   getPandals,
   getMetroStations,
   getNearestMetroForPandal,
+  getBusStops,
+  getBusRoutesForPandal,
   getNearbyPandalsAPI,
   getCrowdData,
   getEateriesForPandal,
@@ -15,6 +17,7 @@ import {
 import { formatDistance, formatDuration, formatCurrency } from '../../../lib/format';
 import {
   IconMetro,
+  IconBus,
   IconWalk,
   IconRoute,
   IconMapPin,
@@ -48,12 +51,17 @@ export default async function PandalDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  const metroStations = await getMetroStations();
-  const nearestMetroInfo = await getNearestMetroForPandal(pandal.id);
-  const nearbyPandals = await getNearbyPandalsAPI(pandal.latitude, pandal.longitude, 2.5, 4, pandal.id);
-  const crowdInfo = await getCrowdData(pandal.id);
-  const nearbyEateries = await getEateriesForPandal(pandal.id);
-  const artDetails = await getPandalArtDetails(pandal.id);
+  const [metroStations, busStops, busConnectivity, nearestMetroInfo, nearbyPandals, crowdInfo, nearbyEateries, artDetails] =
+    await Promise.all([
+      getMetroStations(),
+      getBusStops(),
+      getBusRoutesForPandal(pandal.id),
+      getNearestMetroForPandal(pandal.id),
+      getNearbyPandalsAPI(pandal.latitude, pandal.longitude, 2.5, 4, pandal.id),
+      getCrowdData(pandal.id),
+      getEateriesForPandal(pandal.id),
+      getPandalArtDetails(pandal.id),
+    ]);
 
   const nearestMetro = nearestMetroInfo?.metro;
   const walkingMeters = nearestMetroInfo?.walkingMeters || pandal.walkingDistanceM;
@@ -441,7 +449,7 @@ export default async function PandalDetailPage({ params }: PageProps) {
           Calculated from real geographic coordinates and festive road closure parameters.
         </p>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px' }}>
           {/* Metro Card */}
           <TransportCard
             mode="metro"
@@ -452,6 +460,21 @@ export default async function PandalDetailPage({ params }: PageProps) {
             fare={10}
             isRecommended={true}
             notes={`Fastest and most dependable festive arrival. Exit station and walk ${formatDistance(walkingMeters)} along the pedestrian corridor.`}
+          />
+
+          {/* Bus Card */}
+          <TransportCard
+            mode="bus"
+            title={`${busConnectivity ? busConnectivity.cleanStopName : (pandal.nearestBusStop || 'Kolkata Bus Stop')}`}
+            subtitle={busConnectivity ? `${busConnectivity.busCount} Direct Bus Lines Active` : 'Kolkata Surface Transit'}
+            durationMinutes={Math.max(15, Math.round(walkingMinutes * 1.5))}
+            distanceMeters={walkingMeters + 400}
+            fare={15}
+            notes={
+              busConnectivity && busConnectivity.buses.length > 0
+                ? `Alight at ${busConnectivity.cleanStopName}. Top routes: ${busConnectivity.buses.slice(0, 4).map(b => b.busNumber).join(', ')}.`
+                : 'Direct surface connectivity via Kolkata public & private bus network.'
+            }
           />
 
           {/* Pedestrian Card */}
@@ -476,6 +499,84 @@ export default async function PandalDetailPage({ params }: PageProps) {
             notes="Festive vehicular congestion may cause delays. Private vehicles not allowed beyond perimeter."
           />
         </div>
+
+        {/* Direct Bus Routes Section */}
+        {busConnectivity && busConnectivity.buses.length > 0 && (
+          <div
+            style={{
+              marginTop: '28px',
+              background: '#FFF',
+              border: '1px solid var(--border)',
+              borderRadius: '8px',
+              padding: '24px 28px',
+              boxShadow: '0 2px 12px rgba(0,0,0,0.03)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '1.2rem' }}>🚌</span>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0, color: 'var(--foreground)' }}>
+                    Buses Serving {busConnectivity.cleanStopName}
+                  </h3>
+                </div>
+                <p style={{ fontSize: '0.82rem', color: 'var(--taupe)', marginTop: '4px' }}>
+                  {busConnectivity.busCount} verified bus routes connect directly to this pandal's nearest transit stop.
+                </p>
+              </div>
+
+              <Link
+                href="/bus"
+                className="btn btn-secondary btn-sm"
+                style={{ fontSize: '0.75rem', padding: '6px 12px' }}
+              >
+                Explore Bus Route Navigator →
+              </Link>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '12px' }}>
+              {busConnectivity.buses.map(bus => (
+                <div
+                  key={bus.busNumber}
+                  style={{
+                    background: '#F9FAF8',
+                    border: '1px solid #E8EDE6',
+                    borderRadius: '6px',
+                    padding: '12px 14px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                    <span
+                      style={{
+                        background: bus.isAc ? '#E0F2FE' : '#E8F5E9',
+                        color: bus.isAc ? '#0284C7' : '#1B5E20',
+                        border: bus.isAc ? '1px solid #BAE6FD' : '1px solid #C8E6C9',
+                        padding: '2px 8px',
+                        borderRadius: '4px',
+                        fontWeight: 800,
+                        fontSize: '0.82rem',
+                        letterSpacing: '0.04em',
+                      }}
+                    >
+                      {bus.busNumber}
+                    </span>
+                    <span style={{ fontSize: '0.68rem', color: '#666', fontWeight: 600 }}>
+                      {bus.isAc ? '❄️ AC Bus' : bus.operatorType}
+                    </span>
+                  </div>
+
+                  <div style={{ fontSize: '0.78rem', color: '#333', lineHeight: 1.3 }}>
+                    <div style={{ color: '#666', fontSize: '0.7rem' }}>Origin ➔ Destination:</div>
+                    <strong>{bus.origin}</strong> ➔ <strong>{bus.destination}</strong>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </section>
 
       {/* 4. INTERACTIVE MAP & SURROUNDINGS */}
@@ -485,11 +586,12 @@ export default async function PandalDetailPage({ params }: PageProps) {
           <div>
             <div className="eyebrow">Spatial Coordinates</div>
             <h3 style={{ fontFamily: 'var(--font-serif)', marginBottom: '14px' }}>
-              Interactive Location & Metro Stations
+              Interactive Location, Metro & Bus Hub
             </h3>
             <LeafletMap
               pandals={[pandal, ...nearbyPandals]}
               metroStations={metroStations}
+              busStops={busStops}
               center={[pandal.latitude, pandal.longitude]}
               zoom={15}
               selectedPandalId={pandal.id}

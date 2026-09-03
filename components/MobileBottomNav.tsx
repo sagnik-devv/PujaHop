@@ -4,60 +4,35 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  IconSearch,
-  IconHeart,
-  IconRoute,
-  IconCalendar,
   IconEye,
+  IconRoute,
+  IconMetro,
+  IconBus,
+  IconMapPin,
 } from './Icons';
-import { useFavorites } from '../lib/favorites-context';
 
 export default function MobileBottomNav() {
   const pathname = usePathname();
-  const { count, isLoaded } = useFavorites();
 
   const items = [
     { label: 'Explore', href: '/explore', icon: <IconEye size={20} /> },
     { label: 'Route', href: '/route', icon: <IconRoute size={20} /> },
-    { label: 'Planner', href: '/planner', icon: <IconCalendar size={20} /> },
-    { label: 'Search', href: '/search', icon: <IconSearch size={20} /> },
-    {
-      label: 'Saved',
-      href: '/favorites',
-      icon: (
-        <div style={{ position: 'relative' }}>
-          <IconHeart size={20} fill={count > 0 ? '#B3261E' : 'none'} color={count > 0 ? '#B3261E' : 'currentColor'} />
-          {isLoaded && count > 0 && (
-            <span
-              style={{
-                position: 'absolute',
-                top: -6,
-                right: -8,
-                background: '#B3261E',
-                color: '#FFF',
-                fontSize: '0.6rem',
-                fontWeight: 700,
-                height: '14px',
-                minWidth: '14px',
-                borderRadius: '7px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '0 2px',
-              }}
-            >
-              {count}
-            </span>
-          )}
-        </div>
-      ),
-    },
+    { label: 'Metro', href: '/metro', icon: <IconMetro size={20} /> },
+    { label: 'Bus', href: '/bus', icon: <IconBus size={20} /> },
+    { label: 'Near Me', href: '/nearby', icon: <IconMapPin size={20} /> },
   ];
 
   return (
     <nav className="mobile-bottom-nav" aria-label="Mobile Navigation">
       {items.map(item => {
-        const isActive = pathname === item.href;
+        const isActive =
+          pathname === item.href ||
+          (item.href === '/bus' && pathname.startsWith('/bus')) ||
+          (item.href === '/metro' && pathname.startsWith('/metro')) ||
+          (item.href === '/explore' && pathname.startsWith('/explore')) ||
+          (item.href === '/nearby' && pathname.startsWith('/nearby')) ||
+          (item.href === '/route' && pathname.startsWith('/route'));
+
         return (
           <Link
             key={item.href}
@@ -65,7 +40,9 @@ export default function MobileBottomNav() {
             className={`mobile-bottom-item ${isActive ? 'active' : ''}`}
             aria-current={isActive ? 'page' : undefined}
           >
-            {item.icon}
+            <div className="mobile-bottom-icon-wrap">
+              {item.icon}
+            </div>
             <span>{item.label}</span>
           </Link>
         );

@@ -1,11 +1,15 @@
 import { GENERATED_PANDALS } from './generated-pujas';
 import { GENERATED_METRO_STATIONS } from './generated-metro';
+import { GENERATED_BUS_ROUTES, GENERATED_BUS_STOPS, PANDAL_BUS_MAP } from './generated-buses';
 import { GENERATED_FOOD_STALLS } from './generated-food';
 import { GENERATED_PANDAL_EATERIES, PANDAL_EATERIES_MAP } from './generated-eateries';
 import { GENERATED_PANDAL_ART_DETAILS, PANDAL_ART_DETAILS_MAP } from './generated-art-details';
 import {
   Pandal,
   MetroStation,
+  BusRoute,
+  BusStop,
+  PandalBusConnectivity,
   FoodStall,
   PandalEatery,
   PandalArtDetails,
@@ -83,6 +87,43 @@ export async function getNearestMetroForPandal(pandalId: number): Promise<{
   return findNearestMetro(pandal.latitude, pandal.longitude, GENERATED_METRO_STATIONS);
 }
 
+export async function getBusRoutes(): Promise<BusRoute[]> {
+  return GENERATED_BUS_ROUTES;
+}
+
+export async function getBusRouteByNumber(busNumber: string): Promise<BusRoute | null> {
+  const norm = busNumber.trim().toLowerCase();
+  const route = GENERATED_BUS_ROUTES.find(r => r.busNumber.toLowerCase() === norm);
+  return route || null;
+}
+
+export async function getBusStops(): Promise<BusStop[]> {
+  return GENERATED_BUS_STOPS;
+}
+
+export async function getBusStopById(id: string): Promise<BusStop | null> {
+  const stop = GENERATED_BUS_STOPS.find(s => s.id === id);
+  return stop || null;
+}
+
+export async function getBusRoutesForPandal(pandalId: number): Promise<PandalBusConnectivity | null> {
+  const conn = PANDAL_BUS_MAP[pandalId];
+  return conn || null;
+}
+
+export async function searchBusRoutes(query: string): Promise<BusRoute[]> {
+  const q = query.trim().toLowerCase();
+  if (!q) return GENERATED_BUS_ROUTES.slice(0, 25);
+  return GENERATED_BUS_ROUTES.filter(
+    r =>
+      r.busNumber.toLowerCase().includes(q) ||
+      r.origin.toLowerCase().includes(q) ||
+      r.destination.toLowerCase().includes(q) ||
+      r.operatorType.toLowerCase().includes(q) ||
+      r.routeStops.some(s => s.toLowerCase().includes(q))
+  );
+}
+
 export async function searchPandals(query: string): Promise<SearchResultGroup> {
   const q = query.trim().toLowerCase();
   if (!q) {
@@ -93,13 +134,20 @@ export async function searchPandals(query: string): Promise<SearchResultGroup> {
     };
   }
 
+  // Find if query matches a bus route number (e.g. "30A", "47B")
+  const matchingBus = GENERATED_BUS_ROUTES.find(r => r.busNumber.toLowerCase() === q);
+  const busPandalIds = matchingBus ? new Set(matchingBus.pandalIds) : new Set();
+
   const pandals = GENERATED_PANDALS.filter(
     p =>
       p.name.toLowerCase().includes(q) ||
       p.region.toLowerCase().includes(q) ||
       p.address.toLowerCase().includes(q) ||
       p.theme.toLowerCase().includes(q) ||
-      p.nearestMetro.toLowerCase().includes(q)
+      p.nearestMetro.toLowerCase().includes(q) ||
+      (p.nearestBusStop && p.nearestBusStop.toLowerCase().includes(q)) ||
+      (p.topBuses && p.topBuses.some(b => b.toLowerCase().includes(q))) ||
+      busPandalIds.has(p.id)
   ).slice(0, 15);
 
   const metroStations = GENERATED_METRO_STATIONS.filter(
@@ -394,59 +442,69 @@ export async function getRoutes(params: RouteSearchParams): Promise<{
     ],
   };
 
-  // 4. BUDGET PUBLIC BUS
-  const busDuration = Math.max(25, Math.round(directDistanceKm * 4.5));
+  // 4. BUDGET PUBLIC BUS ROUTE (Direct Kolkata Bus Route)
+  const targetBusInfo = PANDAL_BUS_MAP[targetPandal.id];
+  const targetBusStopName = targetBusInfo ? targetBusInfo.cleanStopName : (targetPandal.nearestBusStop || `${targetPandal.region} Bus Hub`);
+  const topBuses = targetBusInfo && targetBusInfo.buses.length > 0 ? targetBusInfo.buses.slice(0, 3) : [];
+  const topBusesStr = topBuses.map(b => b.busNumber).join(', ');
+  const primaryBus = topBuses[0] || null;
+
+  const busDuration = Math.max(20, Math.round(directDistanceKm * 4.2));
   const busFare = 15;
   const busOption: RouteOption = {
     id: 'route-bus-public',
-    title: 'Special Puja Public Bus',
-    tagline: 'Most economical option via CSTC / WBTC festive routes',
+    title: topBusesStr ? `Kolkata Bus (${topBusesStr})` : 'Kolkata Public Bus',
+    tagline: primaryBus ? `Route ${primaryBus.busNumber} (${primaryBus.origin} ➔ ${primaryBus.destination})` : 'Economical surface route via Kolkata bus network',
     totalTimeMinutes: busDuration,
     totalDistanceKm: Math.round(directDistanceKm * 1.1 * 10) / 10,
     estimatedFare: busFare,
-    walkingDistanceMeters: 750,
+    walkingDistanceMeters: 600,
     transfersCount: 0,
     isRecommended: false,
     badge: 'Cheapest (₹15)',
-    crowdPenaltyMinutes: 8,
-    trafficPenaltyMinutes: 12,
-    compositeScore: 7.8,
+    crowdPenaltyMinutes: 6,
+    trafficPenaltyMinutes: 10,
+    compositeScore: 8.0,
     segments: [
       {
         id: 'seg-1',
         mode: 'walk',
         from: fromTitle,
-        to: 'Nearest Bus Stand',
-        durationMinutes: 6,
-        distanceMeters: 450,
+        to: 'Nearest Boarding Bus Stop',
+        durationMinutes: 5,
+        distanceMeters: 350,
         fare: 0,
-        instructions: 'Walk to major arterial bus stop',
+        instructions: 'Walk to the nearest major arterial bus stop',
       },
       {
         id: 'seg-2',
         mode: 'bus',
-        from: 'Bus Stand',
-        to: `${targetPandal.region} Crossing`,
-        durationMinutes: busDuration - 10,
+        from: 'Arterial Bus Stop',
+        to: targetBusStopName,
+        durationMinutes: busDuration - 9,
         distanceMeters: Math.round(directDistanceKm * 1000),
         fare: busFare,
-        instructions: `Take WBTC Puja Parikrama Bus / Route towards ${targetPandal.region}`,
+        instructions: primaryBus
+          ? `Board Bus ${primaryBus.busNumber} (${primaryBus.operatorType}${primaryBus.isAc ? ' AC' : ''}) towards ${targetBusStopName}`
+          : `Take festive bus corridor towards ${targetBusStopName}`,
+        lineName: topBusesStr ? `Bus ${topBusesStr}` : 'Kolkata Bus',
+        lineColor: '#2F7D4A',
       },
       {
         id: 'seg-3',
         mode: 'walk',
-        from: `${targetPandal.region} Crossing`,
+        from: targetBusStopName,
         to: targetPandal.name,
         durationMinutes: 4,
-        distanceMeters: 300,
+        distanceMeters: 250,
         fare: 0,
-        instructions: 'Walk to pandal entrance',
+        instructions: `Alight at ${targetBusStopName} and walk 250m along pedestrian lane to pandal entry gate`,
       },
     ],
     summarySteps: [
-      `Walk to Bus Stand`,
-      `WBTC Puja Special Bus`,
-      `Walk to ${targetPandal.name}`,
+      `Walk to Bus Stop`,
+      topBusesStr ? `Board Bus ${topBusesStr}` : 'Board Public Bus',
+      `Alight at ${targetBusStopName} & walk to pandal`,
     ],
   };
 

@@ -6,6 +6,7 @@ import { MetroStation, Pandal } from '../../lib/types';
 import MetroPujaPlanner from '../../components/MetroPujaPlanner';
 import {
   IconMetro,
+  IconBus,
   IconSparkles,
   IconRoute,
   IconShield,
@@ -59,8 +60,50 @@ export default function MetroPageClient({
         />
 
         <div className="container" style={{ position: 'relative', zIndex: 10, textAlign: 'center', maxWidth: '840px' }}>
-          <div className="eyebrow" style={{ color: 'var(--soft-gold)', justifyContent: 'center' }}>
-            <IconMetro size={14} color="#D4B77A" /> The Barricade-Free Festive Lifeline
+          {/* Transit Navigator Switcher */}
+          <div
+            style={{
+              display: 'inline-flex',
+              background: 'rgba(255,255,255,0.08)',
+              border: '1px solid rgba(212,183,122,0.3)',
+              borderRadius: '30px',
+              padding: '4px',
+              marginBottom: '20px',
+            }}
+          >
+            <div
+              style={{
+                padding: '6px 18px',
+                borderRadius: '24px',
+                fontSize: '0.82rem',
+                fontWeight: 700,
+                background: '#155799',
+                color: '#FFF',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: '0 2px 8px rgba(21,87,153,0.4)',
+              }}
+            >
+              <IconMetro size={15} /> Metro Guide
+            </div>
+            <Link
+              href="/bus"
+              style={{
+                padding: '6px 18px',
+                borderRadius: '24px',
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                color: 'var(--stone)',
+                textDecoration: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <IconBus size={15} /> Bus Routes Guide (180 Lines)
+            </Link>
           </div>
 
           <h1
@@ -68,7 +111,7 @@ export default function MetroPageClient({
               color: '#FFF',
               fontSize: 'clamp(2.4rem, 5vw, 3.4rem)',
               fontFamily: 'var(--font-serif)',
-              margin: '12px 0 16px',
+              margin: '0 0 16px',
               lineHeight: 1.15,
             }}
           >

@@ -86,6 +86,7 @@ PujarHop/
 │   ├── route/                         # 2-point smart route calculation & alternatives
 │   ├── planner/                       # Multi-stop day itinerary optimizer
 │   ├── metro/                         # Dedicated Kolkata Metro Hopping Guide
+│   ├── bus/                           # Dedicated Kolkata Bus Route Navigator & Pandal Guide
 │   ├── nearby/                        # Geolocation proximity pandal radar
 │   ├── favorites/                     # Saved pandals drawer with 1-click plan export
 │   ├── emergency/                     # Police, medical, and fire emergency helpline
@@ -93,19 +94,20 @@ PujarHop/
 ├── components/                        # Reusable UI Components
 │   ├── Navbar.tsx                     # Sticky header with quick search & navigation
 │   ├── Footer.tsx                     # Bengal cultural footer & quick links
-│   ├── PandalCard.tsx                 # Luxury card with authentic photo & transit chips
-│   ├── LeafletMap.tsx                 # Geospatial map with live location pin
+│   ├── PandalCard.tsx                 # Luxury card with authentic photo, Metro & Bus transit chips
+│   ├── LeafletMap.tsx                 # Geospatial map with Metro and Bus Stop layer toggles
 │   ├── MetroPujaPlanner.tsx           # Interactive metro-centric puja discovery
 │   ├── CrowdBadge.tsx                 # Crowd level badge with live pulse indicator
 │   └── Icons.tsx                      # Handcrafted SVG transit and cultural icons
 ├── lib/                               # Data Models, Utilities & Algorithms
-│   ├── api.ts                         # Data access layer for pandals, metros, and art
+│   ├── api.ts                         # Data access layer for pandals, metros, buses, and art
 │   ├── types.ts                       # TypeScript interface definitions
 │   ├── geo.ts                         # Haversine distance and geometric calculations
 │   ├── location-service.ts            # 5-tier robust GPS / IP / cache location engine
 │   ├── route-optimizer.ts             # Traveling Salesperson routing algorithm
 │   ├── generated-pujas.ts             # 248 fully geocoded pandal database
 │   ├── generated-metro.ts             # 45 Kolkata Metro stations across all lines
+│   ├── generated-buses.ts             # 180 bus routes, 54 stop hubs & pandal mappings
 │   ├── generated-food.ts              # Verified nearby eateries & heritage cabins
 │   └── generated-art-details.ts       # 248-record art, philosophy & socials dataset
 ├── public/                            # Static Assets

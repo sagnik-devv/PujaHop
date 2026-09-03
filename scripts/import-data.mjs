@@ -65,6 +65,66 @@ function haversineDistance(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
+function cleanStopName(raw) {
+  if (!raw) return 'Kolkata Bus Stop';
+  const trimmed = raw.trim();
+  const lower = trimmed.toLowerCase();
+
+  const specificMap = {
+    'sovabazar metro': 'Shobhabazar Metro Stop',
+    'mg road metro': 'MG Road Metro Stop',
+    'shyambazar': 'Shyambazar Five-Point',
+    'belgachia': 'Belgachia Bridge Stop',
+    'girish park': 'Girish Park Crossing',
+    'cossipore': 'Cossipore Road',
+    'dum dum station': 'Dum Dum Station Hub',
+    'dumdumpark': 'Dum Dum Park VIP',
+    'dum dum park': 'Dum Dum Park VIP',
+    'greystreet': 'Grey Street Junction',
+    'hatibagan': 'Hatibagan Crossing',
+    'bagbazar': 'Bagbazar Bata',
+    'khanna': 'Khanna Cinema Crossing',
+    'ultadanga': 'Ultadanga Hudco More',
+    'saltlake': 'Salt Lake Karunamoyee',
+    'sealdah': 'Sealdah Station Hub',
+    'howrah': 'Howrah Station Terminus',
+    'esplanade': 'Esplanade Bus Terminus',
+    'park street': 'Park Street Crossing',
+    'rabindra sadan': 'Exide / Rabindra Sadan',
+    'bhawanipore': 'Bhowanipore / Ashutosh Mukherjee Rd',
+    'kalighat': 'Kalighat Tram Depot',
+    'rashbehari': 'Rashbehari Crossing',
+    'gariahat': 'Gariahat Junction',
+    'jadavpur': 'Jadavpur 8B Bus Stand',
+    'tollygunge': 'Tollygunge Tram Depot',
+    'behala': 'Behala Chowrasta',
+    'taratala': 'Taratala Crossing',
+    'new alipore': 'New Alipore Petrol Pump',
+    'ballygunge': 'Ballygunge Phari',
+    'kasba': 'Kasba New Market',
+    'ruby': 'Ruby Hospital More (EM Bypass)',
+    'acropolis': 'Acropolis Mall / Rajdanga',
+    'science city': 'Science City Crossing',
+    'vip road': 'VIP Road Kaikhali',
+  };
+
+  if (specificMap[lower]) {
+    return specificMap[lower];
+  }
+
+  return trimmed
+    .split(/[\s_]+/)
+    .map(w => {
+      const l = w.toLowerCase();
+      if (l === 'mg') return 'MG';
+      if (l === 'rg') return 'RG';
+      if (l === 'vip') return 'VIP';
+      if (l === 'em') return 'EM';
+      return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+    })
+    .join(' ');
+}
+
 async function runImport() {
   console.log('Starting PUJAHOP Data Import Pipeline...\n');
 
@@ -77,10 +137,17 @@ async function runImport() {
   const sourcePujaPath = path.join(rootDir, 'pujo csv', 'data', 'kolkata_durga_puja_pandals_geocoded.csv');
   const targetPujaPath = path.join(dataDir, 'pujas.csv');
   const targetMetroPath = path.join(dataDir, 'metro.csv');
+  const sourceBusPath = path.join(rootDir, 'pujo csv', 'data', 'bus route.csv');
+  const targetBusPath = path.join(dataDir, 'bus_routes.csv');
 
   if (fs.existsSync(sourcePujaPath) && !fs.existsSync(targetPujaPath)) {
     fs.copyFileSync(sourcePujaPath, targetPujaPath);
     console.log(`Copied verified pandals data to ${targetPujaPath}`);
+  }
+
+  if (fs.existsSync(sourceBusPath) && !fs.existsSync(targetBusPath)) {
+    fs.copyFileSync(sourceBusPath, targetBusPath);
+    console.log(`Copied verified bus routes data to ${targetBusPath}`);
   }
 
   if (!fs.existsSync(targetPujaPath)) {
@@ -93,6 +160,14 @@ async function runImport() {
 
   if (!fs.existsSync(targetMetroPath)) {
     throw new Error(`Cannot find metro.csv in ${dataDir}`);
+  }
+
+  if (!fs.existsSync(targetBusPath)) {
+    if (fs.existsSync(sourceBusPath)) {
+      fs.copyFileSync(sourceBusPath, targetBusPath);
+    } else {
+      throw new Error(`Cannot find bus_routes.csv in ${dataDir} or source path`);
+    }
   }
 
   // 1. Parse Metro CSV
@@ -132,7 +207,142 @@ async function runImport() {
     });
   }
 
-  // 2. Parse Pandals CSV
+  // 2. Parse Bus CSV
+  const busContent = fs.readFileSync(targetBusPath, 'utf8');
+  const busRows = parseCSV(busContent);
+  const busHeaders = busRows[0].map(h => h.trim());
+
+  const busRoutesMap = new Map();
+  const busStopsMap = new Map();
+  const pandalBusMap = new Map();
+
+  for (let i = 1; i < busRows.length; i++) {
+    const row = busRows[i];
+    if (!row || row.length === 0) continue;
+    const raw = {};
+    busHeaders.forEach((h, idx) => {
+      raw[h] = row[idx] ? row[idx].trim() : '';
+    });
+
+    const busNo = raw.bus_number;
+    if (!busNo) continue;
+
+    const pandalId = parseInt(raw.pandal_id, 10);
+    const pandalName = raw.pandal_name || '';
+    const stopName = raw.matched_bus_stop || 'Kolkata Bus Stop';
+    const stopKey = stopName.toLowerCase();
+    const lat = parseFloat(raw.pandal_latitude);
+    const lon = parseFloat(raw.pandal_longitude);
+    const isAc = raw.is_ac ? raw.is_ac.toLowerCase() === 'true' : false;
+
+    // Bus Route aggregation
+    if (!busRoutesMap.has(busNo)) {
+      busRoutesMap.set(busNo, {
+        busNumber: busNo,
+        operatorType: raw.operator_type || 'Private',
+        serviceVariant: raw.service_variant || 'Standard',
+        isAc,
+        origin: raw.origin || 'Kolkata',
+        destination: raw.destination || 'Kolkata',
+        routeStops: (raw.route_stops || '').split(';').map(s => s.trim()).filter(Boolean),
+        listedStopCount: parseInt(raw.listed_stop_count || '0', 10),
+        pandalIdsSet: new Set(),
+        matchedBusStopsSet: new Set(),
+      });
+    }
+    const routeObj = busRoutesMap.get(busNo);
+    if (!isNaN(pandalId)) routeObj.pandalIdsSet.add(pandalId);
+    routeObj.matchedBusStopsSet.add(stopName);
+
+    // Bus Stop aggregation
+    if (!busStopsMap.has(stopKey)) {
+      busStopsMap.set(stopKey, {
+        id: `bus-stop-${busStopsMap.size + 1}`,
+        name: stopName,
+        cleanName: cleanStopName(stopName),
+        lats: [],
+        lons: [],
+        nearestMetro: raw.nearest_metro || '',
+        busNumbersSet: new Set(),
+        pandalIdsSet: new Set(),
+      });
+    }
+    const stopObj = busStopsMap.get(stopKey);
+    if (!isNaN(lat) && !isNaN(lon)) {
+      stopObj.lats.push(lat);
+      stopObj.lons.push(lon);
+    }
+    stopObj.busNumbersSet.add(busNo);
+    if (!isNaN(pandalId)) stopObj.pandalIdsSet.add(pandalId);
+
+    // Pandal Bus mapping
+    if (!isNaN(pandalId)) {
+      if (!pandalBusMap.has(pandalId)) {
+        pandalBusMap.set(pandalId, {
+          pandalId,
+          pandalName,
+          matchedStop: stopName,
+          cleanStopName: cleanStopName(stopName),
+          busesMap: new Map(),
+        });
+      }
+      const pEntry = pandalBusMap.get(pandalId);
+      if (!pEntry.busesMap.has(busNo)) {
+        pEntry.busesMap.set(busNo, {
+          busNumber: busNo,
+          isAc,
+          operatorType: raw.operator_type || 'Private',
+          origin: raw.origin || 'Kolkata',
+          destination: raw.destination || 'Kolkata',
+        });
+      }
+    }
+  }
+
+  // Convert bus routes to serializable array
+  const busRoutes = Array.from(busRoutesMap.values()).map(r => ({
+    busNumber: r.busNumber,
+    operatorType: r.operatorType,
+    serviceVariant: r.serviceVariant,
+    isAc: r.isAc,
+    origin: r.origin,
+    destination: r.destination,
+    routeStops: r.routeStops,
+    listedStopCount: r.listedStopCount || r.routeStops.length,
+    pandalIds: Array.from(r.pandalIdsSet).sort((a, b) => a - b),
+    matchedBusStops: Array.from(r.matchedBusStopsSet),
+  })).sort((a, b) => a.busNumber.localeCompare(b.busNumber, undefined, { numeric: true }));
+
+  // Convert bus stops to serializable array
+  const busStops = Array.from(busStopsMap.values()).map(s => {
+    const avgLat = s.lats.length > 0 ? s.lats.reduce((a, b) => a + b, 0) / s.lats.length : 22.5726;
+    const avgLon = s.lons.length > 0 ? s.lons.reduce((a, b) => a + b, 0) / s.lons.length : 88.3639;
+    return {
+      id: s.id,
+      name: s.name,
+      cleanName: s.cleanName,
+      latitude: Math.round(avgLat * 1000000) / 1000000,
+      longitude: Math.round(avgLon * 1000000) / 1000000,
+      nearestMetro: s.nearestMetro || undefined,
+      busNumbers: Array.from(s.busNumbersSet).sort((a, b) => a.localeCompare(b, undefined, { numeric: true })),
+      pandalIds: Array.from(s.pandalIdsSet).sort((a, b) => a - b),
+    };
+  }).sort((a, b) => b.busNumbers.length - a.busNumbers.length);
+
+  // Convert pandalBusMap to Record<number, PandalBusConnectivity>
+  const pandalBusRecords = {};
+  pandalBusMap.forEach((entry, id) => {
+    pandalBusRecords[id] = {
+      pandalId: entry.pandalId,
+      pandalName: entry.pandalName,
+      matchedStop: entry.matchedStop,
+      cleanStopName: entry.cleanStopName,
+      busCount: entry.busesMap.size,
+      buses: Array.from(entry.busesMap.values()),
+    };
+  });
+
+  // 3. Parse Pandals CSV
   const pujaContent = fs.readFileSync(targetPujaPath, 'utf8');
   const pujaRows = parseCSV(pujaContent);
   const pujaHeaders = pujaRows[0].map(h => h.trim());
@@ -215,6 +425,12 @@ async function runImport() {
 
     const imageUrl = durgaImages[(id - 1) % durgaImages.length];
 
+    // Bus connectivity info
+    const busInfo = pandalBusRecords[id];
+    const nearestBusStop = busInfo ? busInfo.cleanStopName : 'Kolkata Bus Corridor';
+    const availableBusesCount = busInfo ? busInfo.busCount : 0;
+    const topBuses = busInfo ? busInfo.buses.slice(0, 4).map(b => b.busNumber) : [];
+
     pandals.push({
       id,
       name,
@@ -228,6 +444,9 @@ async function runImport() {
       walkingDistanceM,
       walkingTimeMinutes,
       nearestRailwayStation: raw.nearest_railway_station || 'Sealdah Railway Station',
+      nearestBusStop,
+      availableBusesCount,
+      topBuses,
       popularityScore: isNaN(popularityScore) ? 7.5 : popularityScore,
       crowdLevel,
       famous: isFamous,
@@ -245,7 +464,7 @@ async function runImport() {
     validPandalCount++;
   }
 
-  // 3. Output TypeScript files
+  // 4. Output TypeScript files
   const libDir = path.join(rootDir, 'lib');
   if (!fs.existsSync(libDir)) {
     fs.mkdirSync(libDir, { recursive: true });
@@ -253,6 +472,7 @@ async function runImport() {
 
   const pandalsTsPath = path.join(libDir, 'generated-pujas.ts');
   const metroTsPath = path.join(libDir, 'generated-metro.ts');
+  const busTsPath = path.join(libDir, 'generated-buses.ts');
 
   const pandalsTsContent = `// Auto-generated by scripts/import-data.mjs - DO NOT EDIT DIRECTLY
 import { Pandal } from './types';
@@ -266,8 +486,19 @@ import { MetroStation } from './types';
 export const GENERATED_METRO_STATIONS: MetroStation[] = ${JSON.stringify(metroStations, null, 2)};
 `;
 
+  const busTsContent = `// Auto-generated by scripts/import-data.mjs - DO NOT EDIT DIRECTLY
+import { BusRoute, BusStop, PandalBusConnectivity } from './types';
+
+export const GENERATED_BUS_ROUTES: BusRoute[] = ${JSON.stringify(busRoutes, null, 2)};
+
+export const GENERATED_BUS_STOPS: BusStop[] = ${JSON.stringify(busStops, null, 2)};
+
+export const PANDAL_BUS_MAP: Record<number, PandalBusConnectivity> = ${JSON.stringify(pandalBusRecords, null, 2)};
+`;
+
   fs.writeFileSync(pandalsTsPath, pandalsTsContent, 'utf8');
   fs.writeFileSync(metroTsPath, metroTsContent, 'utf8');
+  fs.writeFileSync(busTsPath, busTsContent, 'utf8');
 
   console.log('==========================================');
   console.log('✨ PUJAHOP DATA IMPORT SUMMARY ✨');
@@ -276,9 +507,13 @@ export const GENERATED_METRO_STATIONS: MetroStation[] = ${JSON.stringify(metroSt
   console.log(`Valid Pandal Records Imported: ${validPandalCount}`);
   console.log(`Warnings / Discrepancies: ${warningsCount}`);
   console.log(`Metro Stations Imported: ${metroStations.length}`);
+  console.log(`Bus Routes Ingested: ${busRoutes.length}`);
+  console.log(`Bus Stop Hubs Ingested: ${busStops.length}`);
+  console.log(`Pandals with Bus Mappings: ${Object.keys(pandalBusRecords).length}`);
   console.log('==========================================');
   console.log(`Generated: ${pandalsTsPath}`);
   console.log(`Generated: ${metroTsPath}`);
+  console.log(`Generated: ${busTsPath}`);
   console.log('==========================================\n');
 }
 
