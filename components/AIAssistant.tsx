@@ -21,7 +21,7 @@ export default function AIAssistant() {
     {
       id: 'm-1',
       sender: 'assistant',
-      text: 'নমস্কার! I am your PujaHop AI Assistant. Tell me your starting location, budget, or preferred pandals, and I will recommend the smartest route.',
+      text: 'নমস্কার! I am your Pujo Navigation Assistant. Tell me your starting location, budget, or preferred pandals, and I will recommend the smartest route.',
     },
   ]);
 
@@ -64,7 +64,7 @@ export default function AIAssistant() {
         action = { label: 'Explore North Pandals', href: '/explore?region=North+Kolkata' };
       } else {
         reply =
-          'I have analyzed Kolkata’s 248 verified pandals and Metro network. For an optimal hopping route with minimal traffic delays, I recommend combining Blue Line Metro with short walking hops.';
+          'I have analyzed Kolkata’s 248 verified pandals and Metro network. For an efficient hopping route with minimal traffic delays, I recommend combining Blue Line Metro with short walking hops.';
         action = { label: 'Explore 248 Pandals', href: '/explore' };
       }
 
@@ -101,7 +101,7 @@ export default function AIAssistant() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '1.2rem' }}>🤖</span>
               <div>
-                <div style={{ fontWeight: 700, fontSize: '0.92rem' }}>PujaHop AI Guide</div>
+                <div style={{ fontWeight: 700, fontSize: '0.92rem' }}>Pujo Navigation Guide</div>
                 <div style={{ fontSize: '0.7rem', color: '#D4B77A' }}>Live Transit & Route Intelligence</div>
               </div>
             </div>

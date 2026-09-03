@@ -1,4 +1,4 @@
-# 🪔 PUJAHOP — Kolkata Durga Puja Smart Navigation & Pandal Hopping Platform
+# 🪔 PUJO NAVIGATION — Kolkata Durga Puja Smart Navigation & Pandal Hopping Platform
 
 <div align="center">
 
@@ -19,9 +19,9 @@
 
 ## 📖 Overview
 
-**PUJAHOP** is a modern, high-performance web platform built to solve the ultimate festive challenge in Kolkata: navigating millions of visitors across hundreds of Durga Puja pandals safely, efficiently, and culturally immersed.
+**PUJO NAVIGATION** is a modern, high-performance web platform built to solve the ultimate festive challenge in Kolkata: navigating millions of visitors across hundreds of Durga Puja pandals safely, efficiently, and culturally immersed.
 
-From iconic crowd magnets like **Sreebhumi Sporting Club** and **Ekdalia Evergreen** to contemporary social awakening art installations in **Haridevpur** and traditional Rajbari heritage pujas, PUJAHOP delivers real-time metro connectivity, walking itineraries, crowd telemetry, heritage eatery pitstops, and master artisan cultural dossiers.
+From iconic crowd magnets like **Sreebhumi Sporting Club** and **Ekdalia Evergreen** to contemporary social awakening art installations in **Haridevpur** and traditional Rajbari heritage pujas, PUJO NAVIGATION delivers real-time metro connectivity, walking itineraries, crowd telemetry, heritage eatery pitstops, and master artisan cultural dossiers.
 
 ---
 
@@ -155,7 +155,7 @@ npm run start
 
 ## 👥 The Team
 
-PUJAHOP was conceptualized, designed, and built with ❤️ for the city of Kolkata by:
+PUJO NAVIGATION was conceptualized, designed, and built with ❤️ for the city of Kolkata by:
 
 <div align="center">
 
@@ -174,4 +174,3 @@ PUJAHOP was conceptualized, designed, and built with ❤️ for the city of Kolk
 This project is created to celebrate the UNESCO Intangible Cultural Heritage of Humanity — **Durga Puja in Kolkata**. All puja imagery and committee themes remain the cultural and intellectual heritage of their respective clubs, artists, and organizers.
 
 Built with dedication for Kolkata. **শুভ শারদীয়া! Happy Pandal Hopping!**
-# PujaHop

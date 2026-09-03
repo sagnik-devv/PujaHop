@@ -372,7 +372,7 @@ export default async function HomePage() {
               durationMinutes={12}
               distanceMeters={900}
               fare={0}
-              notes="Optimal inside heritage clusters like Shyambazar, Baghbazar, and Hatibagan."
+              notes="Best suited inside heritage clusters like Shyambazar, Baghbazar, and Hatibagan."
             />
 
             <TransportCard
@@ -421,7 +421,7 @@ export default async function HomePage() {
               Plan Your Ultimate Puja Night in 60 Seconds
             </h2>
             <p style={{ color: 'var(--stone)', fontSize: '1rem', lineHeight: 1.6, marginBottom: '28px' }}>
-              Select your favourite pandals, starting station, and budget. PujaHop calculates the optimal visiting sequence, timing milestones, and transit transfers so you spend less time in traffic and more time celebrating.
+              Select your favourite pandals, starting station, and budget. Pujo Navigation calculates the best estimated visiting sequence, timing milestones, and transit transfers so you spend less walking and more time celebrating.
             </p>
 
             <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
@@ -441,7 +441,7 @@ export default async function HomePage() {
                 <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>Sample 4-Pandal Evening Plan</div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--taupe)' }}>North Kolkata Heritage Trail • 4.2 km</div>
               </div>
-              <span className="badge badge-famous">Optimized</span>
+              <span className="badge badge-famous">Best Route</span>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '0.82rem' }}>

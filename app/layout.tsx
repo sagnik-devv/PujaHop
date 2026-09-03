@@ -7,18 +7,37 @@ import { FavoritesProvider } from '../lib/favorites-context';
 import { ToastProvider } from '../lib/toast-context';
 
 export const metadata: Metadata = {
-  title: 'PUJAHOP — Kolkata Durga Puja Smart Navigation & Pandal Hopping Guide',
+  metadataBase: new URL('https://pujonavigation.in'),
+  title: 'Pujo Navigation | Kolkata Durga Puja 2026',
   description:
-    'Kolkata’s premier Durga Puja discovery and navigation platform. Explore 248+ geo-tagged pandals, calculate fastest Metro routes, check crowd levels, and plan your hopping itinerary.',
+    'Explore Kolkata’s Durga Puja pandals, Metro routes, food stops and Pujo itineraries. Official smart navigation guide with verified pandal directions, crowd trends, and heritage food trails.',
   keywords: [
-    'Durga Puja Kolkata',
-    'Pandal Hopping',
-    'Kolkata Metro Puja Routes',
+    'Pujo Navigation',
+    'Kolkata Durga Puja 2026',
+    'Durga Puja pandals Kolkata',
+    'Kolkata Puja route',
+    'Durga Puja Metro guide',
+    'Kolkata pandal hopping',
     'Sreebhumi Sporting',
     'Baghbazar Sarbojanin',
-    'PujaHop',
     'Kolkata festival guide',
   ],
+  openGraph: {
+    title: 'Pujo Navigation | Kolkata Durga Puja 2026',
+    description: 'Explore Kolkata’s Durga Puja pandals, Metro routes, food stops and Pujo itineraries.',
+    url: 'https://pujonavigation.in',
+    siteName: 'Pujo Navigation',
+    locale: 'en_IN',
+    type: 'website',
+    images: [
+      {
+        url: '/images/logo.png',
+        width: 1200,
+        height: 1200,
+        alt: 'Pujo Navigation Logo',
+      },
+    ],
+  },
   icons: {
     icon: [
       { url: '/images/logo.png', type: 'image/png' },

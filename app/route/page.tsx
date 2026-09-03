@@ -17,9 +17,9 @@ export default async function RoutePage({ searchParams }: PageProps) {
   const metroStations = await getMetroStations();
 
   const initialToId = params.to ? parseInt(params.to, 10) : pandals[0]?.id || 1;
-  const initialFromName = params.fromName || 'Current Location';
-  const initialLat = params.lat ? parseFloat(params.lat) : undefined;
-  const initialLon = params.lon ? parseFloat(params.lon) : undefined;
+  const initialFromName = params.fromName || 'Central Kolkata (Esplanade)';
+  const initialLat = params.lat ? parseFloat(params.lat) : (params.fromName ? undefined : 22.5649);
+  const initialLon = params.lon ? parseFloat(params.lon) : (params.fromName ? undefined : 88.3517);
 
   return (
     <RouteClient

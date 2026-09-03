@@ -226,7 +226,7 @@ export default function ExploreClient({
               Explore 248 Kolkata Pandals
             </h1>
             <p style={{ fontSize: '0.84rem', color: 'var(--stone)', maxWidth: '480px' }}>
-              Filter by locality, live crowd, or toggle <strong>Metro Reference View</strong> to hop station-by-station. Showing <strong>{filteredPandals.length}</strong> pandals.
+              Filter by locality, estimated crowd trends, or toggle <strong>Metro Reference View</strong> to hop station-by-station. Showing <strong>{filteredPandals.length}</strong> pandals.
             </p>
           </div>
         </div>

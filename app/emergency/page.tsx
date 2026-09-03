@@ -88,7 +88,7 @@ export default async function EmergencyPage() {
           </div>
 
           <p style={{ color: 'var(--taupe)', fontSize: '0.88rem', lineHeight: 1.6, marginBottom: '20px' }}>
-            In compliance with PujaHop data integrity standards, we do not fabricate public toilet or parking locations. Real-time geo-feeds from Kolkata Municipal Corporation (KMC) and Kolkata Traffic Police will integrate during Phase 2.
+            In compliance with Pujo Navigation data integrity standards, we do not fabricate public toilet or parking locations. Real-time geo-feeds from Kolkata Municipal Corporation (KMC) and Kolkata Traffic Police will integrate during Phase 2.
           </p>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>

@@ -22,13 +22,16 @@ export const KOLKATA_HUBS: Array<{
 }> = [
   // Major Railway & Transit Hubs
   { name: 'Howrah Railway Station', subtitle: 'Howrah • Major Terminal Hub', type: 'hub', lat: 22.5855, lon: 88.3433, aliases: ['howrah', 'hwh', 'howrah station', 'howrah bridge'] },
+  { name: 'Howrah Maidan', subtitle: 'Howrah • Green Line Metro & Market', type: 'hub', lat: 22.5878, lon: 88.3326, aliases: ['howrah maidan', 'ac market'] },
+  { name: 'Shibpur / Mandirtala', subtitle: 'Howrah • Vidyasagar Setu Corridor', type: 'landmark', lat: 22.5640, lon: 88.3180, aliases: ['shibpur', 'mandirtala'] },
+  { name: 'Salkia Chowrasta', subtitle: 'North Howrah • GT Road Hub', type: 'landmark', lat: 22.6080, lon: 88.3510, aliases: ['salkia', 'salkia chowrasta'] },
   { name: 'Sealdah Railway Station', subtitle: 'Central Kolkata • Main Terminal', type: 'hub', lat: 22.5670, lon: 88.3715, aliases: ['sealdah', 'sda', 'sealdah station', 'sealdah south', 'sealdah north'] },
   { name: 'Kolkata Railway Station (Chitpur)', subtitle: 'North Kolkata • Express Terminal', type: 'hub', lat: 22.6033, lon: 88.3752, aliases: ['chitpur', 'kolkata station', 'koaa'] },
   { name: 'Netaji Subhash Chandra Bose Airport (CCU)', subtitle: 'Dum Dum • International Airport', type: 'hub', lat: 22.6547, lon: 88.4467, aliases: ['airport', 'ccu', 'dum dum airport', 'kolkata airport'] },
   { name: 'Esplanade Bus Terminus & Central', subtitle: 'Central Kolkata • City Core', type: 'hub', lat: 22.5649, lon: 88.3517, aliases: ['esplanade', 'central', 'dharmatala', 'curzon park', 'maidan central'] },
   { name: 'Babughat Ferry & Bus Terminal', subtitle: 'Strand Road • Riverfront Hub', type: 'hub', lat: 22.5678, lon: 88.3378, aliases: ['babughat', 'babu ghat', 'millennium park'] },
-  { name: 'Santragachi Junction', subtitle: 'Howrah • Long Distance Hub', type: 'hub', lat: 22.5810, lon: 88.2830, aliases: ['santragachi', 'src'] },
   { name: 'Nabanna (State Secretariat)', subtitle: 'Mandirtala • Vidyasagar Setu', type: 'landmark', lat: 22.5560, lon: 88.3240, aliases: ['nabanna', 'mandirtala', 'kona expressway'] },
+  { name: 'Santragachi Junction', subtitle: 'Howrah • Long Distance Hub', type: 'hub', lat: 22.5810, lon: 88.2830, aliases: ['santragachi', 'src'] },
 
   // South Kolkata Core
   { name: 'Gariahat Crossing', subtitle: 'South Kolkata • Retail Hub', type: 'landmark', lat: 22.5190, lon: 88.3653, aliases: ['gariahat', 'gariahat flyover', 'ballygunge phari', 'pantaloons'] },
@@ -159,9 +162,14 @@ export async function resolveLocationCoordinates(query: string): Promise<{
   lon: number;
   source: 'local' | 'osm' | 'fallback';
 }> {
-  const q = query.toLowerCase().trim();
+  let q = query.toLowerCase().trim();
   if (!q) {
     return { name: 'Central Kolkata (Esplanade)', lat: 22.5649, lon: 88.3517, source: 'fallback' };
+  }
+
+  // Strip "my location: ", "my location (", etc.
+  if (q.startsWith('my location')) {
+    q = q.replace(/^my location[:\s]*(\()?/i, '').replace(/\)$/, '').trim();
   }
 
   // 1. Check direct match in Metro Stations
@@ -213,7 +221,7 @@ export async function resolveLocationCoordinates(query: string): Promise<{
       signal: controller.signal,
       headers: {
         'Accept': 'application/json',
-        'User-Agent': 'PujaHopKolkataTransit/1.0',
+        'User-Agent': 'PujoNavigationKolkataTransit/1.0',
       },
     });
     clearTimeout(timeoutId);
@@ -252,7 +260,7 @@ export async function resolveLocationCoordinates(query: string): Promise<{
  * to provide a human-readable origin label (e.g. "Near Gariahat Crossing (~180m)").
  */
 export function getClosestLandmarkName(lat: number, lon: number): string {
-  let closestName = 'Kolkata Central';
+  let closestName = 'Central Kolkata';
   let minDistance = 9999;
 
   // Check metro stations
@@ -273,13 +281,103 @@ export function getClosestLandmarkName(lat: number, lon: number): string {
     }
   }
 
+  // Also check all 248 pandals to identify neighborhood
+  let closestPandalName = '';
+  let closestPandalRegion = '';
+  let minPandalDist = 9999;
+  for (const p of GENERATED_PANDALS) {
+    const dist = calculateDistance(lat, lon, p.latitude, p.longitude);
+    if (dist < minPandalDist) {
+      minPandalDist = dist;
+      closestPandalName = p.name;
+      closestPandalRegion = p.region;
+    }
+  }
+
+  const isKolkata = lat >= 22.20 && lat <= 22.80 && lon >= 88.15 && lon <= 88.60;
+
   if (minDistance < 0.4) {
     return `${closestName} (${Math.round(minDistance * 1000)}m)`;
-  } else if (minDistance < 2.0) {
+  } else if (minDistance < 1.8) {
     return `Near ${closestName} (~${minDistance.toFixed(1)} km)`;
+  } else if (minPandalDist < 1.0) {
+    return `${closestPandalRegion} (Near ${closestPandalName})`;
+  } else if (isKolkata && closestPandalRegion) {
+    return `${closestPandalRegion}, Kolkata`;
+  } else if (isKolkata) {
+    return 'Central Kolkata (Esplanade)';
   } else {
-    return `Kolkata (${closestName} area)`;
+    return `Live GPS (${lat.toFixed(3)}, ${lon.toFixed(3)})`;
   }
+}
+
+/**
+ * Reverse geocodes coordinates to a human-readable neighborhood/locality name.
+ * Uses OpenStreetMap Nominatim with fallback to local geospatial database.
+ */
+export async function reverseGeocodeLocation(lat: number, lon: number): Promise<{
+  formattedName: string;
+  locality?: string;
+  isKolkata: boolean;
+}> {
+  const isKolkata = lat >= 22.20 && lat <= 22.80 && lon >= 88.15 && lon <= 88.60;
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2600);
+    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=16`, {
+      signal: controller.signal,
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'PujoNavigationKolkataTransit/1.0',
+      },
+    });
+    clearTimeout(timeoutId);
+
+    if (res.ok) {
+      const data = await res.json();
+      const addr = data.address || {};
+      const neighborhood = addr.neighbourhood || addr.suburb || addr.residential || addr.commercial || addr.village || addr.town || addr.city_district || addr.road;
+      const city = addr.city || addr.town || addr.county || addr.state_district;
+      const state = addr.state;
+
+      if (isKolkata) {
+        const nearestMetro = findNearestMetroStation(lat, lon);
+        if (nearestMetro.distanceM < 1200) {
+          const areaLabel = neighborhood || nearestMetro.metro.name;
+          return {
+            formattedName: `${areaLabel} (Near ${nearestMetro.metro.name} Metro)`,
+            locality: areaLabel,
+            isKolkata: true,
+          };
+        } else if (neighborhood) {
+          return {
+            formattedName: `${neighborhood}, Kolkata`,
+            locality: neighborhood,
+            isKolkata: true,
+          };
+        }
+      } else {
+        const parts = [neighborhood, city, state].filter(Boolean);
+        const uniqueParts = Array.from(new Set(parts));
+        return {
+          formattedName: uniqueParts.join(', ') || city || state || 'Detected Location',
+          locality: neighborhood || city,
+          isKolkata: false,
+        };
+      }
+    }
+  } catch {
+    // Network or timeout, fallback below
+  }
+
+  // Fallback if reverse geocoding is offline
+  const landmark = getClosestLandmarkName(lat, lon);
+  return {
+    formattedName: landmark,
+    locality: landmark,
+    isKolkata,
+  };
 }
 
 export interface UserLocationResult {
@@ -290,7 +388,7 @@ export interface UserLocationResult {
   nearestMetroName: string;
   nearestMetroId: number;
   nearestMetroDistanceM: number;
-  source: 'gps' | 'gps-coarse' | 'cache' | 'ip' | 'default';
+  source: 'gps' | 'gps-coarse' | 'cache' | 'default';
   isKolkata: boolean;
   errorMessage?: string;
 }
@@ -315,18 +413,16 @@ export function findNearestMetroStation(lat: number, lon: number): {
 }
 
 /**
- * Robust, multi-layered location detection:
- * 1. Checks High-Accuracy HTML5 GPS (7s timeout)
- * 2. Falls back to Standard/Coarse Accuracy HTML5 GPS (5s timeout)
- * 3. Checks localStorage cached recent position (<12 hours)
- * 4. Checks IP-based coarse fallback
- * 5. Automatically correlates closest landmark & closest Kolkata Metro station
+ * Robust HTML5 GPS location detection.
+ * 1. Checks High-Accuracy HTML5 GPS
+ * 2. Falls back to Standard/Coarse Accuracy HTML5 GPS
+ * 3. Never guesses fake locations via unreliable IP geolocation.
  */
 export async function detectUserLocation(options?: {
   preferHighAccuracy?: boolean;
   timeoutMs?: number;
 }): Promise<UserLocationResult> {
-  const timeoutMs = options?.timeoutMs || 7000;
+  const timeoutMs = options?.timeoutMs || 8000;
 
   const queryBrowserGeo = (highAccuracy: boolean, timeout: number): Promise<GeolocationPosition> => {
     return new Promise((resolve, reject) => {
@@ -336,7 +432,7 @@ export async function detectUserLocation(options?: {
       navigator.geolocation.getCurrentPosition(resolve, reject, {
         enableHighAccuracy: highAccuracy,
         timeout,
-        maximumAge: 60000,
+        maximumAge: 10000,
       });
     });
   };
@@ -347,7 +443,7 @@ export async function detectUserLocation(options?: {
   let source: UserLocationResult['source'] = 'default';
   let errorMessage: string | undefined = undefined;
 
-  // Step 1: Try high accuracy GPS
+  // Step 1: Real HTML5 GPS (High Accuracy)
   try {
     const pos = await queryBrowserGeo(options?.preferHighAccuracy ?? true, timeoutMs);
     lat = pos.coords.latitude;
@@ -355,65 +451,26 @@ export async function detectUserLocation(options?: {
     accuracy = pos.coords.accuracy;
     source = 'gps';
   } catch (err: any) {
-    console.warn('High accuracy GPS timed out or failed, trying coarse GPS:', err?.message);
-    // Step 2: Try coarse/standard accuracy GPS
+    console.warn('High accuracy GPS timed out or failed, trying standard accuracy:', err?.message);
+    // Step 2: Try standard accuracy GPS
     try {
-      const pos2 = await queryBrowserGeo(false, 5000);
+      const pos2 = await queryBrowserGeo(false, 4000);
       lat = pos2.coords.latitude;
       lon = pos2.coords.longitude;
       accuracy = pos2.coords.accuracy;
       source = 'gps-coarse';
     } catch (err2: any) {
-      console.warn('Coarse GPS also failed:', err2?.message);
       errorMessage = err2?.message || 'GPS location unavailable';
-
-      // Step 3: Check cached location in localStorage
-      if (typeof window !== 'undefined') {
-        try {
-          const cached = localStorage.getItem('pujahop_cached_location');
-          if (cached) {
-            const parsed = JSON.parse(cached);
-            if (Date.now() - (parsed.timestamp || 0) < 12 * 3600 * 1000) {
-              lat = parsed.lat;
-              lon = parsed.lon;
-              accuracy = parsed.accuracy;
-              source = 'cache';
-            }
-          }
-        } catch {
-          // Ignore cache parse errors
-        }
-      }
-
-      // Step 4: If still default, try IP fallback
-      if (source === 'default') {
-        try {
-          const controller = new AbortController();
-          const ipTimeout = setTimeout(() => controller.abort(), 2500);
-          const res = await fetch('https://get.geojs.io/v1/ip/geo.json', { signal: controller.signal });
-          clearTimeout(ipTimeout);
-          if (res.ok) {
-            const ipData = await res.json();
-            const ipLat = parseFloat(ipData.latitude);
-            const ipLon = parseFloat(ipData.longitude);
-            if (!isNaN(ipLat) && !isNaN(ipLon)) {
-              lat = ipLat;
-              lon = ipLon;
-              source = 'ip';
-            }
-          }
-        } catch {
-          // IP fallback failed or aborted
-        }
-      }
+      // DO NOT fall back to inaccurate IP geolocation! Throw so callers handle cleanly.
+      throw new Error(errorMessage);
     }
   }
 
   // Check if coordinates are in Greater Kolkata region
   const isKolkata = lat >= 22.20 && lat <= 22.80 && lon >= 88.15 && lon <= 88.60;
 
-  // Cache valid detected position
-  if (source === 'gps' || source === 'gps-coarse') {
+  // Cache valid detected position only if accuracy is acceptable
+  if ((source === 'gps' || source === 'gps-coarse') && (!accuracy || accuracy < 2000)) {
     if (typeof window !== 'undefined') {
       try {
         localStorage.setItem(
@@ -426,7 +483,9 @@ export async function detectUserLocation(options?: {
     }
   }
 
-  const landmark = getClosestLandmarkName(lat, lon);
+  // Reverse geocode to exact neighborhood or real-world locality
+  const rev = await reverseGeocodeLocation(lat, lon);
+  const landmark = rev.formattedName;
   const { metro: nearestMetro, distanceM: nearestMetroDistanceM } = findNearestMetroStation(lat, lon);
 
   return {
@@ -438,7 +497,7 @@ export async function detectUserLocation(options?: {
     nearestMetroId: nearestMetro.id,
     nearestMetroDistanceM,
     source,
-    isKolkata,
+    isKolkata: rev.isKolkata,
     errorMessage,
   };
 }

@@ -209,10 +209,10 @@ export default function MetroPageClient({
                 </h3>
               </div>
               <p style={{ fontSize: '0.85rem', color: '#555', lineHeight: 1.5, marginBottom: '14px' }}>
-                On <strong>Saptami, Ashtami, and Nabami</strong>, Kolkata Metro operates continuous night trains running until <strong>04:00 AM</strong> next morning, with trains running every 6 to 8 minutes on the Blue and Green Lines.
+                On <strong>Saptami, Ashtami, and Nabami</strong>, Kolkata Metro traditionally operates extended festive midnight services on the Blue (North-South) and Green (East-West) lines. Standard schedules apply on Panchami, Sasthi, and Dashami.
               </p>
               <div style={{ fontSize: '0.78rem', background: '#F9F6F0', padding: '10px', borderRadius: '6px', border: '1px solid var(--border-subtle)' }}>
-                💡 <em>Tip: Blue Line connects Dakshineswar to Kavi Subhash, allowing seamless hops between North and South Kolkata legends.</em>
+                💡 <em>Timings follow Metro Railway Kolkata official festive circulars. Blue Line connects Dakshineswar to Kavi Subhash, and Green Line connects Howrah Maidan to Sealdah.</em>
               </div>
             </div>
 

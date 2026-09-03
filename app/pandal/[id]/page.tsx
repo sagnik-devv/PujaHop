@@ -78,6 +78,9 @@ export default async function PandalDetailPage({ params }: PageProps) {
                 <span className="badge badge-region" style={{ background: 'rgba(255,255,255,0.12)', color: 'var(--soft-gold)', borderColor: 'rgba(176,141,87,0.3)' }}>
                   {pandal.region}
                 </span>
+                <span className="badge" style={{ background: 'rgba(255,255,255,0.08)', color: '#D4B77A', borderColor: 'rgba(212,183,122,0.3)', fontSize: '0.74rem' }}>
+                  ✓ Verified for 2026
+                </span>
                 {artDetails?.establishedEra && (
                   <span className="badge" style={{ background: 'rgba(176,141,87,0.18)', color: 'var(--soft-gold)', borderColor: 'rgba(176,141,87,0.4)', fontSize: '0.74rem' }}>
                     Est. {artDetails.establishedEra}

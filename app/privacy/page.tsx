@@ -26,7 +26,7 @@ export default function PrivacyPage() {
         >
           <h2 style={{ fontSize: '1.35rem', marginBottom: '12px' }}>1. Use of Geolocation Data</h2>
           <p style={{ marginBottom: '20px' }}>
-            PujaHop utilizes browser-based geolocation (`navigator.geolocation`) exclusively to compute distances to nearby pandals and suggest optimal starting transit points. Your location data is processed locally in your browser and is never stored, sold, or shared with third-party advertisers.
+            Pujo Navigation utilizes browser-based geolocation (`navigator.geolocation`) exclusively to compute distances to nearby pandals and suggest verified starting transit points. Your location data is processed locally in your browser and is never stored, sold, or shared with third-party advertisers.
           </p>
 
           <h2 style={{ fontSize: '1.35rem', marginBottom: '12px' }}>2. Local Storage & Bookmarks</h2>

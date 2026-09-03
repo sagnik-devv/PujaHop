@@ -22,7 +22,7 @@ export default function LoginClient() {
       return;
     }
 
-    showToast(`Welcome ${name || 'Hopper'}! Signed in to PujaHop.`, 'success');
+    showToast(`Welcome ${name || 'Hopper'}! Signed in to Pujo Navigation.`, 'success');
     setTimeout(() => {
       router.push('/');
     }, 800);
@@ -43,9 +43,9 @@ export default function LoginClient() {
       >
         {/* Brand Header */}
         <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-          <Image src="/images/logo.png" alt="Logo" width={48} height={48} style={{ margin: '0 auto 12px' }} />
+          <Image src="/images/logo.png" alt="Pujo Navigation Logo" width={48} height={48} style={{ margin: '0 auto 12px', objectFit: 'contain' }} />
           <h1 style={{ fontSize: '1.8rem', fontFamily: 'var(--font-serif)', marginBottom: '4px' }}>
-            PUJAHOP
+            PUJO NAVIGATION
           </h1>
           <p style={{ fontSize: '0.82rem', color: 'var(--taupe)' }}>
             Save your customized pandal hopping routes & crowd alerts
@@ -138,12 +138,12 @@ export default function LoginClient() {
             style={{ width: '100%', justifyContent: 'center', marginTop: '8px', padding: '14px' }}
           >
             <IconSparkles size={16} />
-            <span>{tab === 'signin' ? 'Sign In to PujaHop' : 'Create Free Account'}</span>
+            <span>{tab === 'signin' ? 'Sign In to Pujo Navigation' : 'Create Free Account'}</span>
           </button>
         </form>
 
         <div style={{ marginTop: '24px', textAlign: 'center', fontSize: '0.78rem', color: 'var(--taupe)' }}>
-          By signing in, you agree to PujaHop’s{' '}
+          By signing in, you agree to Pujo Navigation’s{' '}
           <Link href="/privacy" style={{ color: 'var(--vermilion)', textDecoration: 'underline' }}>
             Privacy Policy
           </Link>.

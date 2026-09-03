@@ -16,7 +16,9 @@ import {
   EmergencyService,
   SearchResultGroup,
   FilterState,
+  TransportMode,
 } from './types';
+import { getRealWorldMultiRoute, getRealWorldLeg } from './routing-service';
 import {
   calculateDistance,
   calculateDistanceMeters,
@@ -31,8 +33,8 @@ import { formatDistance } from './format';
 import { resolveLocationCoordinates } from './location-service';
 
 /**
- * PUJAHOP SERVICE LAYER
- * This acts as the backend-swap seam for Next.js -> FastAPI / PostgreSQL.
+ * PUJO NAVIGATION SERVICE LAYER
+ * Consolidated verified client & server accessors for pandals, metro stations, food pitstops and routes.
  */
 
 export async function getPandals(): Promise<Pandal[]> {
@@ -344,15 +346,17 @@ export async function getRoutes(params: RouteSearchParams): Promise<{
     ],
   };
 
-  // 3. DIRECT CAB / TAXI (Door to Door with traffic adjustment)
-  const cabDuration = estimateCabMinutes(directDistanceKm, 1.8);
-  const cabFare = estimateCabFare(directDistanceKm);
+  // 3. DIRECT CAB / TAXI (Door to Door with real-world road routing)
+  const realCabLeg = await getRealWorldLeg(fromLat, fromLon, targetPandal.latitude, targetPandal.longitude, 'driving');
+  const realCabDistanceKm = realCabLeg.distanceMeters > 0 ? realCabLeg.distanceMeters / 1000 : directDistanceKm * 1.34;
+  const cabDuration = Math.max(8, Math.round((realCabLeg.durationSeconds / 60) * 1.35));
+  const cabFare = estimateCabFare(realCabDistanceKm);
   const cabOption: RouteOption = {
     id: 'route-cab-direct',
     title: 'Direct Cab / Yellow Taxi',
     tagline: 'Direct ride with real-time Puja traffic penalties',
     totalTimeMinutes: cabDuration,
-    totalDistanceKm: Math.round(directDistanceKm * 1.2 * 10) / 10,
+    totalDistanceKm: Math.round(realCabDistanceKm * 10) / 10,
     estimatedFare: cabFare,
     walkingDistanceMeters: 250,
     transfersCount: 0,
@@ -528,6 +532,7 @@ export async function getCrowdData(pandalId: number): Promise<CrowdInfo> {
 
 export interface ItineraryOptions {
   startingPoint: string;
+  startCoords?: { lat: number; lon: number };
   endingPoint?: string;
   startTime: string;
   endTime: string;
@@ -551,9 +556,56 @@ export async function generateItinerary(options: ItineraryOptions): Promise<Itin
     validPandals.push(...trending);
   }
 
-  // Sort logically by geographic proximity (TSP-greedy approximation)
-  const orderedPandals: Pandal[] = [validPandals[0]];
-  const remaining = validPandals.slice(1);
+  // Resolve starting coordinates
+  let startLat = 22.5649; // Default Central Kolkata (Esplanade)
+  let startLon = 88.3517;
+
+  if (options.startCoords && options.startCoords.lat && options.startCoords.lon) {
+    const inKolkata =
+      options.startCoords.lat >= 22.20 &&
+      options.startCoords.lat <= 22.80 &&
+      options.startCoords.lon >= 88.15 &&
+      options.startCoords.lon <= 88.60;
+    if (inKolkata) {
+      startLat = options.startCoords.lat;
+      startLon = options.startCoords.lon;
+    } else if (options.startingPoint) {
+      try {
+        const resolvedStart = await resolveLocationCoordinates(options.startingPoint);
+        if (resolvedStart) {
+          startLat = resolvedStart.lat;
+          startLon = resolvedStart.lon;
+        }
+      } catch {
+        // Fallback to Esplanade
+      }
+    }
+  } else if (options.startingPoint) {
+    try {
+      const resolvedStart = await resolveLocationCoordinates(options.startingPoint);
+      if (resolvedStart) {
+        startLat = resolvedStart.lat;
+        startLon = resolvedStart.lon;
+      }
+    } catch {
+      // Retain fallback coordinates
+    }
+  }
+
+  // Find the pandal closest to the starting location to anchor the route
+  let firstIndex = 0;
+  let minStartDist = 9999;
+  validPandals.forEach((p, idx) => {
+    const dist = calculateDistance(startLat, startLon, p.latitude, p.longitude);
+    if (dist < minStartDist) {
+      minStartDist = dist;
+      firstIndex = idx;
+    }
+  });
+
+  // Sort logically by geographic proximity (TSP-greedy approximation starting from closest to user's hub)
+  const orderedPandals: Pandal[] = [validPandals[firstIndex]];
+  const remaining = validPandals.filter((_, idx) => idx !== firstIndex);
 
   while (remaining.length > 0) {
     const current = orderedPandals[orderedPandals.length - 1];
@@ -571,14 +623,68 @@ export async function generateItinerary(options: ItineraryOptions): Promise<Itin
     orderedPandals.push(remaining.splice(closestIndex, 1)[0]);
   }
 
+  // Construct waypoints list: starting origin followed by all ordered pandals
+  const waypoints = [
+    { lat: startLat, lon: startLon },
+    ...orderedPandals.map(p => ({ lat: p.latitude, lon: p.longitude })),
+  ];
+
+  // Fetch real-world street routing from OSRM routing engine
+  const routingProfile = options.transportPreference === 'cab' ? 'driving' : 'driving';
+  const realRoute = await getRealWorldMultiRoute(waypoints, routingProfile);
+
   let currentHour = parseInt(options.startTime.split(':')[0] || '17', 10);
   let currentMinute = parseInt(options.startTime.split(':')[1] || '00', 10);
+  const startTotalMinutes = currentHour * 60 + currentMinute;
 
-  const stops: ItineraryStop[] = [];
   let totalDistanceKm = 0;
   let totalEstimatedCost = 0;
   let totalTransfers = 0;
   const recommendedMetroStations = new Set<string>();
+
+  // Calculate Leg 0: Transit from Starting Location to First Pandal
+  const initialLeg = realRoute.legs[0] || { distanceMeters: 0, durationSeconds: 0 };
+  const initialDistM = initialLeg.distanceMeters;
+  const initialDistKm = initialDistM / 1000;
+  totalDistanceKm += initialDistKm;
+
+  let initialMode: TransportMode = 'metro';
+  let initialTravelMins = 0;
+  let initialCost = 0;
+
+  if (initialDistKm <= 1.2) {
+    initialMode = 'walk';
+    initialTravelMins = estimateWalkMinutes(initialDistM);
+    initialCost = 0;
+  } else if (options.transportPreference === 'cab') {
+    initialMode = 'cab';
+    initialTravelMins = Math.max(5, Math.round((initialLeg.durationSeconds / 60) * 1.3));
+    initialCost = estimateCabFare(initialDistKm);
+  } else {
+    initialMode = 'metro';
+    initialTravelMins = Math.max(10, Math.round(initialDistKm * 2.2) + 8);
+    initialCost = estimateMetroFare(initialDistKm);
+    totalTransfers += 1;
+  }
+  totalEstimatedCost += initialCost;
+
+  // Advance time from start by initial transit time to first pandal
+  currentMinute += initialTravelMins;
+  while (currentMinute >= 60) {
+    currentMinute -= 60;
+    currentHour += 1;
+  }
+
+  const initialTravel = {
+    from: options.startingPoint || 'Starting Point',
+    to: orderedPandals[0].name,
+    distanceM: initialDistM,
+    durationMinutes: initialTravelMins,
+    mode: initialMode,
+    cost: initialCost,
+  };
+
+  const stops: ItineraryStop[] = [];
 
   for (let i = 0; i < orderedPandals.length; i++) {
     const p = orderedPandals[i];
@@ -598,12 +704,12 @@ export async function generateItinerary(options: ItineraryOptions): Promise<Itin
     let travelToNextMins = 0;
     let travelCost = 0;
     let distM = 0;
-    let nextMode: any = 'metro';
+    let nextMode: TransportMode = 'metro';
 
     if (!isLast) {
-      const nextP = orderedPandals[i + 1];
-      const distKm = calculateDistance(p.latitude, p.longitude, nextP.latitude, nextP.longitude);
-      distM = Math.round(distKm * 1000);
+      const leg = realRoute.legs[i + 1] || { distanceMeters: 0, durationSeconds: 0 };
+      distM = leg.distanceMeters;
+      const distKm = distM / 1000;
       totalDistanceKm += distKm;
 
       if (distKm <= 1.2) {
@@ -612,11 +718,11 @@ export async function generateItinerary(options: ItineraryOptions): Promise<Itin
         travelCost = 0;
       } else if (options.transportPreference === 'cab') {
         nextMode = 'cab';
-        travelToNextMins = estimateCabMinutes(distKm);
+        travelToNextMins = Math.max(4, Math.round((leg.durationSeconds / 60) * 1.3));
         travelCost = estimateCabFare(distKm);
       } else {
         nextMode = 'metro';
-        travelToNextMins = Math.max(12, Math.round(distKm * 2.5) + 10);
+        travelToNextMins = Math.max(10, Math.round(distKm * 2.2) + 8);
         travelCost = estimateMetroFare(distKm);
         totalTransfers += 1;
       }
@@ -652,21 +758,24 @@ export async function generateItinerary(options: ItineraryOptions): Promise<Itin
   }
 
   const endStr = `${String(currentHour).padStart(2, '0')}:${String(currentMinute).padStart(2, '0')}`;
+  const endTotalMinutes = currentHour * 60 + currentMinute;
+  const totalDurationMinutes = endTotalMinutes - startTotalMinutes;
 
   return {
     id: `plan-${Date.now()}`,
     title: `${orderedPandals.length}-Pandal Festive Hop Route`,
-    startingPoint: options.startingPoint || 'Kolkata Central',
+    startingPoint: options.startingPoint || 'Central Kolkata',
     endingPoint: options.endingPoint || 'Return via Metro',
     startTime: options.startTime,
     endTime: endStr,
-    totalDurationMinutes: stops.reduce((acc, s) => acc + s.stayDurationMinutes + (s.travelToNextMinutes || 0), 0),
+    totalDurationMinutes,
     totalDistanceKm: Math.round(totalDistanceKm * 10) / 10,
     totalEstimatedCost: Math.max(40, totalEstimatedCost),
     totalPandals: orderedPandals.length,
     totalTransfers,
     transportPreference: options.transportPreference,
     stops,
+    initialTravel,
     recommendedMetroStations: Array.from(recommendedMetroStations),
     tips: [
       'Carry your Metro Smart Card to bypass ticket counter queues during festive nights.',

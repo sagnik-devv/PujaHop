@@ -10,7 +10,7 @@ export default function AboutPage() {
         <div style={{ textAlign: 'center', marginBottom: '48px' }}>
           <div className="eyebrow" style={{ justifyContent: 'center' }}>Heritage & Technology</div>
           <h1 style={{ fontSize: '3rem', fontFamily: 'var(--font-serif)', marginBottom: '16px' }}>
-            About PUJAHOP
+            About Pujo Navigation
           </h1>
           <p style={{ fontSize: '1.1rem', color: 'var(--taupe)', maxWidth: '640px', margin: '0 auto', lineHeight: 1.6 }}>
             Kolkata’s dedicated travel-tech and festival navigation platform, born to make Durga Puja pandal hopping effortless, elegant, and intelligent.
@@ -36,7 +36,7 @@ export default function AboutPage() {
             Every autumn, the City of Joy transforms into the world’s largest open-air art gallery. Millions of devotees and visitors navigate hundreds of creative pandals spread across North, South, Central, and Eastern Kolkata. However, navigating the city during festive rush with road closures, pedestrian barricades, and massive queues has always been a complex challenge.
           </p>
           <p style={{ marginBottom: '28px' }}>
-            <strong>PUJAHOP</strong> was built to solve this challenge through verified geographic datasets, spatial routing models, and deep integration with Kolkata’s high-frequency Metro railway network.
+            <strong>Pujo Navigation</strong> was built to solve this challenge through verified geographic datasets, spatial routing models, and deep integration with Kolkata’s high-frequency Metro railway network.
           </p>
 
           <div className="durga-eye-divider" />

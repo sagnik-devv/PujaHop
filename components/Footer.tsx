@@ -10,10 +10,10 @@ export default function Footer() {
         {/* Cultural Top Banner */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', paddingBottom: '32px', marginBottom: '40px', borderBottom: '1px solid rgba(176, 141, 87, 0.25)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <Image src="/images/logo.png" alt="PujaHop Logo" width={36} height={36} />
+            <Image src="/images/logo.png" alt="Pujo Navigation Logo" width={36} height={36} style={{ objectFit: 'contain' }} />
             <div>
               <span style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', fontWeight: 700, color: '#FFF' }}>
-                PUJAHOP
+                PUJO NAVIGATION
               </span>
               <span className="bengali-accent" style={{ marginLeft: '12px', fontSize: '0.95rem' }}>
                 শারদোৎসব ২০২৬
@@ -73,7 +73,7 @@ export default function Footer() {
             <div className="footer-column-title">Safety & Support</div>
             <ul className="footer-links-list">
               <li><Link href="/emergency" className="footer-link" style={{ color: '#E57373', fontWeight: 600 }}>Police & Medical Helplines</Link></li>
-              <li><Link href="/about" className="footer-link">About PujaHop</Link></li>
+              <li><Link href="/about" className="footer-link">About Pujo Navigation</Link></li>
               <li><Link href="/privacy" className="footer-link">Privacy & Location Policy</Link></li>
               <li><a href="tel:1090" className="footer-link">Kolkata Police: 1090</a></li>
               <li><a href="tel:112" className="footer-link">National Emergency: 112</a></li>
@@ -84,7 +84,7 @@ export default function Footer() {
         {/* Footer Bottom Bar */}
         <div className="footer-bottom">
           <div>
-            © {new Date().getFullYear()} PUJAHOP • Built with pride for Kolkata Durga Puja • Geo-tagged with OpenStreetMap.
+            © {new Date().getFullYear()} PUJO NAVIGATION • Built with pride for Kolkata Durga Puja • Geo-tagged with OpenStreetMap.
           </div>
           <div style={{ display: 'flex', gap: '20px' }}>
             <Link href="/about" className="footer-link">About</Link>

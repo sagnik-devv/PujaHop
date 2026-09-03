@@ -82,14 +82,15 @@ export default function Navbar() {
           <Link href="/" className="navbar-brand">
             <Image
               src="/images/logo.png"
-              alt="PUJAHOP Logo"
+              alt="Pujo Navigation Logo"
               width={38}
               height={38}
               className="navbar-logo-img"
+              style={{ objectFit: 'contain' }}
               priority
             />
             <span className="navbar-brand-text">
-              PUJAHOP
+              PUJO NAVIGATION
               <span className="navbar-brand-dot" />
             </span>
           </Link>
@@ -251,9 +252,9 @@ export default function Navbar() {
       <aside className={`mobile-drawer ${drawerOpen ? 'open' : ''}`} aria-label="Mobile Navigation">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Image src="/images/logo.png" alt="Logo" width={32} height={32} />
+            <Image src="/images/logo.png" alt="Pujo Navigation Logo" width={32} height={32} style={{ objectFit: 'contain' }} />
             <span style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', fontWeight: 700 }}>
-              PUJAHOP
+              PUJO NAVIGATION
             </span>
           </div>
           <button onClick={() => setDrawerOpen(false)} aria-label="Close menu">
@@ -284,7 +285,7 @@ export default function Navbar() {
           </li>
           <li>
             <Link href="/about" className="mobile-nav-link">
-              <span>About PujaHop</span>
+              <span>About Pujo Navigation</span>
               <IconChevronRight size={18} color="#B08D57" />
             </Link>
           </li>

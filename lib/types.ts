@@ -179,6 +179,14 @@ export interface ItineraryPlan {
   stops: ItineraryStop[];
   recommendedMetroStations: string[];
   tips: string[];
+  initialTravel?: {
+    from: string;
+    to: string;
+    distanceM: number;
+    durationMinutes: number;
+    mode: TransportMode;
+    cost: number;
+  };
 }
 
 export interface CrowdInfo {

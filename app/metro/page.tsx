@@ -4,7 +4,7 @@ import { getMetroStations, getPandals } from '../../lib/api';
 import MetroPageClient from './MetroPageClient';
 
 export const metadata: Metadata = {
-  title: 'Kolkata Metro Durga Puja Guide & Station Navigator | PUJAHOP',
+  title: 'Kolkata Metro Durga Puja Guide & Station Navigator | Pujo Navigation',
   description:
     'Complete Kolkata Metro station-by-station Durga Puja guide. Discover iconic and neighborhood pandals within walking distance from every Blue, Green, Purple, and Orange line station with direct Google Maps directions.',
 };

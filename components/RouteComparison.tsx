@@ -41,7 +41,7 @@ export default function RouteComparison({ routes, targetPandalName }: RouteCompa
           }}
         >
           <IconSparkles size={14} color="#B08D57" />
-          <span>How PujaHop Scores Routes</span>
+          <span>How Pujo Navigation Scores Routes</span>
           <span style={{ transform: showFormula ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }}>
             <IconChevronRight size={14} />
           </span>
@@ -61,11 +61,11 @@ export default function RouteComparison({ routes, targetPandalName }: RouteCompa
           }}
         >
           <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.15rem', marginBottom: '8px' }}>
-            PujaHop Composite Route Scoring Algorithm
+            Pujo Navigation Composite Route Scoring Model
           </h4>
           <p style={{ fontSize: '0.85rem', color: '#4A423B', marginBottom: '14px', lineHeight: 1.5 }}>
             During Durga Puja, roads experience heavy police barricades, pedestrian-only zones, and massive vehicular gridlocks.
-            PujaHop calculates route viability using a weighted multi-factor penalty model:
+            Pujo Navigation calculates route viability using a weighted multi-factor penalty model:
           </p>
 
           <div

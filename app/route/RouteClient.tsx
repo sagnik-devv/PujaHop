@@ -52,24 +52,7 @@ export default function RouteClient({
   const [locating, setLocating] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Auto-detect GPS location on mount if no specific coordinates provided
-  const autoDetectTriggeredRef = useRef(false);
-  useEffect(() => {
-    if (!initialLat && !initialLon && !autoDetectTriggeredRef.current && typeof window !== 'undefined') {
-      autoDetectTriggeredRef.current = true;
-      detectUserLocation({ preferHighAccuracy: false, timeoutMs: 4000 })
-        .then(loc => {
-          if (loc.source !== 'default') {
-            setUserCoords({ lat: loc.lat, lon: loc.lon });
-            setFromName(`My Location (${loc.landmark})`);
-            showToast(`📍 Auto-detected location: ${loc.landmark}`, 'info');
-          }
-        })
-        .catch(err => {
-          console.log('Auto-detect skipped:', err);
-        });
-    }
-  }, [initialLat, initialLon, showToast]);
+
 
   // Handle outside click for autocomplete dropdown
   useEffect(() => {
@@ -527,7 +510,7 @@ export default function RouteClient({
                 }}
               >
                 <div style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--foreground)', marginBottom: '8px' }}>
-                  Computing Optimal Routes from &quot;{fromName}&quot;...
+                  Computing Best Estimated Routes from &quot;{fromName}&quot;...
                 </div>
                 <div style={{ fontSize: '0.85rem' }}>
                   Evaluating Metro line transfers, walking distances, and Kolkata Police barricade corridors.

@@ -71,18 +71,29 @@ export default function PlannerClient({
   const [generating, setGenerating] = useState(false);
   const [viewMode, setViewMode] = useState<'timeline' | 'map'>('timeline');
   const [detectingPlannerLoc, setDetectingPlannerLoc] = useState(false);
+  const [startCoords, setStartCoords] = useState<{ lat: number; lon: number } | null>(null);
 
   const handleDetectPlannerLocation = async () => {
     setDetectingPlannerLoc(true);
-    showToast('Detecting your live location in Kolkata...', 'info');
+    showToast('Detecting your live position via GPS...', 'info');
     try {
       const loc = await detectUserLocation();
-      const label = `My Location (${loc.landmark})`;
+      const coords = { lat: loc.lat, lon: loc.lon };
+      setStartCoords(coords);
+
+      const label = loc.landmark;
       setStartingPoint(label);
-      handleGenerate(undefined, label);
-      showToast(`📍 Starting point pinned to ${label}!`, 'success');
+
+      if (!loc.isKolkata) {
+        handleGenerate(undefined, label, { lat: 22.5649, lon: 88.3517 });
+        showToast(`📍 Detected: ${label}. Itinerary anchored from Central Kolkata (Esplanade Metro).`, 'success');
+      } else {
+        handleGenerate(undefined, label, coords);
+        showToast(`📍 Live location detected: ${label}! Starting point pinned.`, 'success');
+      }
     } catch (err: any) {
-      showToast('Could not detect location. Please type your starting point.', 'warning');
+      console.warn('Geolocation detection error:', err);
+      showToast('Could not access live GPS. Please enable location permissions or enter your starting point.', 'warning');
     } finally {
       setDetectingPlannerLoc(false);
     }
@@ -112,9 +123,14 @@ export default function PlannerClient({
     }
   }, [favorites, initialFromSaved, initialIds]);
 
-  const handleGenerate = async (overrideIds?: number[], overrideStart?: string) => {
+  const handleGenerate = async (
+    overrideIds?: number[],
+    overrideStart?: string,
+    overrideCoords?: { lat: number; lon: number }
+  ) => {
     const idsToUse = overrideIds ?? selectedPandalIds;
     const startToUse = overrideStart ?? startingPoint;
+    const coordsToUse = overrideCoords ?? (startCoords || undefined);
 
     if (idsToUse.length === 0) {
       showToast('Please select at least 1 pandal for your itinerary', 'warning');
@@ -125,6 +141,7 @@ export default function PlannerClient({
     try {
       const generated = await generateItinerary({
         startingPoint: startToUse,
+        startCoords: coordsToUse,
         startTime,
         endTime: '23:00',
         budget,
@@ -301,12 +318,12 @@ export default function PlannerClient({
       <div className="container">
         {/* Header */}
         <div style={{ marginBottom: '32px' }}>
-          <div className="eyebrow">Intelligent Route Optimizer</div>
+          <div className="eyebrow">Smart Route Planning</div>
           <h1 style={{ fontSize: '2.5rem', marginBottom: '8px' }}>
             Pandal Hopping Night Planner
           </h1>
           <p style={{ color: 'var(--taupe)', fontSize: '0.95rem' }}>
-            Select your dream pandals and starting time. PujaHop computes the shortest transit hops, minimum walking fatigue, and estimated timings.
+            Select your dream pandals and starting time. Pujo Navigation computes the best transit hops, walking guidance, and estimated timings.
           </p>
         </div>
 
@@ -357,7 +374,10 @@ export default function PlannerClient({
                 <input
                   type="text"
                   value={startingPoint}
-                  onChange={e => setStartingPoint(e.target.value)}
+                  onChange={e => {
+                    setStartingPoint(e.target.value);
+                    setStartCoords(null);
+                  }}
                   placeholder="e.g. Shyambazar Metro, Sealdah, Kalighat"
                 />
               </div>
@@ -550,7 +570,7 @@ export default function PlannerClient({
               style={{ width: '100%', justifyContent: 'center', padding: '14px' }}
             >
               <IconSparkles size={18} />
-              <span>{generating ? 'Optimizing Sequence...' : 'Generate My Puja Plan'}</span>
+              <span>{generating ? 'Calculating Itinerary...' : 'Generate My Puja Plan'}</span>
             </button>
           </div>
 
@@ -817,6 +837,31 @@ export default function PlannerClient({
 
                 {/* Timeline Stops */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {plan.initialTravel && plan.initialTravel.distanceM > 0 && (
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        margin: '0 0 2px 4px',
+                        fontSize: '0.78rem',
+                        color: 'var(--taupe)',
+                        padding: '6px 14px',
+                        background: 'var(--warm-cream)',
+                        borderRadius: '4px',
+                        width: 'fit-content',
+                        border: '1px dashed #D0C3B4',
+                      }}
+                    >
+                      {plan.initialTravel.mode === 'walk' && <IconWalk size={14} color="#756D65" />}
+                      {plan.initialTravel.mode === 'metro' && <IconMetro size={14} color="#155799" />}
+                      {plan.initialTravel.mode === 'cab' && <IconCab size={14} color="#D99A25" />}
+                      <span>
+                        Starting from <strong>{plan.initialTravel.from}</strong> • Travel to Stop 1: <strong>{formatDuration(plan.initialTravel.durationMinutes)}</strong> (~{formatDistance(plan.initialTravel.distanceM)}) • Est. Cost: {formatCurrency(plan.initialTravel.cost)}
+                      </span>
+                    </div>
+                  )}
+
                   {plan.stops.map((stop) => (
                     <div key={stop.pandal.id}>
                       <div className="planner-timeline-card">

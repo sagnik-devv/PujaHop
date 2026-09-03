@@ -68,7 +68,7 @@ export default function TransportCard({
             borderRadius: '2px',
           }}
         >
-          PujaHop Best Choice
+          Pujo Navigation Top Choice
         </span>
       )}
 

@@ -63,6 +63,7 @@ export default function MobileBottomNav() {
             key={item.href}
             href={item.href}
             className={`mobile-bottom-item ${isActive ? 'active' : ''}`}
+            aria-current={isActive ? 'page' : undefined}
           >
             {item.icon}
             <span>{item.label}</span>
