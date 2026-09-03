@@ -19,6 +19,14 @@ export const metadata: Metadata = {
     'PujaHop',
     'Kolkata festival guide',
   ],
+  icons: {
+    icon: [
+      { url: '/images/logo.png', type: 'image/png' },
+      { url: '/favicon.ico' },
+    ],
+    shortcut: '/images/logo.png',
+    apple: '/images/logo.png',
+  },
 };
 
 export const viewport: Viewport = {
@@ -35,6 +43,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" type="image/png" href="/images/logo.png" />
+        <link rel="shortcut icon" href="/images/logo.png" />
+        <link rel="apple-touch-icon" href="/images/logo.png" />
+      </head>
       <body>
         <ToastProvider>
           <FavoritesProvider>

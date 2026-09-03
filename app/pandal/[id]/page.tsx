@@ -22,8 +22,6 @@ import {
   IconSparkles,
   IconClock,
   IconNavigation,
-  IconFacebook,
-  IconInstagram,
   IconAward,
   IconPalette,
 } from '../../../components/Icons';
@@ -142,32 +140,6 @@ export default async function PandalDetailPage({ params }: PageProps) {
                 >
                   <IconMapPin size={16} /> Open in Google Maps
                 </a>
-
-                {artDetails?.facebookPageUrl && (
-                  <a
-                    href={artDetails.facebookPageUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-secondary btn-lg"
-                    style={{ color: '#FFF', borderColor: 'rgba(24, 119, 242, 0.6)', background: 'rgba(24, 119, 242, 0.25)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-                    title="Official Facebook Page"
-                  >
-                    <IconFacebook size={16} color="#60A5FA" /> Facebook
-                  </a>
-                )}
-
-                {artDetails?.instagramHandle && (
-                  <a
-                    href={`https://instagram.com/${artDetails.instagramHandle.replace('@', '')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-secondary btn-lg"
-                    style={{ color: '#FFF', borderColor: 'rgba(225, 48, 108, 0.6)', background: 'rgba(225, 48, 108, 0.25)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-                    title="Official Instagram"
-                  >
-                    <IconInstagram size={16} color="#F472B6" /> {artDetails.instagramHandle}
-                  </a>
-                )}
               </div>
             </div>
 
@@ -267,53 +239,6 @@ export default async function PandalDetailPage({ params }: PageProps) {
               <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.8rem, 3.5vw, 2.5rem)', margin: '4px 0 0' }}>
                 Art, Architecture & Philosophy
               </h2>
-            </div>
-
-            {/* Social Channels Badges */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-              {artDetails.facebookPageUrl && (
-                <a
-                  href={artDetails.facebookPageUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-secondary btn-sm"
-                  style={{
-                    background: '#1877F2',
-                    color: '#FFF',
-                    borderColor: '#1877F2',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    fontSize: '0.78rem',
-                    fontWeight: 600,
-                  }}
-                >
-                  <IconFacebook size={14} color="#FFF" />
-                  <span>Facebook Page</span>
-                </a>
-              )}
-
-              {artDetails.instagramHandle && (
-                <a
-                  href={`https://instagram.com/${artDetails.instagramHandle.replace('@', '')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-secondary btn-sm"
-                  style={{
-                    background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
-                    color: '#FFF',
-                    border: 'none',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    fontSize: '0.78rem',
-                    fontWeight: 600,
-                  }}
-                >
-                  <IconInstagram size={14} color="#FFF" />
-                  <span>{artDetails.instagramHandle}</span>
-                </a>
-              )}
             </div>
           </div>
 
