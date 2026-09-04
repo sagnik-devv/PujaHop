@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import 'leaflet/dist/leaflet.css';
 import { HopMember, LiveLocation } from '../lib/hop-room';
 import { calculateDistance } from '../lib/geo';
 
@@ -54,24 +55,38 @@ export default function HopMap({
   const [mapReady, setMapReady] = useState(false);
   const fitBoundsTimeoutRef = useRef<any>(null);
 
-  // ResizeObserver & active tab invalidateSize handler
+  // ResizeObserver, window resize & active tab invalidateSize handler
   useEffect(() => {
     if (!mapReady || !mapInstance.current || !mapContainerRef.current) return;
 
-    const timer = setTimeout(() => {
-      mapInstance.current?.invalidateSize();
-    }, 80);
+    const triggerInvalidate = () => {
+      if (mapInstance.current) {
+        mapInstance.current.invalidateSize();
+      }
+    };
+
+    // Staggered triggers to catch layout shifts, font loads, and mobile tab animations
+    const timer1 = setTimeout(triggerInvalidate, 60);
+    const timer2 = setTimeout(triggerInvalidate, 200);
+    const timer3 = setTimeout(triggerInvalidate, 500);
+
+    window.addEventListener('resize', triggerInvalidate);
+    window.addEventListener('orientationchange', triggerInvalidate);
 
     let resizeObserver: ResizeObserver | null = null;
     if (typeof ResizeObserver !== 'undefined') {
       resizeObserver = new ResizeObserver(() => {
-        mapInstance.current?.invalidateSize();
+        triggerInvalidate();
       });
       resizeObserver.observe(mapContainerRef.current);
     }
 
     return () => {
-      clearTimeout(timer);
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+      window.removeEventListener('resize', triggerInvalidate);
+      window.removeEventListener('orientationchange', triggerInvalidate);
       resizeObserver?.disconnect();
     };
   }, [mapReady, active]);
@@ -108,10 +123,29 @@ export default function HopMap({
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap',
         maxZoom: 19,
+        keepBuffer: 4,
+        updateWhenIdle: true,
       }).addTo(map);
 
       mapInstance.current = map;
       setMapReady(true);
+
+      // Multiple invalidateSize calls to guarantee perfect tile rendering across devices
+      setTimeout(() => {
+        if (isMounted && mapInstance.current) {
+          mapInstance.current.invalidateSize();
+        }
+      }, 100);
+      setTimeout(() => {
+        if (isMounted && mapInstance.current) {
+          mapInstance.current.invalidateSize();
+        }
+      }, 350);
+      setTimeout(() => {
+        if (isMounted && mapInstance.current) {
+          mapInstance.current.invalidateSize();
+        }
+      }, 800);
     }
 
     initMap();

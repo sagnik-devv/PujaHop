@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import 'leaflet/dist/leaflet.css';
 import Link from 'next/link';
 import { Pandal, MetroStation, BusStop } from '../lib/types';
 import { formatDistance } from '../lib/format';
@@ -52,6 +53,41 @@ export default function LeafletMap({
     setEnableBus(showBusStops);
   }, [showBusStops]);
 
+  // Invalidate size on container resize / window resize
+  useEffect(() => {
+    if (!mapLoaded || !mapInstance.current || !mapRef.current) return;
+
+    const triggerInvalidate = () => {
+      if (mapInstance.current) {
+        mapInstance.current.invalidateSize();
+      }
+    };
+
+    const timer1 = setTimeout(triggerInvalidate, 80);
+    const timer2 = setTimeout(triggerInvalidate, 250);
+    const timer3 = setTimeout(triggerInvalidate, 600);
+
+    window.addEventListener('resize', triggerInvalidate);
+    window.addEventListener('orientationchange', triggerInvalidate);
+
+    let resizeObserver: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(() => {
+        triggerInvalidate();
+      });
+      resizeObserver.observe(mapRef.current);
+    }
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+      window.removeEventListener('resize', triggerInvalidate);
+      window.removeEventListener('orientationchange', triggerInvalidate);
+      resizeObserver?.disconnect();
+    };
+  }, [mapLoaded]);
+
   const handleMapLocateMe = async () => {
     if (!mapInstance.current) return;
     setLocatingMap(true);
@@ -100,34 +136,45 @@ export default function LeafletMap({
       if (!mapRef.current || mapInstance.current) return;
 
       const L = (await import('leaflet')).default;
-      // Inject leaflet CSS if not already present
-      if (!document.getElementById('leaflet-css')) {
-        const link = document.createElement('link');
-        link.id = 'leaflet-css';
-        link.rel = 'stylesheet';
-        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-        document.head.appendChild(link);
-      }
-
-      if (!isMounted) return;
+      if (!isMounted || !mapRef.current) return;
 
       const map = L.map(mapRef.current, {
         center: center,
         zoom: zoom,
         zoomControl: false,
+        preferCanvas: true,
       });
 
       L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-      // OpenStreetMap clean tile layer (zero watermarks, globally reliable)
+      // OpenStreetMap clean tile layer
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19,
+        keepBuffer: 4,
+        updateWhenIdle: true,
       }).addTo(map);
 
       mapInstance.current = map;
       markersLayer.current = L.layerGroup().addTo(map);
       setMapLoaded(true);
+
+      // Staggered size invalidations to ensure smooth render on cold load
+      setTimeout(() => {
+        if (isMounted && mapInstance.current) {
+          mapInstance.current.invalidateSize();
+        }
+      }, 100);
+      setTimeout(() => {
+        if (isMounted && mapInstance.current) {
+          mapInstance.current.invalidateSize();
+        }
+      }, 350);
+      setTimeout(() => {
+        if (isMounted && mapInstance.current) {
+          mapInstance.current.invalidateSize();
+        }
+      }, 800);
     }
 
     initMap();
