@@ -626,25 +626,8 @@ export async function generateItinerary(options: ItineraryOptions): Promise<Itin
   let startLon = 88.3517;
 
   if (options.startCoords && options.startCoords.lat && options.startCoords.lon) {
-    const inKolkata =
-      options.startCoords.lat >= 22.20 &&
-      options.startCoords.lat <= 22.80 &&
-      options.startCoords.lon >= 88.15 &&
-      options.startCoords.lon <= 88.60;
-    if (inKolkata) {
-      startLat = options.startCoords.lat;
-      startLon = options.startCoords.lon;
-    } else if (options.startingPoint) {
-      try {
-        const resolvedStart = await resolveLocationCoordinates(options.startingPoint);
-        if (resolvedStart) {
-          startLat = resolvedStart.lat;
-          startLon = resolvedStart.lon;
-        }
-      } catch {
-        // Fallback to Esplanade
-      }
-    }
+    startLat = options.startCoords.lat;
+    startLon = options.startCoords.lon;
   } else if (options.startingPoint) {
     try {
       const resolvedStart = await resolveLocationCoordinates(options.startingPoint);

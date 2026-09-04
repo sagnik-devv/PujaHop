@@ -294,43 +294,92 @@ export function getClosestLandmarkName(lat: number, lon: number): string {
     }
   }
 
-  const isKolkata = lat >= 22.20 && lat <= 22.80 && lon >= 88.15 && lon <= 88.60;
+  const isKolkata = lat >= 22.00 && lat <= 23.15 && lon >= 87.90 && lon <= 88.85;
 
-  if (minDistance < 0.4) {
+  if (minDistance < 0.5) {
     return `${closestName} (${Math.round(minDistance * 1000)}m)`;
-  } else if (minDistance < 1.8) {
+  } else if (minDistance < 3.0) {
     return `Near ${closestName} (~${minDistance.toFixed(1)} km)`;
-  } else if (minPandalDist < 1.0) {
+  } else if (minPandalDist < 1.5) {
     return `${closestPandalRegion} (Near ${closestPandalName})`;
-  } else if (isKolkata && closestPandalRegion) {
+  } else if (closestPandalRegion) {
     return `${closestPandalRegion}, Kolkata`;
-  } else if (isKolkata) {
-    return 'Central Kolkata (Esplanade)';
+  } else if (closestName) {
+    return `Near ${closestName}`;
   } else {
-    return `Live GPS (${lat.toFixed(3)}, ${lon.toFixed(3)})`;
+    return `Detected Location (${lat.toFixed(4)}, ${lon.toFixed(4)})`;
   }
 }
 
 /**
  * Reverse geocodes coordinates to a human-readable neighborhood/locality name.
- * Uses OpenStreetMap Nominatim with fallback to local geospatial database.
+ * Uses high-speed client reverse geocoding with OpenStreetMap Nominatim and local gazetteer fallbacks.
  */
 export async function reverseGeocodeLocation(lat: number, lon: number): Promise<{
   formattedName: string;
   locality?: string;
   isKolkata: boolean;
 }> {
-  const isKolkata = lat >= 22.20 && lat <= 22.80 && lon >= 88.15 && lon <= 88.60;
+  const isKolkata = lat >= 22.00 && lat <= 23.15 && lon >= 87.90 && lon <= 88.85;
 
+  // 1. High-speed client-friendly reverse geocoding (BigDataCloud - no auth, fast, reliable in browsers)
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 2600);
+    const timeoutId = setTimeout(() => controller.abort(), 2400);
+    const bdcRes = await fetch(
+      `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`,
+      { signal: controller.signal }
+    );
+    clearTimeout(timeoutId);
+
+    if (bdcRes.ok) {
+      const data = await bdcRes.json();
+      const locality = data.locality || data.city || '';
+      const city = data.city || data.principalSubdivision || '';
+      const nearestMetro = findNearestMetroStation(lat, lon);
+
+      if (isKolkata) {
+        if (nearestMetro.distanceM < 1800) {
+          const areaLabel = locality || nearestMetro.metro.name;
+          return {
+            formattedName: `${areaLabel} (Near ${nearestMetro.metro.name} Metro)`,
+            locality: areaLabel,
+            isKolkata: true,
+          };
+        } else if (locality) {
+          return {
+            formattedName: `${locality}, Kolkata`,
+            locality,
+            isKolkata: true,
+          };
+        }
+      } else {
+        const parts = [locality, city, data.principalSubdivision].filter(Boolean);
+        const uniqueParts = Array.from(new Set(parts));
+        if (uniqueParts.length > 0) {
+          return {
+            formattedName: uniqueParts.join(', '),
+            locality: locality || city,
+            isKolkata: false,
+          };
+        }
+      }
+    }
+  } catch {
+    // Continue to Nominatim fallback
+  }
+
+  // 2. OpenStreetMap Nominatim fallback
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2400);
+    const headers: Record<string, string> = { 'Accept': 'application/json' };
+    if (typeof window === 'undefined') {
+      headers['User-Agent'] = 'PujoNavigationKolkataTransit/1.0';
+    }
     const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=16`, {
       signal: controller.signal,
-      headers: {
-        'Accept': 'application/json',
-        'User-Agent': 'PujoNavigationKolkataTransit/1.0',
-      },
+      headers,
     });
     clearTimeout(timeoutId);
 
@@ -343,7 +392,7 @@ export async function reverseGeocodeLocation(lat: number, lon: number): Promise<
 
       if (isKolkata) {
         const nearestMetro = findNearestMetroStation(lat, lon);
-        if (nearestMetro.distanceM < 1200) {
+        if (nearestMetro.distanceM < 1800) {
           const areaLabel = neighborhood || nearestMetro.metro.name;
           return {
             formattedName: `${areaLabel} (Near ${nearestMetro.metro.name} Metro)`,
@@ -371,7 +420,7 @@ export async function reverseGeocodeLocation(lat: number, lon: number): Promise<
     // Network or timeout, fallback below
   }
 
-  // Fallback if reverse geocoding is offline
+  // 3. Fallback to local Kolkata Gazetteer & Metro database
   const landmark = getClosestLandmarkName(lat, lon);
   return {
     formattedName: landmark,
@@ -467,7 +516,7 @@ export async function detectUserLocation(options?: {
   }
 
   // Check if coordinates are in Greater Kolkata region
-  const isKolkata = lat >= 22.20 && lat <= 22.80 && lon >= 88.15 && lon <= 88.60;
+  const isKolkata = lat >= 22.00 && lat <= 23.15 && lon >= 87.90 && lon <= 88.85;
 
   // Cache valid detected position only if accuracy is acceptable
   if ((source === 'gps' || source === 'gps-coarse') && (!accuracy || accuracy < 2000)) {

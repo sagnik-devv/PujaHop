@@ -92,13 +92,12 @@ export default function PlannerClient({
       const coords = { lat: loc.lat, lon: loc.lon };
       setStartCoords(coords);
 
-      if (!loc.isKolkata) {
-        setStartingPoint('Central Kolkata (Esplanade)');
-        setStartCoords({ lat: 22.5649, lon: 88.3517 });
-        showToast('📍 You appear to be outside Kolkata. Starting point set to Central Kolkata (Esplanade).', 'info');
-      } else {
-        setStartingPoint(loc.landmark);
-        showToast(`📍 Live location detected: ${loc.landmark}!`, 'success');
+      const locationLabel = loc.landmark || 'Current Location';
+      setStartingPoint(locationLabel);
+      showToast(`📍 Location detected: ${locationLabel}!`, 'success');
+
+      if (selectedPandalIds.length > 0) {
+        handleGenerate(selectedPandalIds, locationLabel, coords);
       }
     } catch (err: any) {
       console.warn('Geolocation detection error:', err);
