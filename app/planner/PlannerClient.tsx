@@ -23,9 +23,11 @@ import LeafletMap from '../../components/LeafletMap';
 import { useFavorites } from '../../lib/favorites-context';
 import { useToast } from '../../lib/toast-context';
 
+import { useSearchParams } from 'next/navigation';
+
 interface PlannerClientProps {
   pandals: Pandal[];
-  metroStations: MetroStation[];
+  metroStations?: MetroStation[];
   initialFromSaved?: boolean;
   initialIds?: number[];
 }
@@ -48,17 +50,28 @@ export default function PlannerClient({
 }: PlannerClientProps) {
   const { showToast } = useToast();
   const { favorites, isFavorite } = useFavorites();
+  const searchParams = useSearchParams();
+
+  const urlIdsParam = searchParams?.get('ids');
+  const urlFromSaved = searchParams?.get('fromSaved') === 'true' || initialFromSaved;
 
   const effectiveInitialIds = useMemo(() => {
+    if (urlIdsParam) {
+      const parsed = urlIdsParam
+        .split(',')
+        .map(s => parseInt(s.trim(), 10))
+        .filter(n => !isNaN(n) && n > 0);
+      if (parsed.length > 0) return parsed;
+    }
     if (initialIds && initialIds.length > 0) {
       return initialIds;
     }
     return []; // No dummy placeholders! Empty by default.
-  }, [initialIds]);
+  }, [urlIdsParam, initialIds]);
 
   const [selectedPandalIds, setSelectedPandalIds] = useState<number[]>(effectiveInitialIds);
   const [isPlanningFromSaved, setIsPlanningFromSaved] = useState<boolean>(
-    Boolean(initialFromSaved && initialIds && initialIds.length > 0)
+    Boolean(urlFromSaved && effectiveInitialIds.length > 0)
   );
   const [startingPoint, setStartingPoint] = useState<string>(() =>
     effectiveInitialIds.length > 0 ? getInitialStartingPoint(effectiveInitialIds, pandals) : ''
@@ -95,45 +108,24 @@ export default function PlannerClient({
     }
   };
 
-  // Generate initial plan on load ONLY if initialIds were provided (e.g. from Saved Favorites)
-  useEffect(() => {
-    if (effectiveInitialIds.length > 0) {
-      const initialStart = getInitialStartingPoint(effectiveInitialIds, pandals);
-      handleGenerate(effectiveInitialIds, initialStart);
-    }
-  }, []);
-
-  // Sync if navigated with ?fromSaved=true but ids was not in searchParams
-  const hasSyncedFavoritesRef = useRef(false);
-  useEffect(() => {
-    if (
-      initialFromSaved &&
-      (!initialIds || initialIds.length === 0) &&
-      favorites.length > 0 &&
-      !hasSyncedFavoritesRef.current
-    ) {
-      hasSyncedFavoritesRef.current = true;
-      setSelectedPandalIds(favorites);
-      setIsPlanningFromSaved(true);
-      const startPt = getInitialStartingPoint(favorites, pandals);
-      setStartingPoint(startPt);
-      handleGenerate(favorites, startPt);
-    }
-  }, [favorites, initialFromSaved, initialIds]);
-
   const handleGenerate = async (
     overrideIds?: number[],
     overrideStart?: string,
     overrideCoords?: { lat: number; lon: number }
   ) => {
     const idsToUse = overrideIds ?? selectedPandalIds;
-    const startToUse = overrideStart ?? startingPoint;
-    const coordsToUse = overrideCoords ?? (startCoords || undefined);
 
     if (idsToUse.length === 0) {
       showToast('Please select at least 1 pandal for your itinerary', 'warning');
       return;
     }
+
+    let startToUse = overrideStart ?? startingPoint;
+    if (!startToUse || !startToUse.trim()) {
+      startToUse = getInitialStartingPoint(idsToUse, pandals);
+      setStartingPoint(startToUse);
+    }
+    const coordsToUse = overrideCoords ?? (startCoords || undefined);
 
     setGenerating(true);
     try {
@@ -160,6 +152,39 @@ export default function PlannerClient({
       setGenerating(false);
     }
   };
+
+  // Automatically plan route whenever effectiveInitialIds are provided via URL or props
+  const plannedIdsKeyRef = useRef<string>('');
+  useEffect(() => {
+    if (effectiveInitialIds.length > 0) {
+      const key = effectiveInitialIds.join(',');
+      if (plannedIdsKeyRef.current !== key) {
+        plannedIdsKeyRef.current = key;
+        setSelectedPandalIds(effectiveInitialIds);
+        const initialStart = getInitialStartingPoint(effectiveInitialIds, pandals);
+        setStartingPoint(initialStart);
+        handleGenerate(effectiveInitialIds, initialStart);
+      }
+    }
+  }, [effectiveInitialIds, pandals]);
+
+  // Sync if navigated with ?fromSaved=true but ids was not in searchParams
+  const hasSyncedFavoritesRef = useRef(false);
+  useEffect(() => {
+    if (
+      urlFromSaved &&
+      effectiveInitialIds.length === 0 &&
+      favorites.length > 0 &&
+      !hasSyncedFavoritesRef.current
+    ) {
+      hasSyncedFavoritesRef.current = true;
+      setSelectedPandalIds(favorites);
+      setIsPlanningFromSaved(true);
+      const startPt = getInitialStartingPoint(favorites, pandals);
+      setStartingPoint(startPt);
+      handleGenerate(favorites, startPt);
+    }
+  }, [favorites, urlFromSaved, effectiveInitialIds, pandals]);
 
   const togglePandalSelection = (id: number) => {
     setSelectedPandalIds(prev => {
@@ -477,9 +502,17 @@ export default function PlannerClient({
                   return (
                     <div
                       key={p.id}
+                      role="button"
+                      tabIndex={0}
                       onClick={() => togglePandalSelection(p.id)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          togglePandalSelection(p.id);
+                        }
+                      }}
                       style={{
-                        padding: '8px 12px',
+                        padding: '10px 12px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
@@ -487,14 +520,23 @@ export default function PlannerClient({
                         background: isSelected ? 'var(--warm-cream)' : 'transparent',
                         borderBottom: '1px solid var(--border-subtle)',
                         fontSize: '0.8rem',
+                        transition: 'background 0.15s ease',
                       }}
                     >
-                      <div style={{ flex: 1, minWidth: 0, paddingRight: '8px' }}>
-                        <div style={{ fontWeight: isSelected ? 700 : 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {isSelected ? '✓ ' : ''}{p.name}
-                        </div>
-                        <div style={{ fontSize: '0.7rem', color: 'var(--taupe)' }}>
-                          {p.region} • 🚇 {p.nearestMetro}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: 0, paddingRight: '8px' }}>
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          readOnly
+                          style={{ accentColor: 'var(--vermilion)', cursor: 'pointer', width: '15px', height: '15px', flexShrink: 0 }}
+                        />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontWeight: isSelected ? 700 : 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: isSelected ? 'var(--vermilion)' : 'var(--foreground)' }}>
+                            {p.name}
+                          </div>
+                          <div style={{ fontSize: '0.7rem', color: 'var(--taupe)' }}>
+                            {p.region} • 🚇 {p.nearestMetro}
+                          </div>
                         </div>
                       </div>
 

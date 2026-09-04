@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { getPandals, getMetroStations } from '../../lib/api';
 import PlannerClient from './PlannerClient';
 
@@ -23,11 +23,13 @@ export default async function PlannerPage({ searchParams }: PageProps) {
     : undefined;
 
   return (
-    <PlannerClient
-      pandals={pandals}
-      metroStations={metroStations}
-      initialFromSaved={initialFromSaved}
-      initialIds={initialIds}
-    />
+    <Suspense fallback={<div className="container" style={{ padding: '80px 20px', textAlign: 'center' }}>Loading Pujo Planner...</div>}>
+      <PlannerClient
+        pandals={pandals}
+        metroStations={metroStations}
+        initialFromSaved={initialFromSaved}
+        initialIds={initialIds}
+      />
+    </Suspense>
   );
 }
