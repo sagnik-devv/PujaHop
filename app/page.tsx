@@ -44,7 +44,14 @@ export default function HomePage() {
     <>
       {/* 1. HERO SECTION */}
       <section className="hero-section">
-        {/* Cinematic Durga Video Background */}
+        {/* Mobile Background Image (JPEG) */}
+        <img
+          src="/images/hero-mobile.jpg"
+          alt="Durga Puja 2026"
+          className="hero-mobile-img"
+        />
+
+        {/* Cinematic Durga Video Background (Desktop) */}
         <video
           autoPlay
           loop
@@ -52,7 +59,7 @@ export default function HomePage() {
           playsInline
           preload="auto"
           className="hero-video"
-          poster="/images/pandals/pandal-40.jpg"
+          poster="/images/hero-mobile.jpg"
         >
           <source src="/videos/hero-video.mov" type="video/mp4" />
           <source src="/videos/hero-video.mov" type="video/quicktime" />
