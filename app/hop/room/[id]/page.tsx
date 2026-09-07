@@ -2,8 +2,9 @@
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useAuth } from '../../../../lib/auth-context';
-import { useToast } from '../../../../lib/toast-context';
+import { useAuth } from '@/lib/auth-context';
+import { useToast } from '@/lib/toast-context';
+import { useFavorites } from '@/lib/favorites-context';
 import {
   getHopRoom,
   getRoomMembers,
@@ -13,16 +14,23 @@ import {
   setMeetupPandal,
   clearMeetupPandal,
   leaveHopRoom,
+  fetchRoomPandals,
+  syncMemberFavoritesToRoom,
+  toggleRoomPandalSelection,
+  deleteRoomPandal,
+  addPandalToRoom,
   HopRoom,
   HopMember,
   LiveLocation,
-} from '../../../../lib/hop-room';
-import { getOrSetHopUserId, getHopDisplayName, setHopDisplayName } from '../../../../lib/guest-id';
-import { RealtimeLocationManager } from '../../../../lib/realtime-location';
-import { Pandal } from '../../../../lib/types';
-import HopMap from '../../../../components/HopMap';
-import HopMemberList from '../../../../components/HopMemberList';
-import HopRoomQRCode from '../../../../components/HopRoomQRCode';
+  AggregatedRoomPandal,
+  RoomRouteStats,
+} from '@/lib/hop-room';
+import { getOrSetHopUserId, getHopDisplayName } from '@/lib/guest-id';
+import { RealtimeLocationManager } from '@/lib/realtime-location';
+import { Pandal } from '@/lib/types';
+import HopMap from '@/components/HopMap';
+import HopMemberList from '@/components/HopMemberList';
+import HopRoomQRCode from '@/components/HopRoomQRCode';
 
 export default function HopRoomPage() {
   const params = useParams();
@@ -30,6 +38,7 @@ export default function HopRoomPage() {
   const roomId = params.id as string;
   const { user } = useAuth();
   const { showToast } = useToast();
+  const { favorites } = useFavorites();
 
   const [currentUserId, setCurrentUserId] = useState<string>('');
   const [room, setRoom] = useState<HopRoom | null>(null);
@@ -37,6 +46,12 @@ export default function HopRoomPage() {
   const [locations, setLocations] = useState<Record<string, LiveLocation>>({});
   const [isExpired, setIsExpired] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  // Collaborative Room Pandals & Route State
+  const [roomPandals, setRoomPandals] = useState<AggregatedRoomPandal[]>([]);
+  const [selectedPandals, setSelectedPandals] = useState<AggregatedRoomPandal[]>([]);
+  const [routeStats, setRouteStats] = useState<RoomRouteStats | null>(null);
+  const [isAutoSynced, setIsAutoSynced] = useState(false);
 
   // Sharing & Realtime state
   const [isSharing, setIsSharing] = useState(true);
@@ -63,6 +78,19 @@ export default function HopRoomPage() {
     const uid = getOrSetHopUserId(user?.id);
     setCurrentUserId(uid);
   }, [user]);
+
+  // Fetch Room Pandals & Route
+  const loadPandalsData = useCallback(async () => {
+    if (!roomId) return;
+    try {
+      const data = await fetchRoomPandals(roomId);
+      setRoomPandals(data.pandals);
+      setSelectedPandals(data.selectedPandals);
+      setRouteStats(data.routeStats);
+    } catch {
+      // Network hiccup fallback
+    }
+  }, [roomId]);
 
   // 2. Initial Load of Room Data
   const loadRoomData = useCallback(async () => {
@@ -104,15 +132,42 @@ export default function HopRoomPage() {
 
         setMembers(fetchedMembers);
         setLocations(fetchedLocations);
+
+        // Load room pandals alongside members
+        await loadPandalsData();
       }
     } finally {
       setLoading(false);
     }
-  }, [roomId, user, showToast]);
+  }, [roomId, user, showToast, loadPandalsData]);
 
   useEffect(() => {
     loadRoomData();
   }, [loadRoomData]);
+
+  // Auto-sync personal favorites into the room on first join
+  useEffect(() => {
+    if (!room || isExpired || !currentUserId || isAutoSynced || favorites.length === 0) return;
+
+    const autoSync = async () => {
+      const memberName = user?.name || getHopDisplayName() || 'Pujo Hopper';
+      const { count, error } = await syncMemberFavoritesToRoom({
+        roomId: room.id,
+        userId: currentUserId,
+        memberName,
+        pandalIds: favorites,
+      });
+
+      if (!error && count > 0) {
+        setIsAutoSynced(true);
+        await loadPandalsData();
+        locationManagerRef.current?.broadcastPandalsUpdated();
+        showToast(`Synced ${count} saved pandal(s) from your wishlist!`, 'success');
+      }
+    };
+
+    autoSync();
+  }, [room, isExpired, currentUserId, isAutoSynced, favorites, user, showToast, loadPandalsData]);
 
   // 3. Periodic Background Sync (Polls every 8s so both users stay 100% synchronized)
   useEffect(() => {
@@ -133,15 +188,17 @@ export default function HopRoomPage() {
             ...polledLocations,
           }));
         }
+        // Also refresh pandals & route stats
+        loadPandalsData();
       } catch {
         // Ignore network hiccups during background sync
       }
     }, 8000);
 
     return () => clearInterval(pollInterval);
-  }, [room?.id, isExpired, roomId]);
+  }, [room?.id, isExpired, roomId, loadPandalsData]);
 
-  // 4. Realtime Location Manager Lifecycle (WebSockets + Geolocation)
+  // 4. Realtime Location & Pandals Manager Lifecycle (WebSockets + Geolocation)
   useEffect(() => {
     if (!room || isExpired || !currentUserId) return;
 
@@ -159,7 +216,7 @@ export default function HopRoomPage() {
           }
           return [...prev, newMember];
         });
-        showToast(`${newMember.display_name} is in the room!`, 'info');
+        showToast(`${newMember.display_name} joined the room!`, 'info');
       },
       onSharingChanged: ({ userId, isSharing: sharingState }) => {
         setMembers(prev =>
@@ -183,6 +240,10 @@ export default function HopRoomPage() {
           showToast('Meetup cleared.', 'info');
         }
       },
+      onPandalsUpdated: () => {
+        loadPandalsData();
+        showToast('Room route & pandals updated!', 'info');
+      },
       onConnectionChange: connected => {
         setIsConnected(connected);
       },
@@ -198,7 +259,7 @@ export default function HopRoomPage() {
       manager.stop();
       locationManagerRef.current = null;
     };
-  }, [room?.id, isExpired, currentUserId, showToast]);
+  }, [room?.id, isExpired, currentUserId, showToast, loadPandalsData]);
 
   // Expiration check timer
   useEffect(() => {
@@ -215,7 +276,7 @@ export default function HopRoomPage() {
     return () => clearInterval(interval);
   }, [room, isExpired, showToast]);
 
-  // Toggle Sharing
+  // Toggle GPS Sharing
   const handleToggleSharing = async () => {
     if (!room || !currentUserId) return;
     const nextState = !isSharing;
@@ -263,7 +324,91 @@ export default function HopRoomPage() {
     };
     setRoom(prev => (prev ? { ...prev, ...clearData } : null));
     locationManagerRef.current?.broadcastMeetup(clearData);
-    showToast('Meetup cleared', 'info');
+    showToast('Meetup point cleared', 'info');
+  };
+
+  // Manual Sync Favorites to Room
+  const handleSyncFavorites = async () => {
+    if (!room || !currentUserId || favorites.length === 0) {
+      showToast('No saved pandals in your wishlist to sync', 'info');
+      return;
+    }
+
+    const memberName = user?.name || getHopDisplayName() || 'Pujo Hopper';
+    const { count, error } = await syncMemberFavoritesToRoom({
+      roomId: room.id,
+      userId: currentUserId,
+      memberName,
+      pandalIds: favorites,
+    });
+
+    if (error) {
+      showToast('Failed to sync favorites', 'error');
+    } else {
+      await loadPandalsData();
+      locationManagerRef.current?.broadcastPandalsUpdated();
+      showToast(`Synced ${count} pandal(s) to the group route!`, 'success');
+    }
+  };
+
+  // Toggle Pandal Selection in Route
+  const handleTogglePandal = async (pandalId: number, isSelected: boolean) => {
+    if (!room) return;
+
+    // Optimistic UI update
+    setRoomPandals(prev =>
+      prev.map(p => (p.id === pandalId ? { ...p, isSelected } : p))
+    );
+    setSelectedPandals(prev => {
+      if (isSelected) {
+        const found = roomPandals.find(p => p.id === pandalId);
+        return found && !prev.some(p => p.id === pandalId) ? [...prev, { ...found, isSelected: true }] : prev;
+      } else {
+        return prev.filter(p => p.id !== pandalId);
+      }
+    });
+
+    await toggleRoomPandalSelection({ roomId: room.id, pandalId, isSelected });
+    locationManagerRef.current?.broadcastPandalsUpdated();
+    await loadPandalsData();
+
+    showToast(isSelected ? 'Pandal added to active route' : 'Pandal excluded from route', 'info');
+  };
+
+  // Delete Pandal from Room
+  const handleDeletePandal = async (pandalId: number) => {
+    if (!room) return;
+
+    // Optimistic UI update
+    setRoomPandals(prev => prev.filter(p => p.id !== pandalId));
+    setSelectedPandals(prev => prev.filter(p => p.id !== pandalId));
+
+    await deleteRoomPandal({ roomId: room.id, pandalId });
+    locationManagerRef.current?.broadcastPandalsUpdated();
+    await loadPandalsData();
+
+    showToast('Pandal removed from room', 'info');
+  };
+
+  // Add Pandal to Room
+  const handleAddPandal = async (pandalId: number) => {
+    if (!room || !currentUserId) return;
+
+    const memberName = user?.name || getHopDisplayName() || 'Pujo Hopper';
+    const { error } = await addPandalToRoom({
+      roomId: room.id,
+      userId: currentUserId,
+      memberName,
+      pandalId,
+    });
+
+    if (error) {
+      showToast('Failed to add pandal', 'error');
+    } else {
+      await loadPandalsData();
+      locationManagerRef.current?.broadcastPandalsUpdated();
+      showToast('Pandal added to group route!', 'success');
+    }
   };
 
   // Leave Room
@@ -310,7 +455,7 @@ export default function HopRoomPage() {
           <div style={{ fontSize: '36px', marginBottom: '12px' }}>⏳</div>
           <h2 style={{ fontSize: '1.4rem', fontFamily: 'var(--font-serif)', margin: '0 0 8px' }}>This Hop Room has expired</h2>
           <p style={{ fontSize: '0.85rem', color: 'var(--taupe)', margin: '0 0 20px' }}>
-            All location sharing for "{room.room_name}" has ended. Rooms automatically expire to protect your privacy.
+            All location sharing and group route planning for "{room.room_name}" has ended. Rooms automatically expire to protect your privacy.
           </p>
           <button
             type="button"
@@ -466,7 +611,7 @@ export default function HopRoomPage() {
             boxShadow: mobileTab === 'map' ? '0 2px 6px rgba(0,0,0,0.06)' : 'none',
           }}
         >
-          🗺️ Live Map
+          🗺️ Live Map & Route ({selectedPandals.length})
         </button>
         <button
           type="button"
@@ -484,7 +629,7 @@ export default function HopRoomPage() {
             boxShadow: mobileTab === 'members' ? '0 2px 6px rgba(0,0,0,0.06)' : 'none',
           }}
         >
-          👥 Members ({members.length})
+          🪷 Route & Members ({roomPandals.length})
         </button>
       </div>
 
@@ -507,8 +652,10 @@ export default function HopRoomPage() {
               latitude: room.meetup_latitude,
               longitude: room.meetup_longitude,
             }}
+            selectedPandals={selectedPandals}
             selectedMemberId={selectedMemberId}
             onSelectMember={m => setSelectedMemberId(m.user_id)}
+            onSetMeetup={handleSetMeetup}
             height="100%"
             active={!isMobile || mobileTab === 'map'}
           />
@@ -533,6 +680,10 @@ export default function HopRoomPage() {
               longitude: room.meetup_longitude,
             }}
             selectedMemberId={selectedMemberId}
+            roomPandals={roomPandals}
+            selectedPandals={selectedPandals}
+            routeStats={routeStats ?? undefined}
+            userFavoritesCount={favorites.length}
             onSelectMember={m => {
               setSelectedMemberId(m.user_id);
               if (isMobile) {
@@ -541,6 +692,10 @@ export default function HopRoomPage() {
             }}
             onSetMeetup={handleSetMeetup}
             onClearMeetup={handleClearMeetup}
+            onSyncFavorites={handleSyncFavorites}
+            onTogglePandal={handleTogglePandal}
+            onDeletePandal={handleDeletePandal}
+            onAddPandal={handleAddPandal}
           />
         </div>
       </div>

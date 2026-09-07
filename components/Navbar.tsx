@@ -12,11 +12,11 @@ import {
   IconMenu,
   IconClose,
   IconChevronRight,
-  IconRoute,
   IconSparkles,
 } from './Icons';
 import { useFavorites } from '../lib/favorites-context';
 import { useToast } from '../lib/toast-context';
+import { useLanguage } from '../lib/language-context';
 import { detectUserLocation } from '../lib/location-service';
 
 export default function Navbar() {
@@ -24,6 +24,7 @@ export default function Navbar() {
   const router = useRouter();
   const { count, isLoaded } = useFavorites();
   const { showToast } = useToast();
+  const { language, toggleLanguage, t } = useLanguage();
   const [scrolled, setScrolled] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -44,10 +45,10 @@ export default function Navbar() {
   }, [pathname]);
 
   const handleLocateMe = async () => {
-    showToast('Locating your position in Kolkata...', 'info');
+    showToast(t('locating', 'Locating your position in Kolkata...'), 'info');
     try {
       const loc = await detectUserLocation();
-      showToast(`📍 Location detected: ${loc.landmark}!`, 'success');
+      showToast(`📍 ${t('location_detected', 'Location detected')}: ${loc.landmark}!`, 'success');
       router.push(`/nearby?lat=${loc.lat}&lon=${loc.lon}`);
     } catch (err) {
       console.warn('Geolocation error:', err);
@@ -66,14 +67,14 @@ export default function Navbar() {
   };
 
   const navLinks = [
-    { name: 'Home', href: '/' },
-    { name: 'Hop Room 📡', href: '/hop' },
-    { name: 'Explore Pandals', href: '/explore' },
-    { name: 'Smart Route', href: '/route' },
-    { name: 'Hop Planner', href: '/planner' },
-    { name: 'Metro Guide', href: '/metro' },
-    { name: 'Bus Routes', href: '/bus' },
-    { name: 'Near Me', href: '/nearby' },
+    { name: t('home', 'Home'), href: '/' },
+    { name: t('hop_room', 'Hop Room 📡'), href: '/hop' },
+    { name: t('explore_pandals', 'Explore Pandals'), href: '/explore' },
+    { name: t('smart_route', 'Smart Route'), href: '/route' },
+    { name: t('hop_planner', 'Hop Planner'), href: '/planner' },
+    { name: t('metro_guide', 'Metro Guide'), href: '/metro' },
+    { name: t('bus_routes', 'Bus Routes'), href: '/bus' },
+    { name: t('near_me', 'Near Me'), href: '/nearby' },
   ];
 
   return (
@@ -119,17 +120,17 @@ export default function Navbar() {
             <button
               onClick={() => setSearchOpen(true)}
               className="nav-action-btn"
-              title="Search Pandals & Metro"
+              title={t('search', 'Search')}
               aria-label="Search"
             >
               <IconSearch size={19} />
             </button>
 
-            {/* Quick Locate */}
+            {/* Quick Locate (Desktop Only) */}
             <button
               onClick={handleLocateMe}
-              className="nav-action-btn"
-              title="Puja Near Me"
+              className="nav-action-btn desktop-only"
+              title={t('near_me', 'Puja Near Me')}
               aria-label="Locate me"
             >
               <IconMapPin size={19} />
@@ -139,7 +140,7 @@ export default function Navbar() {
             <Link
               href="/favorites"
               className="nav-action-btn"
-              title="Saved Pandals"
+              title={t('saved_pandals', 'Saved Pandals')}
               aria-label="Saved favorites"
             >
               <IconHeart size={19} fill={count > 0 ? '#B3261E' : 'none'} color={count > 0 ? '#B3261E' : 'currentColor'} />
@@ -148,11 +149,23 @@ export default function Navbar() {
               )}
             </Link>
 
-            {/* Account / Login */}
+            {/* Language Toggle */}
+            <button
+              onClick={toggleLanguage}
+              className="lang-toggle-btn"
+              title={language === 'en' ? 'বাংলা ভাষায় পরিবর্তন করুন' : 'Switch to English'}
+              aria-label="Toggle language"
+            >
+              <span className={`lang-opt ${language === 'en' ? 'active' : ''}`}>EN</span>
+              <span style={{ fontSize: '0.75rem', opacity: 0.5 }}>⇄</span>
+              <span className={`lang-opt ${language === 'bn' ? 'active' : ''}`}>বাংলা</span>
+            </button>
+
+            {/* Account / Login (Desktop Only) */}
             <Link
               href="/login"
               className="nav-action-btn desktop-only"
-              title="Sign In / Account"
+              title={t('sign_in', 'Sign In / Account')}
               aria-label="Account"
             >
               <IconUser size={19} />
@@ -199,7 +212,7 @@ export default function Navbar() {
             onClick={e => e.stopPropagation()}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <div className="eyebrow" style={{ margin: 0 }}>Instant Kolkata Puja Search</div>
+              <div className="eyebrow" style={{ margin: 0 }}>{t('quick_search', 'Instant Kolkata Puja Search')}</div>
               <button onClick={() => setSearchOpen(false)} style={{ color: '#756D65' }}>
                 <IconClose size={22} />
               </button>
@@ -210,36 +223,46 @@ export default function Navbar() {
                 <IconSearch size={22} color="#B08D57" />
                 <input
                   type="text"
-                  placeholder="Search Sreebhumi, Baghbazar, Shyambazar Metro, theme..."
+                  placeholder={t('search_placeholder', 'Search Sreebhumi, Baghbazar, Shyambazar Metro, theme...')}
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                   autoFocus
                   style={{ fontSize: '1.05rem' }}
                 />
                 <button type="submit" className="btn btn-vermilion btn-sm">
-                  Search
+                  {t('search', 'Search')}
                 </button>
               </div>
             </form>
 
             <div style={{ marginTop: '20px' }}>
               <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#756D65', fontWeight: 600 }}>
-                Popular Searches:
+                {t('popular_searches', 'Popular Searches:')}
               </span>
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '8px' }}>
-                {['Shreebhumi Sporting', 'Haridevpur Adarsha Samity', 'Baghbazar Sarbojanin', 'Ekdalia Evergreen', 'Shyambazar Metro', 'Kumartuli Park'].map(term => (
-                  <button
-                    key={term}
-                    onClick={() => {
-                      router.push(`/search?q=${encodeURIComponent(term)}`);
-                      setSearchOpen(false);
-                    }}
-                    className="badge badge-region"
-                    style={{ cursor: 'pointer', padding: '6px 12px' }}
-                  >
-                    {term}
-                  </button>
-                ))}
+                {[
+                  language === 'bn' ? 'শ্রীভূমি স্পোর্টিং' : 'Sreebhumi Sporting',
+                  language === 'bn' ? 'হরিদেবপুর আদর্শ সমিতি' : 'Haridevpur Adarsha Samity',
+                  language === 'bn' ? 'বাগবাজার সর্বজনীন' : 'Baghbazar Sarbojanin',
+                  language === 'bn' ? 'একডালিয়া এভারগ্রিন' : 'Ekdalia Evergreen',
+                  language === 'bn' ? 'শ্যামবাজার মেট্রো' : 'Shyambazar Metro',
+                  language === 'bn' ? 'কুমারটুলী পার্ক' : 'Kumartuli Park'
+                ].map((term, i) => {
+                  const searchTerm = ['Sreebhumi Sporting', 'Haridevpur Adarsha Samity', 'Baghbazar Sarbojanin', 'Ekdalia Evergreen', 'Shyambazar Metro', 'Kumartuli Park'][i];
+                  return (
+                    <button
+                      key={term}
+                      onClick={() => {
+                        router.push(`/search?q=${encodeURIComponent(searchTerm)}`);
+                        setSearchOpen(false);
+                      }}
+                      className="badge badge-region"
+                      style={{ cursor: 'pointer', padding: '6px 12px' }}
+                    >
+                      {term}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -264,6 +287,20 @@ export default function Navbar() {
           </button>
         </div>
 
+        {/* Mobile Language Switcher */}
+        <div style={{ margin: '16px 0', padding: '10px', background: 'var(--warm-white)', borderRadius: '6px', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--taupe)' }}>Language / ভাষা:</span>
+          <button
+            onClick={toggleLanguage}
+            className="lang-toggle-btn"
+            aria-label="Toggle language mobile"
+          >
+            <span className={`lang-opt ${language === 'en' ? 'active' : ''}`}>EN</span>
+            <span style={{ fontSize: '0.75rem', opacity: 0.5 }}>⇄</span>
+            <span className={`lang-opt ${language === 'bn' ? 'active' : ''}`}>বাংলা</span>
+          </button>
+        </div>
+
         <ul className="mobile-nav-links">
           {navLinks.map(link => {
             const isActive = pathname === link.href;
@@ -281,19 +318,19 @@ export default function Navbar() {
           })}
           <li>
             <Link href="/emergency" className="mobile-nav-link">
-              <span>Safety & Essentials</span>
+              <span>{t('safety_essentials', 'Safety & Essentials')}</span>
               <IconChevronRight size={18} color="#B08D57" />
             </Link>
           </li>
           <li>
             <Link href="/about" className="mobile-nav-link">
-              <span>About Pujo Navigation</span>
+              <span>{t('about_pujo_nav', 'About Pujo Navigation')}</span>
               <IconChevronRight size={18} color="#B08D57" />
             </Link>
           </li>
           <li>
             <Link href="/login" className="mobile-nav-link">
-              <span>Sign In / My Account</span>
+              <span>{t('sign_in', 'Sign In / My Account')}</span>
               <IconChevronRight size={18} color="#B08D57" />
             </Link>
           </li>
@@ -305,10 +342,10 @@ export default function Navbar() {
             className="btn btn-vermilion"
             style={{ width: '100%', justifyContent: 'center', marginBottom: '12px' }}
           >
-            <IconSparkles size={16} /> Plan My Puja Night
+            <IconSparkles size={16} /> {t('plan_my_night', 'Plan My Puja Night')}
           </Link>
           <div style={{ fontSize: '0.75rem', color: 'var(--taupe)', textAlign: 'center' }}>
-            Kolkata Durga Puja Navigation & Discovery
+            {t('footer_tagline', 'Kolkata Durga Puja Navigation & Discovery')}
           </div>
         </div>
       </aside>

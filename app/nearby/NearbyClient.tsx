@@ -8,6 +8,7 @@ import PandalCard from '../../components/PandalCard';
 import LeafletMap from '../../components/LeafletMap';
 import { IconMapPin, IconNavigation, IconSparkles } from '../../components/Icons';
 import { useToast } from '../../lib/toast-context';
+import { useLanguage } from '../../lib/language-context';
 
 interface NearbyClientProps {
   pandals: Pandal[];
@@ -23,6 +24,7 @@ export default function NearbyClient({
   initialLon,
 }: NearbyClientProps) {
   const { showToast } = useToast();
+  const { language, t } = useLanguage();
 
   const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(
     initialLat && initialLon ? { lat: initialLat, lon: initialLon } : null
@@ -42,7 +44,7 @@ export default function NearbyClient({
 
   const requestLocation = async () => {
     setLocationStatus('loading');
-    showToast('Detecting your position in Kolkata...', 'info');
+    showToast(language === 'bn' ? 'কলকাতায় আপনার অবস্থান শনাক্ত করা হচ্ছে...' : 'Detecting your position in Kolkata...', 'info');
 
     try {
       const loc = await detectUserLocation();
@@ -51,12 +53,12 @@ export default function NearbyClient({
         lon: loc.lon,
       });
       setLocationStatus('success');
-      showToast(`📍 Location detected: ${loc.landmark}!`, 'success');
+      showToast(language === 'bn' ? `📍 জিপিএস অবস্থান সনাক্ত হয়েছে: ${loc.landmark}!` : `📍 Location detected: ${loc.landmark}!`, 'success');
     } catch (err: any) {
       console.warn('Geolocation denied or timed out:', err);
       setLocationStatus('denied');
       setUserLocation({ lat: 22.5649, lon: 88.3517 }); // Default: Esplanade
-      showToast('Could not access GPS. Showing distances from Central Kolkata.', 'info');
+      showToast(language === 'bn' ? 'জিপিএস অ্যাক্সেস করা যায়নি। সেন্ট্রাল কলকাতা থেকে দূরত্ব দেখাচ্ছে।' : 'Could not access GPS. Showing distances from Central Kolkata.', 'info');
     }
   };
 
@@ -81,12 +83,12 @@ export default function NearbyClient({
       <div className="container">
         {/* Header */}
         <div style={{ marginBottom: '28px' }}>
-          <div className="eyebrow">Real-Time Proximity</div>
+          <div className="eyebrow">{language === 'bn' ? 'লাইভ দূরত্বের হিসাব' : 'Real-Time Proximity'}</div>
           <h1 style={{ fontSize: '2.5rem', marginBottom: '8px' }}>
-            Puja Pandals Near You
+            {t('near_me_title')}
           </h1>
           <p style={{ color: 'var(--taupe)', fontSize: '0.95rem' }}>
-            Find the closest pandals within walking and short transit distance using exact GPS coordinates.
+            {t('near_me_subtitle')}
           </p>
         </div>
 
@@ -123,15 +125,15 @@ export default function NearbyClient({
             <div>
               <div style={{ fontWeight: 700, fontSize: '0.92rem' }}>
                 {locationStatus === 'success'
-                  ? '📍 Your GPS Position Active'
+                  ? (language === 'bn' ? '📍 জিপিএস অবস্থান সক্রিয়' : '📍 Your GPS Position Active')
                   : locationStatus === 'loading'
-                  ? 'Detecting your coordinates...'
-                  : '📍 Pinned to Central Kolkata (Esplanade)'}
+                  ? (language === 'bn' ? 'আপনার স্থানাঙ্ক খোঁজা হচ্ছে...' : 'Detecting your coordinates...')
+                  : (language === 'bn' ? '📍 সেন্ট্রাল কলকাতায় পিন করা হয়েছে (এসপ্ল্যানেড)' : '📍 Pinned to Central Kolkata (Esplanade)')}
               </div>
               <div style={{ fontSize: '0.75rem', color: 'var(--taupe)' }}>
                 {locationStatus === 'denied'
-                  ? 'Grant browser location permission for live proximity.'
-                  : `Coordinates: ${userLocation?.lat.toFixed(4)}, ${userLocation?.lon.toFixed(4)}`}
+                  ? (language === 'bn' ? 'লাইভ দূরত্বের জন্য ব্রাউজার লোকেশন অনুমতি দিন।' : 'Grant browser location permission for live proximity.')
+                  : `${language === 'bn' ? 'স্থানাঙ্ক' : 'Coordinates'}: ${userLocation?.lat.toFixed(4)}, ${userLocation?.lon.toFixed(4)}`}
               </div>
             </div>
           </div>
@@ -142,7 +144,7 @@ export default function NearbyClient({
               className="btn btn-secondary btn-sm"
               disabled={locationStatus === 'loading'}
             >
-              <IconNavigation size={14} /> {locationStatus === 'loading' ? 'Locating...' : 'Refresh GPS'}
+              <IconNavigation size={14} /> {locationStatus === 'loading' ? (language === 'bn' ? 'খোঁজা হচ্ছে...' : 'Locating...') : t('detect_location')}
             </button>
 
             {/* Radius Filters */}
@@ -161,7 +163,7 @@ export default function NearbyClient({
                     cursor: 'pointer',
                   }}
                 >
-                  {r} km
+                  {r} {language === 'bn' ? 'কিমি' : 'km'}
                 </button>
               ))}
             </div>
@@ -171,7 +173,7 @@ export default function NearbyClient({
               className={`badge ${famousOnly ? 'badge-famous' : 'badge-region'}`}
               style={{ cursor: 'pointer', padding: '6px 12px', border: famousOnly ? '1.5px solid #B08D57' : '1px solid var(--border)' }}
             >
-              <IconSparkles size={11} /> Iconic Only
+              <IconSparkles size={11} /> {t('famous_only')}
             </button>
           </div>
         </div>
@@ -181,17 +183,23 @@ export default function NearbyClient({
           {/* List */}
           <div>
             <div style={{ marginBottom: '16px', fontSize: '0.88rem', color: 'var(--taupe)' }}>
-              Found <strong>{nearbyPandals.length}</strong> pandals within <strong>{radiusKm} km</strong> of your location.
+              {language === 'bn' ? (
+                <>আপনার অবস্থানের <strong>{radiusKm} কিমি</strong> মধ্যে <strong>{nearbyPandals.length}টি</strong> প্যান্ডেল পাওয়া গেছে।</>
+              ) : (
+                <>Found <strong>{nearbyPandals.length}</strong> pandals within <strong>{radiusKm} km</strong> of your location.</>
+              )}
             </div>
 
             {nearbyPandals.length === 0 ? (
               <div style={{ padding: '60px', textAlign: 'center', background: '#FFF', borderRadius: '8px', border: '1px dashed var(--border)' }}>
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '8px' }}>No Pandals in this immediate radius</h3>
+                <h3 style={{ fontSize: '1.2rem', marginBottom: '8px' }}>
+                  {language === 'bn' ? 'এই ব্যাসার্ধে কোনো প্যান্ডেল পাওয়া যায়নি' : 'No Pandals in this immediate radius'}
+                </h3>
                 <p style={{ fontSize: '0.85rem', color: 'var(--taupe)', marginBottom: '16px' }}>
-                  Expand the radius slider above to 6 km or 12 km to see surrounding puja pandals.
+                  {language === 'bn' ? 'পার্শ্ববর্তী প্যান্ডেলগুলো দেখতে উপরের ব্যাসার্ধ ফিল্টারটি বাড়িয়ে ৬ কিমি বা ১২ কিমি করুন।' : 'Expand the radius slider above to 6 km or 12 km to see surrounding puja pandals.'}
                 </p>
                 <button onClick={() => setRadiusKm(6)} className="btn btn-primary btn-sm">
-                  Expand Radius to 6 km
+                  {language === 'bn' ? 'ব্যাসার্ধ বাড়িয়ে ৬ কিমি করুন' : 'Expand Radius to 6 km'}
                 </button>
               </div>
             ) : (

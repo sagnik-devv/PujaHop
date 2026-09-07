@@ -7,11 +7,13 @@ import { useRouter } from 'next/navigation';
 import { IconUser, IconSparkles } from '../../components/Icons';
 import { useToast } from '../../lib/toast-context';
 import { useAuth } from '../../lib/auth-context';
+import { useLanguage } from '../../lib/language-context';
 
 export default function LoginClient() {
   const router = useRouter();
   const { user, signIn, signUp, sendEmailOtp, verifyEmailOtp, signOut, loading: authLoading } = useAuth();
   const { showToast } = useToast();
+  const { language, t } = useLanguage();
 
   const [tab, setTab] = useState<'otp' | 'signin' | 'signup'>('otp');
   const [email, setEmail] = useState('');
@@ -35,7 +37,7 @@ export default function LoginClient() {
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) {
-      showToast('Please enter your email address', 'warning');
+      showToast(language === 'bn' ? 'দয়া করে আপনার ইমেল এড্রেস দিন' : 'Please enter your email address', 'warning');
       return;
     }
 
@@ -47,7 +49,7 @@ export default function LoginClient() {
       } else {
         setOtpSent(true);
         setResendTimer(60);
-        showToast(res.message || '6-digit verification code sent to your email!', 'success');
+        showToast(res.message || (language === 'bn' ? '৬-সংখ্যার কোড আপনার ইমেলে পাঠানো হয়েছে!' : '6-digit verification code sent to your email!'), 'success');
       }
     } finally {
       setSubmitting(false);
@@ -58,7 +60,7 @@ export default function LoginClient() {
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!otpCode.trim() || otpCode.trim().length < 6) {
-      showToast('Please enter the 6-digit verification code', 'warning');
+      showToast(language === 'bn' ? 'দয়া করে ৬-সংখ্যার ওটিপি কোড দিন' : 'Please enter the 6-digit verification code', 'warning');
       return;
     }
 
@@ -68,7 +70,7 @@ export default function LoginClient() {
       if (res.error) {
         showToast(res.error, 'error');
       } else {
-        showToast('Email verified successfully! Signed in.', 'success');
+        showToast(language === 'bn' ? 'ইমেল সফলভাবে যাচাই করা হয়েছে!' : 'Email verified successfully! Signed in.', 'success');
         setTimeout(() => {
           router.push('/hop');
         }, 500);
@@ -82,7 +84,7 @@ export default function LoginClient() {
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
-      showToast('Please enter your email and password', 'warning');
+      showToast(language === 'bn' ? 'দয়া করে ইমেল এবং পাসওয়ার্ড দিন' : 'Please enter your email and password', 'warning');
       return;
     }
 
@@ -94,14 +96,14 @@ export default function LoginClient() {
           showToast(res.error, 'error');
           return;
         }
-        showToast(`Welcome ${name || 'Hopper'}! Account created.`, 'success');
+        showToast(language === 'bn' ? `স্বাগতম ${name || 'পূজাপ্রেমী'}! অ্যাকাউন্ট তৈরি হয়েছে।` : `Welcome ${name || 'Hopper'}! Account created.`, 'success');
       } else {
         const res = await signIn(email, password);
         if (res.error) {
           showToast(res.error, 'error');
           return;
         }
-        showToast('Welcome back! Signed in.', 'success');
+        showToast(language === 'bn' ? 'স্বাগতম! সাইন ইন সফল হয়েছে।' : 'Welcome back! Signed in.', 'success');
       }
       setTimeout(() => {
         router.push('/hop');
@@ -144,7 +146,7 @@ export default function LoginClient() {
             {user.name?.charAt(0).toUpperCase() || 'H'}
           </div>
           <h2 style={{ fontSize: '1.4rem', fontFamily: 'var(--font-serif)', margin: '0 0 4px' }}>
-            {user.name || 'Pujo Hopper'}
+            {user.name || (language === 'bn' ? 'পূজাপ্রেমী' : 'Pujo Hopper')}
           </h2>
           <p style={{ fontSize: '0.85rem', color: 'var(--taupe)', margin: '0 0 24px' }}>
             {user.email}
@@ -156,7 +158,7 @@ export default function LoginClient() {
               className="btn btn-vermilion"
               style={{ width: '100%', justifyContent: 'center', padding: '12px' }}
             >
-              Go to Pandal Hop Room 📡
+              {language === 'bn' ? 'প্যান্ডেল হপ রুমে যান 📡' : 'Go to Pandal Hop Room 📡'}
             </Link>
             <button
               type="button"
@@ -172,7 +174,7 @@ export default function LoginClient() {
                 fontWeight: 600,
               }}
             >
-              Sign Out
+              {language === 'bn' ? 'সাইন আউট' : 'Sign Out'}
             </button>
           </div>
         </div>
@@ -200,7 +202,7 @@ export default function LoginClient() {
             PUJO NAVIGATION
           </h1>
           <p style={{ fontSize: '0.82rem', color: 'var(--taupe)' }}>
-            Email OTP Verification & Account Sign In
+            {language === 'bn' ? 'ইমেল ওটিপি যাচাইকরণ ও সাইন ইন' : 'Email OTP Verification & Account Sign In'}
           </p>
         </div>
 
@@ -222,7 +224,7 @@ export default function LoginClient() {
               border: 'none',
             }}
           >
-            Email OTP ✨
+            {language === 'bn' ? 'ইমেল ওটিপি ✨' : 'Email OTP ✨'}
           </button>
           <button
             type="button"
@@ -240,7 +242,7 @@ export default function LoginClient() {
               border: 'none',
             }}
           >
-            Sign In
+            {language === 'bn' ? 'সাইন ইন' : 'Sign In'}
           </button>
           <button
             type="button"
@@ -258,7 +260,7 @@ export default function LoginClient() {
               border: 'none',
             }}
           >
-            Sign Up
+            {language === 'bn' ? 'সাইন আপ' : 'Sign Up'}
           </button>
         </div>
 
@@ -268,7 +270,7 @@ export default function LoginClient() {
             {!otpSent ? (
               <form onSubmit={handleSendOtp} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div className="input-field-group">
-                  <label className="input-field-label">Email Address for Verification</label>
+                  <label className="input-field-label">{language === 'bn' ? 'যাচাইকরণের জন্য ইমেল ঠিকানা' : 'Email Address for Verification'}</label>
                   <div className="input-field-wrapper" style={{ background: '#FFF' }}>
                     <input
                       type="email"
@@ -280,12 +282,12 @@ export default function LoginClient() {
                     />
                   </div>
                   <span style={{ fontSize: '11px', color: 'var(--taupe)', marginTop: '4px', display: 'block' }}>
-                    We'll send a 6-digit one-time code to this email. No password needed.
+                    {language === 'bn' ? 'আমরা এই ইমেলে ৬ সংখ্যার একটি ওটিপি পাঠাব।' : "We'll send a 6-digit one-time code to this email. No password needed."}
                   </span>
                 </div>
 
                 <div className="input-field-group">
-                  <label className="input-field-label">Your Name (Optional)</label>
+                  <label className="input-field-label">{language === 'bn' ? 'আপনার নাম (ঐচ্ছিক)' : 'Your Name (Optional)'}</label>
                   <div className="input-field-wrapper" style={{ background: '#FFF' }}>
                     <input
                       type="text"
@@ -303,24 +305,24 @@ export default function LoginClient() {
                   style={{ width: '100%', justifyContent: 'center', marginTop: '4px', padding: '13px' }}
                 >
                   <IconSparkles size={16} />
-                  <span>{submitting ? 'Sending Code...' : 'Send Verification OTP'}</span>
+                  <span>{submitting ? (language === 'bn' ? 'পাঠানো হচ্ছে...' : 'Sending Code...') : (language === 'bn' ? 'ওটিপি পাঠান' : 'Send Verification OTP')}</span>
                 </button>
               </form>
             ) : (
               <form onSubmit={handleVerifyOtp} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div style={{ background: 'var(--warm-cream)', border: '1px solid var(--border-gold)', borderRadius: '6px', padding: '12px', fontSize: '12px' }}>
-                  Code sent to <strong>{email}</strong>.{' '}
+                  {language === 'bn' ? `কোড পাঠানো হয়েছে ` : `Code sent to `}<strong>{email}</strong>.{' '}
                   <button
                     type="button"
                     onClick={() => setOtpSent(false)}
                     style={{ background: 'none', border: 'none', color: 'var(--vermilion)', cursor: 'pointer', padding: 0, fontWeight: 700, textDecoration: 'underline' }}
                   >
-                    Change
+                    {language === 'bn' ? 'পরিবর্তন করুন' : 'Change'}
                   </button>
                 </div>
 
                 <div className="input-field-group">
-                  <label className="input-field-label">Enter 6-Digit OTP Code</label>
+                  <label className="input-field-label">{language === 'bn' ? '৬-সংখ্যার ওটিপি কোড লিখুন' : 'Enter 6-Digit OTP Code'}</label>
                   <div className="input-field-wrapper" style={{ background: '#FFF' }}>
                     <input
                       type="text"
@@ -341,13 +343,13 @@ export default function LoginClient() {
                   className="btn btn-vermilion"
                   style={{ width: '100%', justifyContent: 'center', marginTop: '4px', padding: '13px' }}
                 >
-                  <span>{submitting ? 'Verifying...' : 'Verify OTP & Sign In'}</span>
+                  <span>{submitting ? (language === 'bn' ? 'যাচাই করা হচ্ছে...' : 'Verifying...') : (language === 'bn' ? 'ওটিপি যাচাই ও সাইন ইন' : 'Verify OTP & Sign In')}</span>
                 </button>
 
                 <div style={{ display: 'flex', justifyContent: 'center', marginTop: '8px' }}>
                   {resendTimer > 0 ? (
                     <span style={{ fontSize: '12px', color: 'var(--taupe)' }}>
-                      Resend code in {resendTimer}s
+                      {language === 'bn' ? `পুনরায় কোড পাঠান ${resendTimer} সেকেন্ডে` : `Resend code in ${resendTimer}s`}
                     </span>
                   ) : (
                     <button
@@ -356,7 +358,7 @@ export default function LoginClient() {
                       disabled={submitting}
                       style={{ background: 'none', border: 'none', color: 'var(--antique-gold)', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}
                     >
-                      Resend OTP Code
+                      {language === 'bn' ? 'পুনরায় ওটিপি পাঠান' : 'Resend OTP Code'}
                     </button>
                   )}
                 </div>
@@ -370,7 +372,7 @@ export default function LoginClient() {
           <form onSubmit={handlePasswordSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {tab === 'signup' && (
               <div className="input-field-group">
-                <label className="input-field-label">Your Name</label>
+                <label className="input-field-label">{language === 'bn' ? 'আপনার নাম' : 'Your Name'}</label>
                 <div className="input-field-wrapper" style={{ background: '#FFF' }}>
                   <input
                     type="text"
@@ -383,7 +385,7 @@ export default function LoginClient() {
             )}
 
             <div className="input-field-group">
-              <label className="input-field-label">Email Address</label>
+              <label className="input-field-label">{t('email_or_phone')}</label>
               <div className="input-field-wrapper" style={{ background: '#FFF' }}>
                 <input
                   type="email"
@@ -396,7 +398,7 @@ export default function LoginClient() {
             </div>
 
             <div className="input-field-group">
-              <label className="input-field-label">Password</label>
+              <label className="input-field-label">{language === 'bn' ? 'পাসওয়ার্ড' : 'Password'}</label>
               <div className="input-field-wrapper" style={{ background: '#FFF' }}>
                 <input
                   type="password"
@@ -417,19 +419,19 @@ export default function LoginClient() {
               <IconSparkles size={16} />
               <span>
                 {submitting
-                  ? 'Please wait...'
+                  ? (language === 'bn' ? 'অপেক্ষা করুন...' : 'Please wait...')
                   : tab === 'signin'
-                  ? 'Sign In with Password'
-                  : 'Create Free Account'}
+                  ? (language === 'bn' ? 'পাসওয়ার্ড দিয়ে সাইন ইন' : 'Sign In with Password')
+                  : (language === 'bn' ? 'ফ্রি অ্যাকাউন্ট তৈরি করুন' : 'Create Free Account')}
               </span>
             </button>
           </form>
         )}
 
         <div style={{ marginTop: '24px', textAlign: 'center', fontSize: '0.78rem', color: 'var(--taupe)' }}>
-          By continuing, you agree to Pujo Navigation’s{' '}
+          {language === 'bn' ? 'এগিয়ে যাওয়ার মাধ্যমে আপনি স্বীকার করছেন ' : 'By continuing, you agree to Pujo Navigation’s '}
           <Link href="/privacy" style={{ color: 'var(--vermilion)', textDecoration: 'underline' }}>
-            Privacy Policy
+            {language === 'bn' ? 'গোপনীয়তা নীতি' : 'Privacy Policy'}
           </Link>.
         </div>
       </div>

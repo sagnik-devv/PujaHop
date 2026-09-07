@@ -9,11 +9,8 @@ import {
   IconBus,
   IconSparkles,
   IconRoute,
-  IconShield,
-  IconCalendar,
-  IconMapPin,
-  IconWalk,
 } from '../../components/Icons';
+import { useLanguage } from '../../lib/language-context';
 
 interface MetroPageClientProps {
   metroStations: MetroStation[];
@@ -24,8 +21,9 @@ interface MetroPageClientProps {
 export default function MetroPageClient({
   metroStations,
   pandals,
-  initialStationId,
 }: MetroPageClientProps) {
+  const { language, t } = useLanguage();
+
   return (
     <div style={{ background: 'var(--background)', minHeight: '100vh', paddingBottom: '80px' }}>
       {/* 1. HERO BANNER */}
@@ -85,7 +83,7 @@ export default function MetroPageClient({
                 boxShadow: '0 2px 8px rgba(21,87,153,0.4)',
               }}
             >
-              <IconMetro size={15} /> Metro Guide
+              <IconMetro size={15} /> {t('metro_guide', 'Metro Guide')}
             </div>
             <Link
               href="/bus"
@@ -102,7 +100,7 @@ export default function MetroPageClient({
                 transition: 'all 0.2s ease',
               }}
             >
-              <IconBus size={15} /> Bus Routes Guide (180 Lines)
+              <IconBus size={15} /> {t('bus_routes', 'Bus Routes Guide')}
             </Link>
           </div>
 
@@ -115,7 +113,7 @@ export default function MetroPageClient({
               lineHeight: 1.15,
             }}
           >
-            Kolkata Metro Durga Puja Guide
+            {t('metro_guide_title', 'Kolkata Metro Durga Puja Guide')}
           </h1>
 
           <div className="hero-accent-line" style={{ margin: '0 auto 20px' }} />
@@ -129,7 +127,7 @@ export default function MetroPageClient({
               margin: '0 auto 32px',
             }}
           >
-            During Durga Puja, vehicular roads across Kolkata are heavily barricaded by the police. Kolkata Metro is the fastest, crowd-free way to hop between legendary pandals. Tap any station to explore all pujas within walking distance with 1-click Google Maps navigation.
+            {t('metro_guide_subtitle', 'During Durga Puja, vehicular roads across Kolkata are heavily barricaded by the police. Kolkata Metro is the fastest, crowd-free way to hop between legendary pandals. Tap any station to explore all pujas within walking distance with 1-click Google Maps navigation.')}
           </p>
 
           {/* Quick Metrics Bar */}
@@ -154,7 +152,7 @@ export default function MetroPageClient({
                 {metroStations.length}
               </div>
               <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--stone)', fontWeight: 600 }}>
-                Metro Stations
+                {t('quick_stats_metros', 'Metro Stations')}
               </div>
             </div>
 
@@ -168,10 +166,10 @@ export default function MetroPageClient({
               }}
             >
               <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.9rem', fontWeight: 700, color: '#A5D6A7' }}>
-                4 Lines
+                {language === 'bn' ? '৪টি লাইন' : '4 Lines'}
               </div>
               <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--stone)', fontWeight: 600 }}>
-                Blue, Green, Purple, Orange
+                {language === 'bn' ? 'ব্লু, গ্রিন, পার্পল, অরেঞ্জ' : 'Blue, Green, Purple, Orange'}
               </div>
             </div>
 
@@ -188,7 +186,7 @@ export default function MetroPageClient({
                 {pandals.length}+
               </div>
               <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--stone)', fontWeight: 600 }}>
-                Pandals Accessible
+                {t('quick_stats_pandals', 'Pandals Accessible')}
               </div>
             </div>
 
@@ -205,7 +203,7 @@ export default function MetroPageClient({
                 04:00 AM
               </div>
               <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--stone)', fontWeight: 600 }}>
-                All-Night Puja Special Trains
+                {language === 'bn' ? 'সারারাত পূজা স্পেশাল ট্রেন' : 'All-Night Puja Special Trains'}
               </div>
             </div>
           </div>
@@ -224,13 +222,13 @@ export default function MetroPageClient({
         <div className="container">
           <div style={{ textAlign: 'center', maxWidth: '720px', margin: '0 auto 40px' }}>
             <div className="eyebrow" style={{ justifyContent: 'center' }}>
-              Essential Festive Transit Intelligence
+              {language === 'bn' ? 'মেট্রো পরিক্রমার নির্দেশিকা' : 'Essential Festive Transit Intelligence'}
             </div>
             <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '2.2rem' }}>
-              How to Master Kolkata Metro During Puja
+              {language === 'bn' ? 'পূজোতে কীভাবে সহজ করবেন মেট্রো সফর' : 'How to Master Kolkata Metro During Puja'}
             </h2>
             <p style={{ color: 'var(--taupe)', marginTop: '8px', fontSize: '0.92rem' }}>
-              Kolkata Metro runs special overnight schedules and high-frequency services across all festive days.
+              {language === 'bn' ? 'দুর্গাপূজার বিশেষ দিনগুলিতে মেট্রো রেল নাইট সার্ভিস পরিচালনা করে।' : 'Kolkata Metro runs special overnight schedules and high-frequency services across all festive days.'}
             </p>
           </div>
 
@@ -248,15 +246,12 @@ export default function MetroPageClient({
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
                 <span style={{ fontSize: '1.4rem' }}>🌙</span>
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0 }}>
-                  All-Night Special Puja Service
+                  {language === 'bn' ? 'সারারাত স্পেশাল মেট্রো পরিষেবা' : 'All-Night Special Puja Service'}
                 </h3>
               </div>
               <p style={{ fontSize: '0.85rem', color: '#555', lineHeight: 1.5, marginBottom: '14px' }}>
-                On <strong>Saptami, Ashtami, and Nabami</strong>, Kolkata Metro traditionally operates extended festive midnight services on the Blue (North-South) and Green (East-West) lines. Standard schedules apply on Panchami, Sasthi, and Dashami.
+                {language === 'bn' ? 'সপ্তমী, অষ্টমী ও নবমীতে রাতভর ট্রেন চলাচল করে ব্লু ও গ্রিন লাইনে।' : 'On Saptami, Ashtami, and Nabami, Kolkata Metro traditionally operates extended festive midnight services on the Blue (North-South) and Green (East-West) lines.'}
               </p>
-              <div style={{ fontSize: '0.78rem', background: '#F9F6F0', padding: '10px', borderRadius: '6px', border: '1px solid var(--border-subtle)' }}>
-                💡 <em>Timings follow Metro Railway Kolkata official festive circulars. Blue Line connects Dakshineswar to Kavi Subhash, and Green Line connects Howrah Maidan to Sealdah.</em>
-              </div>
             </div>
 
             {/* Guide Card 2: Key Interchange Junctions */}
@@ -272,14 +267,13 @@ export default function MetroPageClient({
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
                 <span style={{ fontSize: '1.4rem' }}>🔄</span>
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0 }}>
-                  Key Interchange Stations
+                  {language === 'bn' ? 'প্রধান ইন্টারচেঞ্জ স্টেশনসমূহ' : 'Key Interchange Stations'}
                 </h3>
               </div>
               <ul style={{ fontSize: '0.85rem', color: '#555', lineHeight: 1.6, paddingLeft: '20px', margin: 0 }}>
-                <li><strong>Esplanade:</strong> Connects Blue Line (North-South) with Green Line (East-West under the river to Howrah).</li>
-                <li><strong>Howrah Maidan:</strong> Access iconic Howrah pandals & Eastern/South Eastern train networks.</li>
-                <li><strong>Sealdah:</strong> Green Line gateway to Central & North-East heritage pandals.</li>
-                <li><strong>Kavi Subhash:</strong> Interchange between Blue Line and Orange Line (Ruby).</li>
+                <li><strong>এসপ্ল্যানেড:</strong> {language === 'bn' ? 'ব্লু লাইন ও গ্রিন লাইনের সংযোগস্থল' : 'Connects Blue Line with Green Line'}</li>
+                <li><strong>হাওড়া ময়দান:</strong> {language === 'bn' ? 'হাওড়া অঞ্চলের পুজো ও ট্রেন নেটওয়ার্ক' : 'Access iconic Howrah pandals & trains'}</li>
+                <li><strong>শিয়ালদহ:</strong> {language === 'bn' ? 'মধ্য ও উত্তর কলকাতার ঐতিহ্যবাহী প্যান্ডেল' : 'Green Line gateway to heritage pandals'}</li>
               </ul>
             </div>
 
@@ -296,16 +290,12 @@ export default function MetroPageClient({
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
                 <span style={{ fontSize: '1.4rem' }}>🎫</span>
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0 }}>
-                  Bypass 45-Min Token Queues
+                  {language === 'bn' ? 'লাইনের ভিড় এড়ানোর উপায়' : 'Bypass Token Queues'}
                 </h3>
               </div>
-              <p style={{ fontSize: '0.85rem', color: '#555', lineHeight: 1.5, marginBottom: '14px' }}>
-                Token ticket counters at Kalighat, Shyambazar, and Sovabazar experience heavy lines during peak evenings.
-              </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.8rem', color: 'var(--foreground)' }}>
-                <div>✅ Use a rechargeable <strong>Kolkata Metro Smart Card</strong>.</div>
-                <div>✅ Book UPI QR tickets instantly via the <strong>Metro Ride Kolkata</strong> app.</div>
-                <div>✅ Keep ₹20–₹30 balance topped up before 5:00 PM.</div>
+                <div>✅ {language === 'bn' ? 'মেট্রো স্মার্ট কার্ড ব্যবহার করুন।' : 'Use a Metro Smart Card.'}</div>
+                <div>✅ {language === 'bn' ? 'Metro Ride Kolkata অ্যাপ দিয়ে QR টিকিট কাটুন।' : 'Book UPI QR tickets via Metro Ride Kolkata app.'}</div>
               </div>
             </div>
           </div>
@@ -321,10 +311,10 @@ export default function MetroPageClient({
             }}
           >
             <Link href="/planner" className="btn btn-gold">
-              <IconSparkles size={16} /> Plan Multi-Pandal Night Itinerary
+              <IconSparkles size={16} /> {t('plan_my_night', 'Plan Multi-Pandal Night Itinerary')}
             </Link>
             <Link href="/route" className="btn btn-secondary">
-              <IconRoute size={16} /> Open Smart Route Finder
+              <IconRoute size={16} /> {t('smart_route_calc', 'Open Smart Route Finder')}
             </Link>
           </div>
         </div>

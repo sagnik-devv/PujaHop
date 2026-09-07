@@ -2,8 +2,10 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import 'leaflet/dist/leaflet.css';
-import { HopMember, LiveLocation } from '../lib/hop-room';
+import { HopMember, LiveLocation, AggregatedRoomPandal } from '../lib/hop-room';
 import { calculateDistance } from '../lib/geo';
+import { GENERATED_PANDALS } from '../lib/generated-pujas';
+import { Pandal } from '../lib/types';
 
 interface HopMapProps {
   members: HopMember[];
@@ -15,8 +17,11 @@ interface HopMapProps {
     latitude?: number | null;
     longitude?: number | null;
   } | null;
+  selectedPandals?: AggregatedRoomPandal[];
   selectedMemberId?: string | null;
   onSelectMember?: (member: HopMember) => void;
+  onSelectPandal?: (pandal: AggregatedRoomPandal) => void;
+  onSetMeetup?: (pandal: Pandal) => void;
   height?: string;
   active?: boolean;
 }
@@ -42,14 +47,19 @@ export default function HopMap({
   locations,
   currentUserId,
   meetup,
+  selectedPandals = [],
   selectedMemberId,
   onSelectMember,
+  onSelectPandal,
+  onSetMeetup,
   height = '100%',
   active = true,
 }: HopMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
   const markersRef = useRef<Map<string, any>>(new Map());
+  const routeMarkersRef = useRef<Map<number, any>>(new Map());
+  const routePolylineRef = useRef<any>(null);
   const meetupMarkerRef = useRef<any>(null);
   const prevCoordsRef = useRef<Map<string, [number, number]>>(new Map());
   const [mapReady, setMapReady] = useState(false);
@@ -65,7 +75,6 @@ export default function HopMap({
       }
     };
 
-    // Staggered triggers to catch layout shifts, font loads, and mobile tab animations
     const timer1 = setTimeout(triggerInvalidate, 60);
     const timer2 = setTimeout(triggerInvalidate, 200);
     const timer3 = setTimeout(triggerInvalidate, 500);
@@ -97,10 +106,19 @@ export default function HopMap({
       const selfLoc = currentUserId ? locations[currentUserId] : null;
       openGoogleMapsDirections(lat, lon, selfLoc?.latitude, selfLoc?.longitude);
     };
+
+    (window as any).__hopSetMeetupPandal = (pandalId: number) => {
+      const pandal = GENERATED_PANDALS.find(p => p.id === pandalId);
+      if (pandal && onSetMeetup) {
+        onSetMeetup(pandal);
+      }
+    };
+
     return () => {
       delete (window as any).__hopNavigateToFriend;
+      delete (window as any).__hopSetMeetupPandal;
     };
-  }, [currentUserId, locations]);
+  }, [currentUserId, locations, onSetMeetup]);
 
   // Initialize Leaflet Map once
   useEffect(() => {
@@ -115,7 +133,7 @@ export default function HopMap({
         center: [22.5726, 88.3639], // Kolkata
         zoom: 13,
         zoomControl: false,
-        preferCanvas: true, // Hardware-accelerated canvas rendering for buttery smoothness
+        preferCanvas: true,
       });
 
       L.control.zoom({ position: 'bottomright' }).addTo(map);
@@ -130,7 +148,6 @@ export default function HopMap({
       mapInstance.current = map;
       setMapReady(true);
 
-      // Multiple invalidateSize calls to guarantee perfect tile rendering across devices
       setTimeout(() => {
         if (isMounted && mapInstance.current) {
           mapInstance.current.invalidateSize();
@@ -141,11 +158,6 @@ export default function HopMap({
           mapInstance.current.invalidateSize();
         }
       }, 350);
-      setTimeout(() => {
-        if (isMounted && mapInstance.current) {
-          mapInstance.current.invalidateSize();
-        }
-      }, 800);
     }
 
     initMap();
@@ -159,7 +171,7 @@ export default function HopMap({
     };
   }, []);
 
-  // Center / Fit all points
+  // Center / Fit all points (members + meetup + route stops)
   const handleFitAll = useCallback(async () => {
     if (!mapInstance.current) return;
     const L = (await import('leaflet')).default;
@@ -174,6 +186,9 @@ export default function HopMap({
     if (meetup?.latitude && meetup?.longitude) {
       points.push([meetup.latitude, meetup.longitude]);
     }
+    for (const pandal of selectedPandals) {
+      points.push([pandal.latitude, pandal.longitude]);
+    }
 
     if (points.length === 1) {
       mapInstance.current.setView(points[0], 15, { animate: true });
@@ -184,7 +199,7 @@ export default function HopMap({
         animate: true,
       });
     }
-  }, [members, locations, meetup]);
+  }, [members, locations, meetup, selectedPandals]);
 
   // Center on Self
   const handleCenterSelf = useCallback(() => {
@@ -208,14 +223,13 @@ export default function HopMap({
       const currentMarkerIds = new Set<string>();
       const validPoints: [number, number][] = [];
 
-      // Current user's location for distance calculation
       const selfLoc = currentUserId ? locations[currentUserId] : null;
 
+      // 1. Members Markers
       for (const member of members) {
         const loc = locations[member.user_id];
         const isSharing = (member.is_sharing ?? true) && (loc?.is_sharing ?? true);
 
-        // Skip members without locations or sharing paused
         if (!loc || !isSharing) {
           if (markersRef.current.has(member.user_id)) {
             markersRef.current.get(member.user_id).remove();
@@ -295,7 +309,6 @@ export default function HopMap({
           const marker = markersRef.current.get(member.user_id);
           const prev = prevCoordsRef.current.get(member.user_id);
 
-          // Only mutate position if moved to eliminate layout thrashing
           if (!prev || Math.abs(prev[0] - coords[0]) > 0.00002 || Math.abs(prev[1] - coords[1]) > 0.00002) {
             marker.setLatLng(coords);
             prevCoordsRef.current.set(member.user_id, coords);
@@ -315,7 +328,7 @@ export default function HopMap({
         }
       }
 
-      // Remove removed members
+      // Remove unshared or removed members
       for (const [uid, marker] of markersRef.current.entries()) {
         if (!currentMarkerIds.has(uid)) {
           marker.remove();
@@ -324,7 +337,112 @@ export default function HopMap({
         }
       }
 
-      // Meetup Marker
+      // 2. Route Stops Markers & Polyline
+      const currentRoutePandalIds = new Set<number>();
+
+      selectedPandals.forEach((pandal, idx) => {
+        const pCoords: [number, number] = [pandal.latitude, pandal.longitude];
+        validPoints.push(pCoords);
+        currentRoutePandalIds.add(pandal.id);
+
+        const isCurrentMeetup = meetup?.pandalId === pandal.id;
+        const stopNum = idx + 1;
+
+        const routeIcon = L.divIcon({
+          className: 'hop-route-marker',
+          html: `
+            <div style="position:relative; display:flex; flex-direction:column; align-items:center; cursor:pointer;">
+              <div style="background:#FFFDF9; border:1.5px solid #B3261E; padding:1px 6px; border-radius:10px; font-size:10px; font-weight:800; color:#17120F; box-shadow:0 2px 6px rgba(0,0,0,0.2); white-space:nowrap; margin-bottom:2px; font-family:sans-serif;">
+                Stop #${stopNum}: ${pandal.name.length > 20 ? pandal.name.slice(0, 18) + '...' : pandal.name}
+              </div>
+              <div style="width:28px; height:28px; border-radius:50%; background:#B3261E; border:2.5px solid #FFFFFF; box-shadow:0 3px 8px rgba(179,38,30,0.5); display:flex; align-items:center; justify-content:center; color:#FFF; font-weight:800; font-size:12px; font-family:sans-serif;">
+                ${stopNum}
+              </div>
+            </div>
+          `,
+          iconSize: [36, 36],
+          iconAnchor: [18, 18],
+        });
+
+        const routePopup = `
+          <div style="font-family:sans-serif; padding:4px 6px; min-width:180px;">
+            <div style="font-size:10px; font-weight:800; color:#B3261E; text-transform:uppercase;">
+              Route Stop #${stopNum}
+            </div>
+            <div style="font-size:13px; font-weight:700; color:#17120F; margin:2px 0 4px;">
+              ${pandal.name}
+            </div>
+            <div style="font-size:11px; color:#756D65; margin-bottom:8px;">
+              ${pandal.region} ${pandal.nearestMetro ? `• Near ${pandal.nearestMetro} Metro` : ''}
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              ${
+                !isCurrentMeetup
+                  ? `<button 
+                      type="button"
+                      onclick="window.__hopSetMeetupPandal(${pandal.id})"
+                      style="width:100%; background:var(--gold-gradient, #D99A25); color:#17120F; border:none; padding:6px 10px; border-radius:4px; font-weight:700; font-size:11px; cursor:pointer;"
+                     >
+                      🪷 Set as Meetup Point
+                     </button>`
+                  : `<div style="font-size:11px; font-weight:800; color:#D99A25; text-align:center;">✓ Current Meetup Point</div>`
+              }
+              <button 
+                type="button"
+                onclick="window.__hopNavigateToFriend(${pandal.latitude}, ${pandal.longitude})"
+                style="width:100%; background:#1A73E8; color:#FFF; border:none; padding:6px 10px; border-radius:4px; font-weight:700; font-size:11px; cursor:pointer;"
+              >
+                🗺️ Directions
+              </button>
+            </div>
+          </div>
+        `;
+
+        if (routeMarkersRef.current.has(pandal.id)) {
+          const marker = routeMarkersRef.current.get(pandal.id);
+          marker.setLatLng(pCoords);
+          marker.setIcon(routeIcon);
+          marker.setPopupContent(routePopup);
+        } else {
+          const marker = L.marker(pCoords, { icon: routeIcon, zIndexOffset: 700 }).addTo(
+            mapInstance.current
+          );
+          marker.bindPopup(routePopup);
+          marker.on('click', () => {
+            onSelectPandal?.(pandal);
+          });
+          routeMarkersRef.current.set(pandal.id, marker);
+        }
+      });
+
+      // Remove deselected or deleted route stops
+      for (const [pId, marker] of routeMarkersRef.current.entries()) {
+        if (!currentRoutePandalIds.has(pId)) {
+          marker.remove();
+          routeMarkersRef.current.delete(pId);
+        }
+      }
+
+      // Draw or update connecting polyline
+      if (selectedPandals.length >= 2) {
+        const polyCoords = selectedPandals.map(p => [p.latitude, p.longitude] as [number, number]);
+        if (routePolylineRef.current) {
+          routePolylineRef.current.setLatLngs(polyCoords);
+        } else {
+          routePolylineRef.current = L.polyline(polyCoords, {
+            color: '#B3261E',
+            weight: 3.5,
+            opacity: 0.85,
+            dashArray: '6, 8',
+            lineCap: 'round',
+          }).addTo(mapInstance.current);
+        }
+      } else if (routePolylineRef.current) {
+        routePolylineRef.current.remove();
+        routePolylineRef.current = null;
+      }
+
+      // 3. Meetup Marker
       if (meetup?.latitude && meetup?.longitude) {
         const meetupCoords: [number, number] = [meetup.latitude, meetup.longitude];
         validPoints.push(meetupCoords);
@@ -369,7 +487,7 @@ export default function HopMap({
         meetupMarkerRef.current = null;
       }
 
-      // Auto fit bounds when new members join or positions arrive
+      // Auto fit bounds when new items arrive
       if (validPoints.length >= 2) {
         clearTimeout(fitBoundsTimeoutRef.current);
         fitBoundsTimeoutRef.current = setTimeout(() => {
@@ -391,7 +509,7 @@ export default function HopMap({
     return () => {
       isCancelled = true;
     };
-  }, [members, locations, currentUserId, meetup, mapReady, onSelectMember]);
+  }, [members, locations, currentUserId, meetup, selectedPandals, mapReady, onSelectMember, onSelectPandal]);
 
   return (
     <div style={{ position: 'relative', width: '100%', height }}>
@@ -406,7 +524,7 @@ export default function HopMap({
         }}
       />
 
-      {/* Floating Controls: Fit All Members & My Location */}
+      {/* Floating Controls: Fit All Members/Route & My Location */}
       <div
         style={{
           position: 'absolute',
@@ -421,7 +539,7 @@ export default function HopMap({
         <button
           type="button"
           onClick={handleFitAll}
-          title="Fit all members on map"
+          title="Fit all members & route stops on map"
           style={{
             background: '#FFFFFF',
             border: '1.5px solid var(--border-gold)',
@@ -438,7 +556,7 @@ export default function HopMap({
           }}
         >
           <span>🔍</span>
-          <span>Fit All ({members.filter(m => locations[m.user_id]).length})</span>
+          <span>Fit All ({members.filter(m => locations[m.user_id]).length + selectedPandals.length})</span>
         </button>
 
         {currentUserId && locations[currentUserId] && (

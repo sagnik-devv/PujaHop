@@ -14,6 +14,7 @@ export interface LocationWatcherCallbacks {
     latitude: number | null;
     longitude: number | null;
   }) => void;
+  onPandalsUpdated?: () => void;
   onConnectionChange?: (connected: boolean) => void;
   onError?: (errorMessage: string) => void;
   onSelfPosition?: (coords: { latitude: number; longitude: number; accuracy: number }) => void;
@@ -70,6 +71,7 @@ export class RealtimeLocationManager {
       insforge.realtime.on('sharing_changed', this.handleRemoteSharingChanged);
       insforge.realtime.on('member_joined', this.handleRemoteMemberJoined);
       insforge.realtime.on('meetup_changed', this.handleRemoteMeetupChanged);
+      insforge.realtime.on('pandals_updated', this.handleRemotePandalsUpdated);
 
       insforge.realtime.on('connect', () => {
         this.callbacks.onConnectionChange?.(true);
@@ -124,6 +126,11 @@ export class RealtimeLocationManager {
   private handleRemoteMeetupChanged = (msg: any) => {
     if (!msg || msg.room_id !== this.roomId) return;
     this.callbacks.onMeetupChanged?.(msg.meetup);
+  };
+
+  private handleRemotePandalsUpdated = (msg: any) => {
+    if (!msg || msg.room_id !== this.roomId) return;
+    this.callbacks.onPandalsUpdated?.();
   };
 
   private startGeolocationWatch(): void {
@@ -283,6 +290,17 @@ export class RealtimeLocationManager {
   }
 
   /**
+   * Broadcasts that room pandals or route were updated
+   */
+  public async broadcastPandalsUpdated(): Promise<void> {
+    if (this.isSubscribed) {
+      await insforge.realtime.publish(this.channelName, 'pandals_updated', {
+        room_id: this.roomId,
+      });
+    }
+  }
+
+  /**
    * Stops tracking, unsubscribes and removes event handlers
    */
   public stop(): void {
@@ -297,6 +315,7 @@ export class RealtimeLocationManager {
     insforge.realtime.off('sharing_changed', this.handleRemoteSharingChanged);
     insforge.realtime.off('member_joined', this.handleRemoteMemberJoined);
     insforge.realtime.off('meetup_changed', this.handleRemoteMeetupChanged);
+    insforge.realtime.off('pandals_updated', this.handleRemotePandalsUpdated);
 
     if (this.isSubscribed) {
       insforge.realtime.unsubscribe(this.channelName);

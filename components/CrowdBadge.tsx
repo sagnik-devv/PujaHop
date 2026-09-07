@@ -1,6 +1,9 @@
+'use client';
+
 import React from 'react';
 import { CrowdLevel } from '../lib/types';
 import { getCrowdBadgeStyle } from '../lib/format';
+import { useLanguage } from '../lib/language-context';
 
 interface CrowdBadgeProps {
   level: CrowdLevel;
@@ -10,6 +13,9 @@ interface CrowdBadgeProps {
 
 export default function CrowdBadge({ level, isLive = false, showDetails = false }: CrowdBadgeProps) {
   const style = getCrowdBadgeStyle(level);
+  const { language, tCrowd } = useLanguage();
+
+  const labelText = language === 'bn' ? tCrowd(level) : style.label;
 
   return (
     <div
@@ -36,10 +42,10 @@ export default function CrowdBadge({ level, isLive = false, showDetails = false 
           display: 'inline-block',
         }}
       />
-      <span>{style.label}</span>
+      <span>{labelText}</span>
       {isLive ? (
         <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', color: '#B3261E', fontWeight: 700 }}>
-          LIVE
+          {language === 'bn' ? 'লাইভ' : 'LIVE'}
         </span>
       ) : (
         <span
@@ -50,9 +56,9 @@ export default function CrowdBadge({ level, isLive = false, showDetails = false 
             padding: '1px 4px',
             borderRadius: '2px',
           }}
-          title="Crowd data is estimated based on historical festive traffic patterns"
+          title={language === 'bn' ? 'ঐতিহাসিক উপাত্তের ভিত্তিতে ভিড়ের অনুমান' : 'Crowd data is estimated based on historical festive traffic patterns'}
         >
-          Estimated
+          {language === 'bn' ? 'আনুমানিক' : 'Estimated'}
         </span>
       )}
     </div>

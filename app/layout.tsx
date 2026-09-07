@@ -8,6 +8,8 @@ import { FavoritesProvider } from '../lib/favorites-context';
 import { ToastProvider } from '../lib/toast-context';
 import { AuthProvider } from '../lib/auth-context';
 
+import { LanguageProvider } from '../lib/language-context';
+
 export const metadata: Metadata = {
   metadataBase: new URL('https://pujonavigation.in'),
   title: 'Pujo Navigation | Kolkata Durga Puja 2026',
@@ -70,16 +72,18 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/images/logo.png" />
       </head>
       <body>
-        <AuthProvider>
-          <ToastProvider>
-            <FavoritesProvider>
-              <Navbar />
-              <main style={{ flex: 1 }}>{children}</main>
-              <MobileBottomNav />
-              <Footer />
-            </FavoritesProvider>
-          </ToastProvider>
-        </AuthProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <ToastProvider>
+              <FavoritesProvider>
+                <Navbar />
+                <main style={{ flex: 1 }}>{children}</main>
+                <MobileBottomNav />
+                <Footer />
+              </FavoritesProvider>
+            </ToastProvider>
+          </AuthProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

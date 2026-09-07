@@ -6,17 +6,15 @@ import { getRoutes } from '../../lib/api';
 import {
   searchKolkataLocations,
   resolveLocationCoordinates,
-  getClosestLandmarkName,
   detectUserLocation,
   LocationSuggestion,
-  KOLKATA_HUBS,
 } from '../../lib/location-service';
-import { formatDistance } from '../../lib/format';
 import { calculateDistance } from '../../lib/geo';
 import RouteComparison from '../../components/RouteComparison';
 import LeafletMap from '../../components/LeafletMap';
-import { IconMapPin, IconRoute, IconNavigation, IconMetro, IconSparkles } from '../../components/Icons';
+import { IconMapPin, IconRoute, IconNavigation, IconSparkles } from '../../components/Icons';
 import { useToast } from '../../lib/toast-context';
+import { useLanguage } from '../../lib/language-context';
 
 interface RouteClientProps {
   pandals: Pandal[];
@@ -36,6 +34,8 @@ export default function RouteClient({
   initialLon,
 }: RouteClientProps) {
   const { showToast } = useToast();
+  const { language, tPandalName, tRegion, t } = useLanguage();
+
   const [selectedToId, setSelectedToId] = useState<number>(initialToId);
   const [fromName, setFromName] = useState<string>(initialFromName);
   const [userCoords, setUserCoords] = useState<{ lat?: number; lon?: number }>({
@@ -51,8 +51,6 @@ export default function RouteClient({
   const [showDropdown, setShowDropdown] = useState(false);
   const [locating, setLocating] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-
 
   // Handle outside click for autocomplete dropdown
   useEffect(() => {
@@ -147,13 +145,13 @@ export default function RouteClient({
   // GPS Locate Me Handler
   const handleLocateMe = async () => {
     setLocating(true);
-    showToast('Locating your position in Kolkata...', 'info');
+    showToast(t('locating', 'Locating your position in Kolkata...'), 'info');
 
     try {
       const loc = await detectUserLocation({ preferHighAccuracy: true, timeoutMs: 6000 });
       setUserCoords({ lat: loc.lat, lon: loc.lon });
-      setFromName(`My Location (${loc.landmark})`);
-      showToast(`📍 Location pinned: ${loc.landmark} (Nearest: ${loc.nearestMetroName})`, 'success');
+      setFromName(language === 'bn' ? `আমার অবস্থান (${loc.landmark})` : `My Location (${loc.landmark})`);
+      showToast(`📍 ${t('location_detected', 'Location pinned')}: ${loc.landmark}`, 'success');
     } catch (err: any) {
       console.warn('Geolocation error', err);
       showToast('Could not access GPS. Please choose a starting point or Metro station.', 'warning');
@@ -181,12 +179,12 @@ export default function RouteClient({
       <div className="container">
         {/* Header */}
         <div style={{ marginBottom: '32px' }}>
-          <div className="eyebrow">Intelligent Festive Transit</div>
+          <div className="eyebrow">{language === 'bn' ? 'স্মার্ট পরিবহন নির্দেশিকা' : 'Intelligent Festive Transit'}</div>
           <h1 style={{ fontSize: '2.5rem', marginBottom: '8px' }}>
-            Smart Route Finder
+            {t('smart_route_calc', 'Smart Route Finder')}
           </h1>
           <p style={{ color: 'var(--taupe)', fontSize: '0.95rem' }}>
-            Compare Metro, shared autos, and walking corridors from your location to avoid Kolkata Durga Puja traffic barricades.
+            {t('route_subtitle', 'Compare Metro, shared autos, and walking corridors from your location to avoid Kolkata Durga Puja traffic barricades.')}
           </p>
         </div>
 
@@ -206,7 +204,7 @@ export default function RouteClient({
             <div className="input-field-group" style={{ position: 'relative' }} ref={dropdownRef}>
               <label className="input-field-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span>
-                  <IconMapPin size={13} color="#B08D57" /> From (Your Origin Point)
+                  <IconMapPin size={13} color="#B08D57" /> {t('origin', 'From (Your Origin Point)')}
                 </span>
                 {userCoords.lat && userCoords.lon && (
                   <span style={{ fontSize: '0.7rem', color: '#155799', fontWeight: 600 }}>
@@ -231,7 +229,7 @@ export default function RouteClient({
                       handleResolveCustomOrigin();
                     }
                   }}
-                  placeholder="Type any Kolkata location, metro station, landmark..."
+                  placeholder={language === 'bn' ? 'যেকোনো স্থান, মেট্রো স্টেশন বা ল্যান্ডমার্ক লিখুন...' : 'Type any Kolkata location, metro station, landmark...'}
                 />
 
                 <button
@@ -242,7 +240,7 @@ export default function RouteClient({
                   style={{ cursor: 'pointer', border: 'none', background: locating ? '#E5DED5' : undefined }}
                   title="Detect My Location via GPS"
                 >
-                  <IconNavigation size={12} /> {locating ? 'Locating...' : 'GPS'}
+                  <IconNavigation size={12} /> {locating ? (language === 'bn' ? 'খোঁজা হচ্ছে...' : 'Locating...') : 'GPS'}
                 </button>
               </div>
 
@@ -314,7 +312,7 @@ export default function RouteClient({
             {/* TO: Destination Pandal */}
             <div className="input-field-group">
               <label className="input-field-label">
-                <IconRoute size={13} color="#B3261E" /> To (Destination Pandal)
+                <IconRoute size={13} color="#B3261E" /> {t('destination', 'To (Destination Pandal)')}
               </label>
               <div className="input-field-wrapper" style={{ background: '#FFF' }}>
                 <select
@@ -324,7 +322,7 @@ export default function RouteClient({
                 >
                   {pandals.map(p => (
                     <option key={p.id} value={p.id}>
-                      {p.name} ({p.region}) • 🚇 {p.nearestMetro}
+                      {tPandalName(p)} ({tRegion(p.region)}) • 🚇 {p.nearestMetro}
                     </option>
                   ))}
                 </select>
@@ -340,7 +338,7 @@ export default function RouteClient({
                 className="btn btn-vermilion"
                 style={{ height: '46px', width: '100%', whiteSpace: 'nowrap', padding: '0 20px', justifyContent: 'center' }}
               >
-                <IconSparkles size={16} /> Find Route
+                <IconSparkles size={16} /> {t('calculate_route', 'Find Route')}
               </button>
             </div>
           </div>
@@ -349,7 +347,7 @@ export default function RouteClient({
           <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--border-subtle)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
               <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--taupe)' }}>
-                Popular Starting Hubs:
+                {language === 'bn' ? 'প্রধান প্রারম্ভিক হাবসমূহ:' : 'Popular Starting Hubs:'}
               </span>
 
               <button
@@ -369,7 +367,7 @@ export default function RouteClient({
                   gap: '4px',
                 }}
               >
-                <IconNavigation size={11} /> My Current Location
+                <IconNavigation size={11} /> {language === 'bn' ? 'আমার বর্তমান অবস্থান' : 'My Current Location'}
               </button>
 
               <button
@@ -386,7 +384,7 @@ export default function RouteClient({
                   cursor: 'pointer',
                 }}
               >
-                🚇 Esplanade (Central)
+                🚇 এসপ্ল্যানেড (সেন্ট্রাল)
               </button>
 
               <button
@@ -403,7 +401,7 @@ export default function RouteClient({
                   cursor: 'pointer',
                 }}
               >
-                🚆 Howrah Station
+                🚆 হাওড়া স্টেশন
               </button>
 
               <button
@@ -420,24 +418,7 @@ export default function RouteClient({
                   cursor: 'pointer',
                 }}
               >
-                🚆 Sealdah Station
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleSelectQuickHub('Gariahat Crossing', 22.5190, 88.3653)}
-                style={{
-                  fontSize: '0.72rem',
-                  fontWeight: 500,
-                  padding: '4px 10px',
-                  borderRadius: '16px',
-                  border: '1px solid var(--border)',
-                  background: '#FFF',
-                  color: 'var(--foreground)',
-                  cursor: 'pointer',
-                }}
-              >
-                🛍️ Gariahat (South)
+                🚆 শিয়ালদহ স্টেশন
               </button>
 
               <button
@@ -454,41 +435,7 @@ export default function RouteClient({
                   cursor: 'pointer',
                 }}
               >
-                🪔 Shyambazar (North)
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleSelectQuickHub('Salt Lake Sector V', 22.5735, 88.4331)}
-                style={{
-                  fontSize: '0.72rem',
-                  fontWeight: 500,
-                  padding: '4px 10px',
-                  borderRadius: '16px',
-                  border: '1px solid var(--border)',
-                  background: '#FFF',
-                  color: 'var(--foreground)',
-                  cursor: 'pointer',
-                }}
-              >
-                🏢 Salt Lake (East)
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleSelectQuickHub('Kolkata Airport (CCU)', 22.6547, 88.4467)}
-                style={{
-                  fontSize: '0.72rem',
-                  fontWeight: 500,
-                  padding: '4px 10px',
-                  borderRadius: '16px',
-                  border: '1px solid var(--border)',
-                  background: '#FFF',
-                  color: 'var(--foreground)',
-                  cursor: 'pointer',
-                }}
-              >
-                ✈️ Airport
+                🪔 শ্যামবাজার (উত্তর)
               </button>
             </div>
           </div>
@@ -510,16 +457,16 @@ export default function RouteClient({
                 }}
               >
                 <div style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--foreground)', marginBottom: '8px' }}>
-                  Computing Best Estimated Routes from &quot;{fromName}&quot;...
+                  {language === 'bn' ? `"${fromName}" থেকে সেরা রুট গণনা করা হচ্ছে...` : `Computing Best Estimated Routes from "${fromName}"...`}
                 </div>
                 <div style={{ fontSize: '0.85rem' }}>
-                  Evaluating Metro line transfers, walking distances, and Kolkata Police barricade corridors.
+                  {language === 'bn' ? 'মেট্রো লাইন, হাঁটার দূরত্ব এবং ট্রাফিক বিবেচনা করা হচ্ছে।' : 'Evaluating Metro line transfers, walking distances, and Kolkata Police barricade corridors.'}
                 </div>
               </div>
             ) : targetPandal ? (
               <RouteComparison
                 routes={routes}
-                targetPandalName={targetPandal.name}
+                targetPandalName={tPandalName(targetPandal)}
               />
             ) : null}
           </div>
@@ -539,9 +486,9 @@ export default function RouteClient({
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
                   <div>
-                    <div className="eyebrow" style={{ margin: 0, fontSize: '0.68rem' }}>Destination</div>
+                    <div className="eyebrow" style={{ margin: 0, fontSize: '0.68rem' }}>{t('destination', 'Destination')}</div>
                     <h3 style={{ fontSize: '1.15rem', fontWeight: 700, margin: '2px 0 0' }}>
-                      {targetPandal?.name}
+                      {tPandalName(targetPandal)}
                     </h3>
                   </div>
                   {directDistanceKm !== null && (
@@ -556,17 +503,17 @@ export default function RouteClient({
                         color: 'var(--vermilion)',
                       }}
                     >
-                      ~{directDistanceKm.toFixed(1)} km direct
+                      ~{directDistanceKm.toFixed(1)} {language === 'bn' ? 'কিমি সরাসরি' : 'km direct'}
                     </span>
                   )}
                 </div>
 
                 <div style={{ fontSize: '0.78rem', color: 'var(--taupe)', marginTop: '4px' }}>
-                  🚇 Nearest Metro: <strong>{targetPandal?.nearestMetro}</strong> (approx {targetPandal?.walkingDistanceM}m walk)
+                  🚇 {t('nearest_metro', 'Nearest Metro')}: <strong>{targetPandal?.nearestMetro}</strong> (~{targetPandal?.walkingDistanceM}{language === 'bn' ? 'মিঃ হাঁটা' : 'm walk'})
                 </div>
 
                 <div style={{ fontSize: '0.75rem', color: '#666', marginTop: '6px', borderTop: '1px solid var(--border-subtle)', paddingTop: '6px' }}>
-                  📍 Origin: <strong>{fromName}</strong>
+                  📍 {t('origin', 'Origin')}: <strong>{fromName}</strong>
                 </div>
               </div>
 

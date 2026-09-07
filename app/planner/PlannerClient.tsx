@@ -2,17 +2,15 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
-import { Pandal, MetroStation, ItineraryPlan, FoodStall } from '../../lib/types';
+import { Pandal, MetroStation, ItineraryPlan } from '../../lib/types';
 import { generateItinerary, findNearbyFoodStalls } from '../../lib/api';
 import { PANDAL_EATERIES_MAP } from '../../lib/generated-eateries';
-import { formatCurrency, formatDistance, formatDuration } from '../../lib/format';
+import { formatDistance } from '../../lib/format';
 import { detectUserLocation } from '../../lib/location-service';
 import {
   IconCalendar,
   IconClock,
-  IconMetro,
   IconWalk,
-  IconCab,
   IconSparkles,
   IconShare,
   IconNavigation,
@@ -22,7 +20,7 @@ import CrowdBadge from '../../components/CrowdBadge';
 import LeafletMap from '../../components/LeafletMap';
 import { useFavorites } from '../../lib/favorites-context';
 import { useToast } from '../../lib/toast-context';
-
+import { useLanguage } from '../../lib/language-context';
 import { useSearchParams } from 'next/navigation';
 
 interface PlannerClientProps {
@@ -50,6 +48,7 @@ export default function PlannerClient({
 }: PlannerClientProps) {
   const { showToast } = useToast();
   const { favorites, isFavorite } = useFavorites();
+  const { language, tPandalName, tRegion, t } = useLanguage();
   const searchParams = useSearchParams();
 
   const urlIdsParam = searchParams?.get('ids');
@@ -66,7 +65,7 @@ export default function PlannerClient({
     if (initialIds && initialIds.length > 0) {
       return initialIds;
     }
-    return []; // No dummy placeholders! Empty by default.
+    return [];
   }, [urlIdsParam, initialIds]);
 
   const [selectedPandalIds, setSelectedPandalIds] = useState<number[]>(effectiveInitialIds);
@@ -86,7 +85,7 @@ export default function PlannerClient({
 
   const handleDetectPlannerLocation = async () => {
     setDetectingPlannerLoc(true);
-    showToast('Detecting your live position via GPS...', 'info');
+    showToast(t('locating', 'Detecting your live position via GPS...'), 'info');
     try {
       const loc = await detectUserLocation();
       const coords = { lat: loc.lat, lon: loc.lon };
@@ -94,7 +93,7 @@ export default function PlannerClient({
 
       const locationLabel = loc.landmark || 'Current Location';
       setStartingPoint(locationLabel);
-      showToast(`📍 Location detected: ${locationLabel}!`, 'success');
+      showToast(`📍 ${t('location_detected', 'Location detected')}: ${locationLabel}!`, 'success');
 
       if (selectedPandalIds.length > 0) {
         handleGenerate(selectedPandalIds, locationLabel, coords);
@@ -152,7 +151,6 @@ export default function PlannerClient({
     }
   };
 
-  // Automatically plan route whenever effectiveInitialIds are provided via URL or props
   const plannedIdsKeyRef = useRef<string>('');
   useEffect(() => {
     if (effectiveInitialIds.length > 0) {
@@ -167,7 +165,6 @@ export default function PlannerClient({
     }
   }, [effectiveInitialIds, pandals]);
 
-  // Sync if navigated with ?fromSaved=true but ids was not in searchParams
   const hasSyncedFavoritesRef = useRef(false);
   useEffect(() => {
     if (
@@ -226,12 +223,12 @@ export default function PlannerClient({
     }
   };
 
-  // Filtered and prioritized pandal selector options
   const filteredOptions = useMemo(() => {
     const query = searchPandalQuery.toLowerCase().trim();
     const matches = pandals.filter(
       p =>
         p.name.toLowerCase().includes(query) ||
+        (p.bengaliName && p.bengaliName.toLowerCase().includes(query)) ||
         p.region.toLowerCase().includes(query) ||
         p.nearestMetro.toLowerCase().includes(query)
     );
@@ -246,7 +243,6 @@ export default function PlannerClient({
     return matches;
   }, [pandals, searchPandalQuery, isFavorite]);
 
-  // Google Maps Multi-Stop Directions URL (Uses precise coordinates, URL-safe pipe delimiter, and explicit travel mode)
   const googleMapsMultiStopUrl = useMemo(() => {
     if (!plan || plan.stops.length === 0) return null;
 
@@ -279,7 +275,6 @@ export default function PlannerClient({
     return url;
   }, [plan, startingPoint, startCoords]);
 
-  // Automatically discover famous food stalls/eateries around the planned/saved pandals
   const routeFoodStalls = useMemo(() => {
     if (!plan || plan.stops.length === 0) return [];
     const seenKeys = new Set<string>();
@@ -299,7 +294,6 @@ export default function PlannerClient({
     }> = [];
 
     for (const stop of plan.stops) {
-      // 1. First check verified CSV mapped eateries for this exact pandal
       const mappedEateries = PANDAL_EATERIES_MAP[stop.pandal.id] || [];
       for (const e of mappedEateries) {
         const key = e.cleanName.toLowerCase();
@@ -312,7 +306,7 @@ export default function PlannerClient({
             famousDish: e.bestRecommendedItem,
             recommendedItems: [e.bestRecommendedItem],
             priceForTwo: `₹${e.budgetForTwo} for two`,
-            nearPandalName: stop.pandal.name,
+            nearPandalName: tPandalName(stop.pandal),
             distanceM: e.distanceM,
             walkMins: Math.max(1, Math.round(e.distanceM / 80)),
             latitude: e.latitude,
@@ -321,7 +315,6 @@ export default function PlannerClient({
         }
       }
 
-      // 2. Also supplement with curated food cabins
       const stalls = findNearbyFoodStalls(stop.pandal.latitude, stop.pandal.longitude, 1.2, 1);
       for (const s of stalls) {
         const key = s.name.toLowerCase();
@@ -334,7 +327,7 @@ export default function PlannerClient({
             famousDish: s.famousDish,
             recommendedItems: s.recommendedItems,
             priceForTwo: s.priceForTwo,
-            nearPandalName: stop.pandal.name,
+            nearPandalName: tPandalName(stop.pandal),
             nearestMetro: s.nearestMetro,
             distanceM: s.distanceM,
             walkMins: s.walkMins,
@@ -345,19 +338,19 @@ export default function PlannerClient({
       }
     }
     return results;
-  }, [plan]);
+  }, [plan, tPandalName]);
 
   return (
     <div style={{ background: 'var(--background)', minHeight: 'calc(100vh - var(--header-height))', padding: '40px 0 80px' }}>
       <div className="container">
         {/* Header */}
         <div style={{ marginBottom: '32px' }}>
-          <div className="eyebrow">Smart Route Planning</div>
+          <div className="eyebrow">{language === 'bn' ? 'স্মার্ট রুট প্ল্যানিং' : 'Smart Route Planning'}</div>
           <h1 style={{ fontSize: '2.5rem', marginBottom: '8px' }}>
-            Pandal Hopping Night Planner
+            {t('hop_planner_title', 'Pandal Hopping Night Planner')}
           </h1>
           <p style={{ color: 'var(--taupe)', fontSize: '0.95rem' }}>
-            Select your dream pandals and starting time. Pujo Navigation computes the best transit hops, walking guidance, and estimated timings.
+            {t('hop_planner_subtitle', 'Select your dream pandals and starting time. Pujo Navigation computes the best transit hops, walking guidance, and estimated timings.')}
           </p>
         </div>
 
@@ -375,13 +368,13 @@ export default function PlannerClient({
           >
             <h2 style={{ fontSize: '1.25rem', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <IconCalendar size={18} color="#B08D57" />
-              <span>Itinerary Parameters</span>
+              <span>{language === 'bn' ? 'পরিক্রমার বিবরণ' : 'Itinerary Parameters'}</span>
             </h2>
 
             {/* Starting Station */}
             <div className="input-field-group" style={{ marginBottom: '16px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                <label className="input-field-label" style={{ margin: 0 }}>Starting Point / Metro Station</label>
+                <label className="input-field-label" style={{ margin: 0 }}>{t('start_point', 'Starting Point / Metro Station')}</label>
                 <button
                   type="button"
                   onClick={handleDetectPlannerLocation}
@@ -401,7 +394,7 @@ export default function PlannerClient({
                   title="Detect your current location and use as starting point"
                 >
                   <IconNavigation size={12} color="#B3261E" />
-                  <span>{detectingPlannerLoc ? 'Detecting...' : '📍 Use My Location'}</span>
+                  <span>{detectingPlannerLoc ? (language === 'bn' ? 'খোঁজা হচ্ছে...' : 'Detecting...') : (language === 'bn' ? '📍 আমার অবস্থান ব্যবহার করুন' : '📍 Use My Location')}</span>
                 </button>
               </div>
               <div className="input-field-wrapper" style={{ background: '#FFF' }}>
@@ -412,14 +405,14 @@ export default function PlannerClient({
                     setStartingPoint(e.target.value);
                     setStartCoords(null);
                   }}
-                  placeholder="e.g. Shyambazar Metro, Sealdah, Kalighat"
+                  placeholder={language === 'bn' ? 'যেমন: শ্যামবাজার মেট্রো, শিয়ালদহ, কালীঘাট' : 'e.g. Shyambazar Metro, Sealdah, Kalighat'}
                 />
               </div>
             </div>
 
             {/* Start Time */}
             <div className="input-field-group" style={{ marginBottom: '20px' }}>
-              <label className="input-field-label">Preferred Start Time</label>
+              <label className="input-field-label">{t('start_time', 'Preferred Start Time')}</label>
               <div className="input-field-wrapper" style={{ background: '#FFF' }}>
                 <input
                   type="time"
@@ -433,7 +426,7 @@ export default function PlannerClient({
             <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '20px', marginBottom: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap', gap: '6px' }}>
                 <label className="input-field-label" style={{ margin: 0 }}>
-                  Selected Pandals ({selectedPandalIds.length})
+                  {language === 'bn' ? `নির্বাচিত প্যান্ডেলসমূহ (${selectedPandalIds.length})` : `Selected Pandals (${selectedPandalIds.length})`}
                 </label>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                   {favorites.length > 0 && (
@@ -456,7 +449,7 @@ export default function PlannerClient({
                       }}
                       title="Plan route with all your saved wishlisted pandals"
                     >
-                      <IconHeart size={12} fill="#FFF" /> Plan With Saved ({favorites.length})
+                      <IconHeart size={12} fill="#FFF" /> {language === 'bn' ? `সংরক্ষিত (${favorites.length})` : `Plan With Saved (${favorites.length})`}
                     </button>
                   )}
                   {selectedPandalIds.length > 0 && (
@@ -468,7 +461,7 @@ export default function PlannerClient({
                       }}
                       style={{ fontSize: '0.72rem', color: 'var(--taupe)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
                     >
-                      Clear
+                      {language === 'bn' ? 'মুছে ফেলুন' : 'Clear'}
                     </button>
                   )}
                 </div>
@@ -478,7 +471,7 @@ export default function PlannerClient({
               <div className="input-field-wrapper" style={{ background: '#FFF', padding: '8px 12px', marginBottom: '10px' }}>
                 <input
                   type="text"
-                  placeholder="Filter pandals to add or remove..."
+                  placeholder={language === 'bn' ? 'যোগ বা বাদ দিতে প্যান্ডেল খুঁজুন...' : 'Filter pandals to add or remove...'}
                   value={searchPandalQuery}
                   onChange={e => setSearchPandalQuery(e.target.value)}
                   style={{ fontSize: '0.82rem' }}
@@ -531,10 +524,10 @@ export default function PlannerClient({
                         />
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ fontWeight: isSelected ? 700 : 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: isSelected ? 'var(--vermilion)' : 'var(--foreground)' }}>
-                            {p.name}
+                            {tPandalName(p)}
                           </div>
                           <div style={{ fontSize: '0.7rem', color: 'var(--taupe)' }}>
-                            {p.region} • 🚇 {p.nearestMetro}
+                            {tRegion(p.region)} • 🚇 {p.nearestMetro}
                           </div>
                         </div>
                       </div>
@@ -554,12 +547,12 @@ export default function PlannerClient({
                               gap: '2px',
                             }}
                           >
-                            ♥ Saved
+                            ♥ {t('saved', 'Saved')}
                           </span>
                         )}
                         {p.famous && (
                           <span className="badge badge-famous" style={{ fontSize: '0.6rem', padding: '2px 6px' }}>
-                            Iconic
+                            {t('famous_badge', 'Iconic')}
                           </span>
                         )}
                       </div>
@@ -586,10 +579,10 @@ export default function PlannerClient({
               <IconSparkles size={18} />
               <span>
                 {generating
-                  ? 'Planning Route...'
+                  ? (language === 'bn' ? 'রুট তৈরি হচ্ছে...' : 'Planning Route...')
                   : selectedPandalIds.length === 0
-                  ? 'Select Pandals to Plan Route'
-                  : `Plan Route (${selectedPandalIds.length} Pandals)`}
+                  ? (language === 'bn' ? 'রুট প্ল্যানের জন্য প্যান্ডেল বেছে নিন' : 'Select Pandals to Plan Route')
+                  : (language === 'bn' ? `রুট তৈরি করুন (${selectedPandalIds.length}টি প্যান্ডেল)` : `Plan Route (${selectedPandalIds.length} Pandals)`)}
               </span>
             </button>
           </div>
@@ -632,10 +625,10 @@ export default function PlannerClient({
                       </div>
                       <div>
                         <div style={{ fontWeight: 700, fontSize: '0.92rem', color: 'var(--foreground)' }}>
-                          Custom Day Plan for Your {plan.totalPandals} Saved Pandals
+                          {language === 'bn' ? `আপনার সংরক্ষিত ${plan.totalPandals}টি প্যান্ডেলের কাস্টম প্ল্যান` : `Custom Day Plan for Your ${plan.totalPandals} Saved Pandals`}
                         </div>
                         <div style={{ fontSize: '0.78rem', color: 'var(--taupe)' }}>
-                          Optimized pandal hopping sequence for Kolkata Durga Puja!
+                          {language === 'bn' ? 'সেরা প্যান্ডেল হপিং সিকোয়েন্স!' : 'Optimized pandal hopping sequence for Kolkata Durga Puja!'}
                         </div>
                       </div>
                     </div>
@@ -645,7 +638,7 @@ export default function PlannerClient({
                       className="btn btn-secondary btn-sm"
                       style={{ fontSize: '0.75rem', padding: '4px 10px' }}
                     >
-                      ← Edit Saved List
+                      ← {language === 'bn' ? 'সংরক্ষিত তালিকা সম্পাদনা' : 'Edit Saved List'}
                     </Link>
                   </div>
                 )}
@@ -663,13 +656,13 @@ export default function PlannerClient({
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
                     <div>
-                      <div className="eyebrow" style={{ margin: 0 }}>Generated Day Itinerary</div>
+                      <div className="eyebrow" style={{ margin: 0 }}>{t('your_itinerary', 'Generated Day Itinerary')}</div>
                       <h2 style={{ fontSize: '1.4rem', marginTop: '4px' }}>{plan.title}</h2>
                       <div style={{ fontSize: '0.82rem', color: 'var(--taupe)', marginTop: '2px' }}>
                         {startingPoint ? (
-                          <>From: <strong>{startingPoint}</strong> • </>
+                          <>{t('origin', 'From')}: <strong>{startingPoint}</strong> • </>
                         ) : null}
-                        <span><strong>{plan.totalPandals} Pandals</strong> in Hopping Sequence</span>
+                        <span><strong>{plan.totalPandals} {language === 'bn' ? 'টি প্যান্ডেল' : 'Pandals'}</strong> {language === 'bn' ? 'পরিক্রমা ক্রমে' : 'in Hopping Sequence'}</span>
                       </div>
                     </div>
 
@@ -682,19 +675,18 @@ export default function PlannerClient({
                           className="btn btn-vermilion btn-sm"
                           title="Open complete multi-stop hopping route in Google Maps"
                         >
-                          <IconNavigation size={14} /> Full Route in Maps
+                          <IconNavigation size={14} /> Google Maps
                         </a>
                       )}
                       <button onClick={handleSavePlan} className="btn btn-secondary btn-sm" title="Save Plan">
-                        <IconHeart size={14} /> Save
+                        <IconHeart size={14} /> {t('save_favorite', 'Save')}
                       </button>
                       <button onClick={handleSharePlan} className="btn btn-secondary btn-sm" title="Share Plan">
-                        <IconShare size={14} /> Share
+                        <IconShare size={14} /> {t('share', 'Share')}
                       </button>
                     </div>
                   </div>
 
-                  {/* Summary Metric Strip (Without confusing time or distance numbers) */}
                   <div
                     style={{
                       display: 'flex',
@@ -710,12 +702,9 @@ export default function PlannerClient({
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <span style={{ fontSize: '18px' }}>🪷</span>
                       <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--foreground)' }}>
-                        {plan.totalPandals} Planned Pandals
+                        {plan.totalPandals} {language === 'bn' ? 'পরিকল্পিত প্যান্ডেল' : 'Planned Pandals'}
                       </span>
                     </div>
-                    <span style={{ fontSize: '12px', color: 'var(--taupe)' }}>
-                      Tap "Full Route in Maps" for turn-by-turn walking directions
-                    </span>
                   </div>
                 </div>
 
@@ -757,7 +746,7 @@ export default function PlannerClient({
                         gap: '6px',
                       }}
                     >
-                      <IconClock size={14} /> Step-by-Step Timeline
+                      <IconClock size={14} /> {language === 'bn' ? 'ধাপে ধাপে টাইমলাইন' : 'Step-by-Step Timeline'}
                     </button>
                     <button
                       type="button"
@@ -777,12 +766,8 @@ export default function PlannerClient({
                         gap: '6px',
                       }}
                     >
-                      <IconNavigation size={14} /> Route Map ({plan.stops.length} stops)
+                      <IconNavigation size={14} /> {language === 'bn' ? 'রুট ম্যাপ' : 'Route Map'} ({plan.stops.length})
                     </button>
-                  </div>
-
-                  <div style={{ fontSize: '0.78rem', color: 'var(--taupe)' }}>
-                    Sequence automatically sorted by geographic proximity
                   </div>
                 </div>
 
@@ -805,7 +790,7 @@ export default function PlannerClient({
                     />
                     <div style={{ padding: '16px 20px', background: '#FFFDF9', borderTop: '1px solid var(--border-subtle)' }}>
                       <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--foreground)', marginBottom: '8px' }}>
-                        Hop Route Sequence:
+                        {language === 'bn' ? 'পরিক্রমা ক্রম:' : 'Hop Route Sequence:'}
                       </div>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
                         {plan.stops.map((stop, i) => (
@@ -823,7 +808,7 @@ export default function PlannerClient({
                             }}
                           >
                             <strong style={{ color: 'var(--vermilion)' }}>#{stop.stopNumber}</strong>
-                            <span>{stop.pandal.name}</span>
+                            <span>{tPandalName(stop.pandal)}</span>
                             <span style={{ color: 'var(--taupe)', fontSize: '0.7rem' }}>({stop.arrivalTime})</span>
                             {i < plan.stops.length - 1 && <span style={{ color: '#C0B3A6', marginLeft: '2px' }}>→</span>}
                           </span>
@@ -853,7 +838,7 @@ export default function PlannerClient({
                     >
                       <IconWalk size={14} color="#756D65" />
                       <span>
-                        Starting from <strong>{plan.initialTravel.from}</strong> • Heading to Stop 1: <strong>{plan.stops[0]?.pandal.name}</strong>
+                        {t('origin', 'Starting from')} <strong>{plan.initialTravel.from}</strong> • {language === 'bn' ? 'প্রথম গন্তব্য:' : 'Heading to Stop 1:'} <strong>{tPandalName(plan.stops[0]?.pandal)}</strong>
                       </span>
                     </div>
                   )}
@@ -881,10 +866,10 @@ export default function PlannerClient({
                             </span>
                             <div>
                               <h3 style={{ fontSize: '1.15rem', fontWeight: 700 }}>
-                                <Link href={`/pandal/${stop.pandal.id}`}>{stop.pandal.name}</Link>
+                                <Link href={`/pandal/${stop.pandal.id}`}>{tPandalName(stop.pandal)}</Link>
                               </h3>
                               <div style={{ fontSize: '0.75rem', color: 'var(--taupe)' }}>
-                                {stop.pandal.region} • 🚇 {stop.pandal.nearestMetro}
+                                {tRegion(stop.pandal.region)} • 🚇 {stop.pandal.nearestMetro}
                               </div>
                             </div>
                           </div>
@@ -894,13 +879,13 @@ export default function PlannerClient({
                               {stop.arrivalTime} – {stop.departureTime}
                             </div>
                             <div style={{ fontSize: '0.72rem', color: 'var(--taupe)' }}>
-                              Stay: {stop.stayDurationMinutes} mins
+                              {t('stay_duration', 'Stay')}: {stop.stayDurationMinutes} {language === 'bn' ? 'মিঃ' : 'mins'}
                             </div>
                           </div>
                         </div>
 
                         <p style={{ fontSize: '0.82rem', color: '#4A423B', margin: '8px 0 12px' }}>
-                          Theme: {stop.highlightTheme || stop.pandal.theme}
+                          {t('theme', 'Theme')}: {stop.highlightTheme || stop.pandal.theme}
                         </p>
 
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid var(--border-subtle)', paddingTop: '10px', flexWrap: 'wrap', gap: '8px' }}>
@@ -921,88 +906,10 @@ export default function PlannerClient({
                               className="btn btn-secondary btn-sm"
                               style={{ padding: '4px 10px', fontSize: '0.72rem' }}
                             >
-                              Transit Details →
+                              {t('view_details', 'Transit Details')} →
                             </Link>
                           </div>
                         </div>
-
-                        {/* AUTO-RECOMMENDED FAMOUS FOOD STALL AROUND THIS PANDAL (CSV DATA + CURATED) */}
-                        {(() => {
-                          const mappedEateries = PANDAL_EATERIES_MAP[stop.pandal.id] || [];
-                          const primaryEatery = mappedEateries[0];
-                          const fallbackStall = findNearbyFoodStalls(stop.pandal.latitude, stop.pandal.longitude, 1.4, 1)[0];
-
-                          const activeFood = primaryEatery ? {
-                            name: primaryEatery.cleanName,
-                            category: primaryEatery.cuisineType,
-                            distanceM: primaryEatery.distanceM,
-                            bestDish: primaryEatery.bestRecommendedItem,
-                            otherOptions: mappedEateries.length > 1 ? mappedEateries.slice(1).map(m => m.cleanName) : [],
-                            budget: `₹${primaryEatery.budgetForTwo} for two`,
-                            latitude: primaryEatery.latitude,
-                            longitude: primaryEatery.longitude,
-                          } : fallbackStall ? {
-                            name: fallbackStall.name,
-                            category: fallbackStall.category,
-                            distanceM: fallbackStall.distanceM,
-                            bestDish: fallbackStall.famousDish,
-                            otherOptions: fallbackStall.recommendedItems.slice(0, 2),
-                            budget: fallbackStall.priceForTwo,
-                            latitude: fallbackStall.latitude,
-                            longitude: fallbackStall.longitude,
-                          } : null;
-
-                          if (!activeFood) return null;
-                          const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${stop.pandal.latitude},${stop.pandal.longitude}&destination=${activeFood.latitude},${activeFood.longitude}&travelmode=walking`;
-
-                          return (
-                            <div
-                              style={{
-                                marginTop: '12px',
-                                background: 'linear-gradient(135deg, #FFFDF9 0%, #FAF6EE 100%)',
-                                border: '1px solid #E8D9C0',
-                                borderRadius: '6px',
-                                padding: '10px 14px',
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                flexWrap: 'wrap',
-                                gap: '8px',
-                              }}
-                            >
-                              <div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                  <span style={{ fontSize: '0.85rem' }}>🍢</span>
-                                  <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#B08D57', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                                    Famous Food Pitstop ({formatDistance(activeFood.distanceM)} walk • {activeFood.budget})
-                                  </span>
-                                </div>
-                                <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--foreground)', marginTop: '2px' }}>
-                                  {activeFood.name} <span style={{ fontSize: '0.74rem', fontWeight: 500, color: 'var(--taupe)' }}>({activeFood.category})</span>
-                                </div>
-                                <div style={{ fontSize: '0.76rem', color: '#555', marginTop: '2px' }}>
-                                  <strong style={{ color: '#B3261E' }}>Must Have:</strong> {activeFood.bestDish}
-                                  {activeFood.otherOptions.length > 0 && (
-                                    <span style={{ color: 'var(--taupe)', marginLeft: '6px' }}>
-                                      • Also nearby: {activeFood.otherOptions.join(', ')}
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-
-                              <a
-                                href={mapsUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="btn btn-vermilion btn-sm"
-                                style={{ fontSize: '0.72rem', padding: '5px 10px', whiteSpace: 'nowrap' }}
-                                title={`Directions from ${stop.pandal.name} to ${activeFood.name} in Google Maps`}
-                              >
-                                <IconNavigation size={11} /> Food in Google Maps
-                              </a>
-                            </div>
-                          );
-                        })()}
                       </div>
 
                       {/* Transition leg to next stop */}
@@ -1023,7 +930,7 @@ export default function PlannerClient({
                         >
                           <IconWalk size={14} color="#756D65" />
                           <span>
-                            Next in sequence: <strong>{plan.stops[stop.stopNumber]?.pandal.name || 'Next Pandal'}</strong>
+                            {t('next_stop', 'Next in sequence')}: <strong>{tPandalName(plan.stops[stop.stopNumber]?.pandal) || 'Next Pandal'}</strong>
                           </span>
                         </div>
                       )}
@@ -1031,7 +938,7 @@ export default function PlannerClient({
                   ))}
                 </div>
 
-                {/* FULL FESTIVE FOOD TRAIL FOR THIS ITINERARY */}
+                {/* FULL FESTIVE FOOD TRAIL */}
                 {routeFoodStalls.length > 0 && (
                   <div
                     style={{
@@ -1046,18 +953,12 @@ export default function PlannerClient({
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px', marginBottom: '16px' }}>
                       <div>
                         <div className="eyebrow" style={{ color: '#B08D57', margin: 0 }}>
-                          Curated Festive Food Stops
+                          {t('heritage_food_spots', 'Curated Festive Food Stops')}
                         </div>
                         <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '4px 0 0', fontFamily: 'var(--font-serif)' }}>
-                          Famous Food Stalls Along Your Route ({routeFoodStalls.length})
+                          {language === 'bn' ? `আপনার রুটের বিখ্যাত খাবারের দোকান (${routeFoodStalls.length})` : `Famous Food Stalls Along Your Route (${routeFoodStalls.length})`}
                         </h3>
-                        <div style={{ fontSize: '0.8rem', color: 'var(--taupe)', marginTop: '2px' }}>
-                          Authentic street food, heritage cabins, and mishti shops auto-recommended around your saved pandals.
-                        </div>
                       </div>
-                      <span className="badge" style={{ background: '#FFF8E1', color: '#B78103', border: '1px solid #FFE082', fontWeight: 700 }}>
-                        🍢 Auto-Recommended
-                      </span>
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px' }}>
@@ -1088,15 +989,12 @@ export default function PlannerClient({
                               {stall.name}
                             </div>
                             <div style={{ fontSize: '0.74rem', color: 'var(--taupe)', marginBottom: '6px' }}>
-                              {stall.nearestMetro ? `🚇 ${stall.nearestMetro} • ` : ''}🚶 {formatDistance(stall.distanceM)} walk
+                              {stall.nearestMetro ? `🚇 ${stall.nearestMetro} • ` : ''}🚶 {formatDistance(stall.distanceM)} {language === 'bn' ? 'হাঁটা' : 'walk'}
                             </div>
 
                             <div style={{ background: '#FFF', border: '1px solid #E8D9C0', borderRadius: '4px', padding: '8px', marginBottom: '10px' }}>
                               <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#B3261E' }}>
-                                ★ Must Have: {stall.famousDish}
-                              </div>
-                              <div style={{ fontSize: '0.7rem', color: '#666', marginTop: '2px' }}>
-                                {stall.recommendedItems.slice(0, 2).join(' • ')}
+                                ★ {t('famous_dish', 'Must Have')}: {stall.famousDish}
                               </div>
                             </div>
                           </div>
@@ -1109,25 +1007,11 @@ export default function PlannerClient({
                             style={{ width: '100%', justifyContent: 'center', fontSize: '0.72rem', padding: '6px 10px' }}
                             title={`Navigate to ${stall.name} in Google Maps`}
                           >
-                            <IconNavigation size={12} /> Directions in Google Maps
+                            <IconNavigation size={12} /> Google Maps
                           </a>
                         </div>
                       ))}
                     </div>
-                  </div>
-                )}
-
-                {/* Pro Festive Tips */}
-                {plan.tips && plan.tips.length > 0 && (
-                  <div style={{ marginTop: '32px', background: '#FFFDF9', border: '1px solid #E5DED5', borderRadius: '6px', padding: '20px' }}>
-                    <div style={{ fontWeight: 700, fontSize: '0.88rem', color: 'var(--vermilion)', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <IconSparkles size={16} /> Puja Night Navigation Tips
-                    </div>
-                    <ul style={{ paddingLeft: '20px', fontSize: '0.82rem', color: '#4A423B', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                      {plan.tips.map((tip, idx) => (
-                        <li key={idx}>{tip}</li>
-                      ))}
-                    </ul>
                   </div>
                 )}
               </div>
@@ -1144,10 +1028,10 @@ export default function PlannerClient({
               >
                 <div style={{ fontSize: '42px', marginBottom: '14px' }}>🪷</div>
                 <h3 style={{ fontSize: '1.4rem', fontFamily: 'var(--font-serif)', margin: '0 0 10px', color: 'var(--foreground)' }}>
-                  Plan Your Puja Hopping Route
+                  {t('hop_planner_title', 'Plan Your Puja Hopping Route')}
                 </h3>
                 <p style={{ fontSize: '0.9rem', color: 'var(--taupe)', maxWidth: '460px', margin: '0 auto 24px', lineHeight: 1.6 }}>
-                  Select pandals from the left, or save your favorite pandals while exploring and tap <strong>"Plan With Saved"</strong> to generate your optimized hopping route.
+                  {language === 'bn' ? 'বাঁদিক থেকে প্যান্ডেল বাছাই করুন এবং "রুট তৈরি করুন" বাটনে ক্লিক করুন।' : 'Select pandals from the left, or save your favorite pandals while exploring and tap "Plan With Saved" to generate your optimized hopping route.'}
                 </p>
 
                 {favorites.length > 0 ? (
@@ -1157,7 +1041,7 @@ export default function PlannerClient({
                     className="btn btn-vermilion"
                     style={{ margin: '0 auto', padding: '12px 24px', fontSize: '0.9rem' }}
                   >
-                    <IconHeart size={16} fill="#FFF" /> Plan Route With Saved ({favorites.length} Pandals)
+                    <IconHeart size={16} fill="#FFF" /> {language === 'bn' ? `সংরক্ষিত ${favorites.length}টি প্যান্ডেল দিয়ে প্ল্যান তৈরি করুন` : `Plan Route With Saved (${favorites.length} Pandals)`}
                   </button>
                 ) : (
                   <Link
@@ -1166,7 +1050,7 @@ export default function PlannerClient({
                     style={{ margin: '0 auto', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
                   >
                     <span>🔍</span>
-                    <span>Explore & Wishlist Pandals</span>
+                    <span>{t('explore_pandals', 'Explore Pandals')}</span>
                   </Link>
                 )}
               </div>

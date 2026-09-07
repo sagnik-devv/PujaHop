@@ -4,10 +4,11 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Pandal } from '../lib/types';
-import { formatDistance, formatDuration } from '../lib/format';
+import { formatDistance } from '../lib/format';
 import { IconMetro, IconBus, IconWalk, IconRoute, IconSparkles } from './Icons';
 import CrowdBadge from './CrowdBadge';
 import FavoriteButton from './FavoriteButton';
+import { useLanguage } from '../lib/language-context';
 
 interface PandalCardProps {
   pandal: Pandal;
@@ -15,9 +16,13 @@ interface PandalCardProps {
 }
 
 export default function PandalCard({ pandal, distanceUserKm }: PandalCardProps) {
+  const { language, tPandalName, tRegion, t } = useLanguage();
   const [imageSrc, setImageSrc] = useState(
     pandal.imageUrl || `/images/pandals/pandal-${pandal.id}.jpg`
   );
+
+  const displayName = tPandalName(pandal);
+  const displayRegion = tRegion(pandal.region);
 
   return (
     <article className="pandal-card">
@@ -25,7 +30,7 @@ export default function PandalCard({ pandal, distanceUserKm }: PandalCardProps) 
         <Link href={`/pandal/${pandal.id}`}>
           <Image
             src={imageSrc}
-            alt={pandal.name}
+            alt={displayName}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             style={{ objectFit: 'cover' }}
@@ -39,24 +44,24 @@ export default function PandalCard({ pandal, distanceUserKm }: PandalCardProps) 
         <div className="pandal-card-badge-top">
           {pandal.id === 40 && (
             <span className="badge" style={{ background: '#B3261E', color: '#FFF', fontWeight: 800, border: '1px solid #FF8A80', boxShadow: '0 2px 8px rgba(179,38,30,0.4)' }}>
-              🔥 #1 Most Crowded
+              🔥 {language === 'bn' ? '#১ সর্বাধিক ভিড়' : '#1 Most Crowded'}
             </span>
           )}
           {pandal.id === 205 && (
             <span className="badge" style={{ background: '#0D47A1', color: '#FFF', fontWeight: 800, border: '1px solid #90CAF9' }}>
-              🎨 Art Installation
+              🎨 {language === 'bn' ? 'আর্ট ইন্সটলেশন' : 'Art Installation'}
             </span>
           )}
           {pandal.famous && pandal.id !== 40 && pandal.id !== 205 && (
             <span className="badge badge-famous">
-              <IconSparkles size={12} color="#B08D57" /> Iconic Pandal
+              <IconSparkles size={12} color="#B08D57" /> {t('famous_badge', 'Iconic Pandal')}
             </span>
           )}
           {distanceUserKm !== undefined && (
             <span className="badge badge-region">
               {distanceUserKm < 1
-                ? `${Math.round(distanceUserKm * 1000)}m away`
-                : `${distanceUserKm.toFixed(1)} km away`}
+                ? `${Math.round(distanceUserKm * 1000)}${language === 'bn' ? 'মি দূরে' : 'm away'}`
+                : `${distanceUserKm.toFixed(1)} ${language === 'bn' ? 'কিমি দূরে' : 'km away'}`}
             </span>
           )}
         </div>
@@ -67,12 +72,12 @@ export default function PandalCard({ pandal, distanceUserKm }: PandalCardProps) 
 
       <div className="pandal-card-content">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
-          <span className="pandal-card-region">{pandal.region}</span>
+          <span className="pandal-card-region">{displayRegion}</span>
           <CrowdBadge level={pandal.crowdLevel} />
         </div>
 
         <h3 className="pandal-card-title">
-          <Link href={`/pandal/${pandal.id}`}>{pandal.name}</Link>
+          <Link href={`/pandal/${pandal.id}`}>{displayName}</Link>
         </h3>
 
         <p className="pandal-card-theme" title={pandal.theme}>
@@ -101,7 +106,7 @@ export default function PandalCard({ pandal, distanceUserKm }: PandalCardProps) 
             <span style={{ color: '#8C8178' }}>•</span>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', whiteSpace: 'nowrap', color: '#666' }}>
               <IconWalk size={12} color="#756D65" />
-              {pandal.walkingTimeMinutes}m ({formatDistance(pandal.walkingDistanceM)})
+              {pandal.walkingTimeMinutes}{t('walking_time', 'mins walk')} ({formatDistance(pandal.walkingDistanceM)})
             </span>
           </div>
 
@@ -142,14 +147,14 @@ export default function PandalCard({ pandal, distanceUserKm }: PandalCardProps) 
             href={`/pandal/${pandal.id}`}
             style={{ fontWeight: 600, color: 'var(--foreground)', fontSize: '0.82rem' }}
           >
-            Explore Pandal →
+            {t('view_details', 'View Details')} →
           </Link>
           <Link
             href={`/route?to=${pandal.id}`}
             className="btn btn-vermilion btn-sm"
             style={{ padding: '6px 12px', fontSize: '0.72rem' }}
           >
-            <IconRoute size={14} /> Find Route
+            <IconRoute size={14} /> {t('plan_route', 'Find Route')}
           </Link>
         </div>
       </div>

@@ -7,6 +7,7 @@ import { SearchResultGroup } from '../../lib/types';
 import { searchPandals } from '../../lib/api';
 import PandalCard from '../../components/PandalCard';
 import { IconSearch, IconMetro, IconMapPin, IconSparkles } from '../../components/Icons';
+import { useLanguage } from '../../lib/language-context';
 
 interface SearchClientProps {
   initialQuery: string;
@@ -18,6 +19,7 @@ export default function SearchClient({
   initialResults,
 }: SearchClientProps) {
   const router = useRouter();
+  const { language, t, tRegion, tMetroName } = useLanguage();
   const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState<SearchResultGroup>(initialResults);
   const [loading, setLoading] = useState(false);
@@ -47,14 +49,18 @@ export default function SearchClient({
 
   const totalMatches = results.pandals.length + results.metroStations.length + results.areas.length;
 
+  const suggestions = language === 'bn'
+    ? ['শ্রীভূমি', 'হরিদেবপুর আদর্শ সমিতি', 'বাগবাজার', 'একডালিয়া', 'কুমারটুলি', 'শ্যামবাজার মেট্রো']
+    : ['Shreebhumi', 'Haridevpur Adarsha Samity', 'Baghbazar', 'Ekdalia', 'Kumartuli', 'Shyambazar Metro'];
+
   return (
     <div style={{ background: 'var(--background)', minHeight: 'calc(100vh - var(--header-height))', padding: '40px 0 80px' }}>
       <div className="container container-narrow">
         {/* Search Bar Banner */}
         <div style={{ marginBottom: '36px' }}>
-          <div className="eyebrow">Universal Query</div>
+          <div className="eyebrow">{language === 'bn' ? 'গ্লোবাল সার্চ' : 'Universal Query'}</div>
           <h1 style={{ fontSize: '2.4rem', marginBottom: '16px' }}>
-            Search Kolkata Durga Puja
+            {t('quick_search')}
           </h1>
 
           <form onSubmit={handleSearch}>
@@ -73,7 +79,7 @@ export default function SearchClient({
                 type="text"
                 value={query}
                 onChange={e => setQuery(e.target.value)}
-                placeholder="Search pandals (e.g. Sreebhumi, Baghbazar), metro stations, areas..."
+                placeholder={t('search_pandals_placeholder')}
                 autoFocus
                 style={{ fontSize: '1.05rem' }}
               />
@@ -92,9 +98,9 @@ export default function SearchClient({
           {/* Quick Filter Tag Buttons */}
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '14px' }}>
             <span style={{ fontSize: '0.75rem', color: 'var(--taupe)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, alignSelf: 'center' }}>
-              Suggestions:
+              {t('popular_searches')}
             </span>
-            {['Shreebhumi', 'Haridevpur Adarsha Samity', 'Baghbazar', 'Ekdalia', 'Kumartuli', 'Shyambazar Metro'].map(term => (
+            {suggestions.map(term => (
               <button
                 key={term}
                 onClick={() => setQuery(term)}
@@ -110,13 +116,15 @@ export default function SearchClient({
         {/* Results Sections */}
         {loading ? (
           <div style={{ padding: '60px', textAlign: 'center', color: 'var(--taupe)' }}>
-            Searching Kolkata database...
+            {language === 'bn' ? 'কলকাতা ডাটাবেস খোঁজা হচ্ছে...' : 'Searching Kolkata database...'}
           </div>
         ) : query && totalMatches === 0 ? (
           <div style={{ padding: '60px', textAlign: 'center', background: '#FFF', borderRadius: '8px', border: '1px dashed var(--border)' }}>
-            <h3 style={{ fontSize: '1.3rem', marginBottom: '8px' }}>No Results Found for &quot;{query}&quot;</h3>
+            <h3 style={{ fontSize: '1.3rem', marginBottom: '8px' }}>
+              {language === 'bn' ? `"${query}" এর জন্য কোনো ফলাফল পাওয়া যায়নি` : `No Results Found for "${query}"`}
+            </h3>
             <p style={{ fontSize: '0.88rem', color: 'var(--taupe)' }}>
-              Try searching by a famous locality (e.g. &quot;North Kolkata&quot;, &quot;Salt Lake&quot;) or Metro station.
+              {language === 'bn' ? 'অন্য কোনো অঞ্চলের নাম (যেমন "উত্তর কলকাতা", "সল্টলেক") বা মেট্রো স্টেশন দিয়ে খুঁজুন।' : 'Try searching by a famous locality (e.g. "North Kolkata", "Salt Lake") or Metro station.'}
             </p>
           </div>
         ) : (
@@ -127,7 +135,7 @@ export default function SearchClient({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
                   <IconMetro size={18} color="#155799" />
                   <h3 style={{ fontSize: '1.2rem', fontWeight: 700 }}>
-                    Matching Metro Stations ({results.metroStations.length})
+                    {language === 'bn' ? `সংযুক্ত মেট্রো স্টেশন (${results.metroStations.length})` : `Matching Metro Stations (${results.metroStations.length})`}
                   </h3>
                 </div>
 
@@ -150,14 +158,14 @@ export default function SearchClient({
                     >
                       <div>
                         <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#155799' }}>
-                          {m.name} Metro Station
+                          {tMetroName(m.name, m.bengaliName)} {language === 'bn' ? 'মেট্রো স্টেশন' : 'Metro Station'}
                         </div>
                         <div style={{ fontSize: '0.78rem', color: 'var(--taupe)' }}>
-                          {m.bengaliName} • {m.line}
+                          {m.line}
                         </div>
                       </div>
                       <span style={{ fontSize: '0.75rem', color: 'var(--vermilion)', fontWeight: 600 }}>
-                        View Pandals →
+                        {language === 'bn' ? 'প্যান্ডেল দেখুন →' : 'View Pandals →'}
                       </span>
                     </Link>
                   ))}
@@ -171,7 +179,7 @@ export default function SearchClient({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
                   <IconMapPin size={18} color="#B08D57" />
                   <h3 style={{ fontSize: '1.2rem', fontWeight: 700 }}>
-                    Matching Kolkata Regions ({results.areas.length})
+                    {language === 'bn' ? `সংযুক্ত কলকাতা অঞ্চল (${results.areas.length})` : `Matching Kolkata Regions (${results.areas.length})`}
                   </h3>
                 </div>
 
@@ -183,7 +191,7 @@ export default function SearchClient({
                       className="badge badge-region"
                       style={{ padding: '8px 16px', fontSize: '0.85rem' }}
                     >
-                      <IconMapPin size={14} color="#B08D57" /> Explore {area}
+                      <IconMapPin size={14} color="#B08D57" /> {language === 'bn' ? `${tRegion(area)} দেখুন` : `Explore ${area}`}
                     </Link>
                   ))}
                 </div>
@@ -196,7 +204,7 @@ export default function SearchClient({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
                   <IconSparkles size={18} color="#B3261E" />
                   <h3 style={{ fontSize: '1.2rem', fontWeight: 700 }}>
-                    Matching Puja Pandals ({results.pandals.length})
+                    {language === 'bn' ? `সংযুক্ত পূজা প্যান্ডেল (${results.pandals.length})` : `Matching Puja Pandals (${results.pandals.length})`}
                   </h3>
                 </div>
 

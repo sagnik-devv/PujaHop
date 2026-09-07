@@ -12,6 +12,7 @@ import {
   IconChevronRight,
   IconSparkles,
 } from './Icons';
+import { useLanguage } from '../lib/language-context';
 
 interface RouteCardProps {
   route: RouteOption;
@@ -20,6 +21,7 @@ interface RouteCardProps {
 }
 
 export default function RouteCard({ route, targetPandalName, onSelect }: RouteCardProps) {
+  const { language, t } = useLanguage();
   const [expanded, setExpanded] = useState(route.isRecommended);
 
   const getModeIcon = (mode: string) => {
@@ -58,7 +60,7 @@ export default function RouteCard({ route, targetPandalName, onSelect }: RouteCa
             {formatDuration(route.totalTimeMinutes)}
           </div>
           <div style={{ fontSize: '0.75rem', color: 'var(--taupe)' }}>
-            {route.estimatedFare === 0 ? 'Free' : formatCurrency(route.estimatedFare)} • {route.totalDistanceKm} km
+            {route.estimatedFare === 0 ? (language === 'bn' ? 'বিনামূল্যে' : 'Free') : formatCurrency(route.estimatedFare)} • {route.totalDistanceKm} {language === 'bn' ? 'কিমি' : 'km'}
           </div>
         </div>
       </div>
@@ -67,25 +69,25 @@ export default function RouteCard({ route, targetPandalName, onSelect }: RouteCa
       <div className="route-stats-row">
         <div className="route-stat-item">
           <span className="route-stat-val">{formatDuration(route.totalTimeMinutes)}</span>
-          <span className="route-stat-lbl">Travel Time</span>
+          <span className="route-stat-lbl">{t('total_time', 'Travel Time')}</span>
         </div>
         <div className="route-stat-item">
           <span className="route-stat-val">{formatCurrency(route.estimatedFare)}</span>
-          <span className="route-stat-lbl">Est. Fare</span>
+          <span className="route-stat-lbl">{t('total_fare', 'Est. Fare')}</span>
         </div>
         <div className="route-stat-item">
           <span className="route-stat-val">{formatDistance(route.walkingDistanceMeters)}</span>
-          <span className="route-stat-lbl">Walking</span>
+          <span className="route-stat-lbl">{t('walk', 'Walking')}</span>
         </div>
         <div className="route-stat-item">
           <span className="route-stat-val">{route.transfersCount}</span>
-          <span className="route-stat-lbl">Transfers</span>
+          <span className="route-stat-lbl">{t('transfers', 'Transfers')}</span>
         </div>
         <div className="route-stat-item" style={{ marginLeft: 'auto' }}>
           <span className="route-stat-val" style={{ color: 'var(--antique-gold)' }}>
             {route.compositeScore}/10
           </span>
-          <span className="route-stat-lbl">Smart Score</span>
+          <span className="route-stat-lbl">{language === 'bn' ? 'স্মার্ট স্কোরে' : 'Smart Score'}</span>
         </div>
       </div>
 
@@ -128,7 +130,7 @@ export default function RouteCard({ route, targetPandalName, onSelect }: RouteCa
             gap: '4px',
           }}
         >
-          <span>{expanded ? 'Hide Step-by-Step Directions' : 'View Step-by-Step Directions'}</span>
+          <span>{expanded ? (language === 'bn' ? 'ধাপে ধাপে দিকনির্দেশ লুকান' : 'Hide Step-by-Step Directions') : (language === 'bn' ? 'ধাপে ধাপে দিকনির্দেশ দেখুন' : 'View Step-by-Step Directions')}</span>
           <span style={{ transform: expanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }}>
             <IconChevronRight size={15} />
           </span>
@@ -141,14 +143,14 @@ export default function RouteCard({ route, targetPandalName, onSelect }: RouteCa
           className="btn btn-vermilion btn-sm"
           title={`Navigate from ${route.segments[0]?.from || 'origin'} to ${targetPandalName} in Google Maps`}
         >
-          <IconNavigation size={14} /> Start Navigation
+          <IconNavigation size={14} /> {language === 'bn' ? 'ন্যাভিগেশন শুরু করুন' : 'Start Navigation'}
         </a>
       </div>
 
       {/* Detailed Segment Timeline */}
       {expanded && (
         <div className="route-timeline">
-          {route.segments.map((seg, i) => (
+          {route.segments.map((seg) => (
             <div
               key={seg.id}
               className={`timeline-step ${seg.mode === 'metro' ? 'active-metro' : ''}`}

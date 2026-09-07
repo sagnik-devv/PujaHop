@@ -5,7 +5,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 1,
     "name": "Ahiritola Jubak Brinda Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "আহিরীটোলা যুবক বৃন্দ দুর্গাপূজা",
     "region": "North Kolkata",
     "address": "Ahiritola Jubak Brinda Durga Puja, Ahiritola Jubak Brinda, North Kolkata, Kolkata, West Bengal, 700005, India",
     "latitude": 22.596201,
@@ -39,7 +39,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 2,
     "name": "Amherst Sarbojanin Durgotsab",
-    "bengaliName": "",
+    "bengaliName": "আমহার্স্ট সর্বজনীন দুর্গোৎসব",
     "region": "North Kolkata",
     "address": "Amherst Sarbojanin Durgotsab, Amherst Durgotsab, North Kolkata, Kolkata, West Bengal, 700007, India",
     "latitude": 22.584012,
@@ -73,7 +73,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 3,
     "name": "Aswiningar Sarbojanin Durgotsav",
-    "bengaliName": "",
+    "bengaliName": "অশ্বিনীনগর সর্বজনীন দুর্গোৎসব",
     "region": "North Kolkata",
     "address": "Aswiningar Sarbojanin Durgotsav, Aswiningar, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.612234,
@@ -107,7 +107,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 4,
     "name": "Baghbazar Palli Puja O Pradarshani",
-    "bengaliName": "",
+    "bengaliName": "বাগবাজার পল্লী পূজা ও প্রদর্শনী",
     "region": "North Kolkata",
     "address": "Baghbazar Palli Puja O Pradarshani, Baghbazar Palli Puja O Pradarshani, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.603345,
@@ -141,7 +141,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 5,
     "name": "Bandhudal Durgotsob",
-    "bengaliName": "",
+    "bengaliName": "বন্ধু দল দুর্গোৎসব",
     "region": "North Kolkata",
     "address": "Bandhudal Durgotsob, Bandhudal Durgotsob, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.603812,
@@ -175,7 +175,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 6,
     "name": "Beadon Street Sarbojanin Durgotsav",
-    "bengaliName": "",
+    "bengaliName": "বিডন স্ট্রিট সর্বজনীন দুর্গোৎসব",
     "region": "North Kolkata",
     "address": "Beadon Street Sarbojanin Durgotsav, Beadon Street, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.611623,
@@ -209,7 +209,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 7,
     "name": "Belgachia Sadharan Durgotsab",
-    "bengaliName": "",
+    "bengaliName": "বেলগাছিয়া সাধারণ দুর্গোৎসব",
     "region": "North Kolkata",
     "address": "Belgachia Sadharan Durgotsab, Belgachia Sadharan Durgotsab, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.595412,
@@ -243,7 +243,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 8,
     "name": "Belgachia Yuba Sammilani Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "বেলগাছিয়া যুব সন্মিলনী দুর্গাপূজা",
     "region": "North Kolkata",
     "address": "Belgachia Yuba Sammilani Durga Puja, Belgachia Yuba Sammilani, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.603234,
@@ -277,7 +277,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 9,
     "name": "Bhagabati Park Durga Puja Committee",
-    "bengaliName": "",
+    "bengaliName": "ভগবতী পার্ক দুর্গাপূজা কমিটি",
     "region": "North Kolkata",
     "address": "Bhagabati Park Durga Puja Committee, Bhagabati Park, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.611012,
@@ -311,7 +311,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 10,
     "name": "Bharatiya Tarun Sangha Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "ভারতীয় তরুণ সংঘ দুর্গাপূজা",
     "region": "North Kolkata",
     "address": "Bharatiya Tarun Sangha Durga Puja, Bharatiya Tarun Sangha, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.594823,
@@ -345,7 +345,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 11,
     "name": "Brindaban Matri Mandir Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "বৃন্দাবন মাতৃ মন্দির দুর্গাপূজা",
     "region": "North Kolkata",
     "address": "Brindaban Matri Mandir Durga Puja, Brindaban Matri Mandir, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.602645,
@@ -379,7 +379,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 12,
     "name": "Calcutta Youth Forum",
-    "bengaliName": "",
+    "bengaliName": "ক্যালকাটা ইউথ ফোরাম",
     "region": "North Kolkata",
     "address": "Calcutta Youth Forum, Calcutta Youth Forum, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.610412,
@@ -413,7 +413,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 13,
     "name": "Campbagan Sadharan Durgotsav",
-    "bengaliName": "",
+    "bengaliName": "ক্যাম্পবাগান সাধারণ দুর্গোৎসব",
     "region": "North Kolkata",
     "address": "Campbagan Sadharan Durgotsav, Campbagan Sadharan, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.594234,
@@ -447,7 +447,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 14,
     "name": "Chaltabagan Lohapatty Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "চালতাবাগান লোহাপট্টি দুর্গাপূজা",
     "region": "North Kolkata",
     "address": "Chaltabagan Lohapatty Durga Puja, Chaltabagan Lohapatty, North Kolkata, Kolkata, West Bengal, 700006, India",
     "latitude": 22.584123,
@@ -481,7 +481,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 15,
     "name": "Chorebagan Sarbojanin Durgotsab Samity",
-    "bengaliName": "",
+    "bengaliName": "চোরবাগান সর্বজনীন দুর্গোৎসব সমিতি",
     "region": "North Kolkata",
     "address": "Chorebagan Sarbojanin Durgotsab Samity, Chorebagan Durgotsab Samity, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.609845,
@@ -515,7 +515,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 16,
     "name": "Cossipore Shakti Sangha Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "কাশীপুর শক্তি সংঘ দুর্গাপূজা",
     "region": "North Kolkata",
     "address": "Cossipore Shakti Sangha Durga Puja, Cossipore Shakti Sangha, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.593612,
@@ -549,7 +549,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 17,
     "name": "Dakshin Rabindrapally Sarbojanin Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "দক্ষিণ রবীন্দ্রপল্লী সর্বজনীন দুর্গাপূজা",
     "region": "North Kolkata",
     "address": "Dakshin Rabindrapally Sarbojanin Durga Puja, Dakshin Rabindrapally, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.601423,
@@ -583,7 +583,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 18,
     "name": "Darjeepara Sarbojanin Durgotsab Samity",
-    "bengaliName": "",
+    "bengaliName": "দরজিপাড়া সর্বজনীন দুর্গোৎসব সমিতি",
     "region": "North Kolkata",
     "address": "Darjeepara Sarbojanin Durgotsab Samity, Darjeepara Durgotsab Samity, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.609212,
@@ -617,7 +617,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 19,
     "name": "Deshbandhunagar Sarbojanin Durgotsab",
-    "bengaliName": "",
+    "bengaliName": "দেশবন্ধুনগর সর্বজনীন দুর্গোৎসব",
     "region": "North Kolkata",
     "address": "Deshbandhunagar Sarbojanin Durgotsab, Deshbandhunagar Durgotsab, North Kolkata, Kolkata, West Bengal, 700055, India",
     "latitude": 22.614734,
@@ -650,7 +650,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 20,
     "name": "Dum Dum Park Bharat Chakra Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "দমদম পার্ক ভারত চক্র দুর্গাপূজা",
     "region": "North Kolkata",
     "address": "Dum Dum Park Bharat Chakra Durga Puja, Dum Dum Park Bharat Chakra, North Kolkata, Kolkata, West Bengal, 700055, India",
     "latitude": 22.610512,
@@ -684,7 +684,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 21,
     "name": "Dum Dum Park Sarbojanin Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "দমদম পার্ক সর্বজনীন দুর্গাপূজা",
     "region": "North Kolkata",
     "address": "Dum Dum Park Sarbojanin Durga Puja, Dum Dum Park, North Kolkata, Kolkata, West Bengal, 700055, India",
     "latitude": 22.630323,
@@ -718,7 +718,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 22,
     "name": "Goabagan Sarodatsav Sammilani Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "গোয়াবাগান শারদোৎসব সম্মিলনী দুর্গাপূজা",
     "region": "North Kolkata",
     "address": "Goabagan Sarodatsav Sammilani Durga Puja, Goabagan Sarodatsav Sammilani, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.592412,
@@ -752,7 +752,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 23,
     "name": "Golaghata Sammilani Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "গোলাঘাটা সম্মিলনী দুর্গাপূজা",
     "region": "North Kolkata",
     "address": "Golaghata Sammilani Durga Puja, Golaghata Sammilani, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.600234,
@@ -786,7 +786,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 24,
     "name": "Grey Street Sarbojanin Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "গ্রে স্ট্রিট সর্বজনীন দুর্গাপূজা",
     "region": "North Kolkata",
     "address": "Grey Street Sarbojanin Durga Puja, Grey Street, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.608012,
@@ -820,7 +820,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 25,
     "name": "Halsibagan Sarbojanin Durgotsab",
-    "bengaliName": "",
+    "bengaliName": "হালসিবাগান সর্বজনীন দুর্গোৎসব",
     "region": "North Kolkata",
     "address": "Halsibagan Sarbojanin Durgotsab, Halsibagan Durgotsab, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.591823,
@@ -854,7 +854,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 26,
     "name": "Hari Ghosh Street Sarbojanin",
-    "bengaliName": "",
+    "bengaliName": "হরি ঘোষ স্ট্রিট সর্বজনীন",
     "region": "North Kolkata",
     "address": "Hari Ghosh Street Sarbojanin, Hari Ghosh Street, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.599645,
@@ -888,7 +888,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 27,
     "name": "Hatibagan Nabinpally Sarbojanin Durgotsav",
-    "bengaliName": "",
+    "bengaliName": "হাতিবাগান নবীনপল্লী সর্বজনীন দুর্গোৎসব",
     "region": "North Kolkata",
     "address": "Hatibagan Nabinpally Sarbojanin Durgotsav, Hatibagan Nabinpally, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.607412,
@@ -922,7 +922,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 28,
     "name": "Jagat Mukherjee Park Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "জগৎ মুখার্জী পার্ক দুর্গাপূজা",
     "region": "North Kolkata",
     "address": "Jagat Mukherjee Park Durga Puja, Jagat Mukherjee Park, North Kolkata, Kolkata, West Bengal, 700005, India",
     "latitude": 22.598234,
@@ -956,7 +956,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 29,
     "name": "Jokermath Sarbojonin Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "জোকারমাঠ সর্বজনীন দুর্গাপূজা",
     "region": "North Kolkata",
     "address": "Jokermath Sarbojonin Durga Puja, Jokermath Sarbojonin, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.605212,
@@ -990,7 +990,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 30,
     "name": "Kailash Bose Street Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "কৈলাশ বোস স্ট্রিট দুর্গাপূজা",
     "region": "North Kolkata",
     "address": "Kailash Bose Street Durga Puja, Kailash Bose Street, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.589045,
@@ -1024,7 +1024,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 31,
     "name": "Kankurgachi Sarbojanin Durgotsab",
-    "bengaliName": "",
+    "bengaliName": "কাঁকুড়গাছি সর্বজনীন দুর্গোৎসব",
     "region": "North Kolkata",
     "address": "Kankurgachi Sarbojanin Durgotsab, Kankurgachi Durgotsab, North Kolkata, Kolkata, West Bengal, 700064, India",
     "latitude": 22.586823,
@@ -1058,7 +1058,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 32,
     "name": "Kashi Bose Lane Durga Puja Committee",
-    "bengaliName": "",
+    "bengaliName": "কাশী বোস লেন দুর্গাপূজা কমিটি",
     "region": "North Kolkata",
     "address": "Kashi Bose Lane Durga Puja Committee, Kashi Bose Lane, North Kolkata, Kolkata, West Bengal, 700006, India",
     "latitude": 22.589234,
@@ -1092,7 +1092,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 33,
     "name": "Kumartuli Park Sarbojanin Durgotsab Committee",
-    "bengaliName": "",
+    "bengaliName": "কুমারটুলী পার্ক সর্বজনীন দুর্গোৎসব কমিটি",
     "region": "North Kolkata",
     "address": "Kumartuli Park Sarbojanin Durgotsab Committee, Kumartuli Park Durgotsab, North Kolkata, Kolkata, West Bengal, 700005, India",
     "latitude": 22.599512,
@@ -1126,7 +1126,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 34,
     "name": "Kumartuli Sarbojanin Durgotsab",
-    "bengaliName": "",
+    "bengaliName": "কুমারটুলী সর্বজনীন দুর্গোৎসব",
     "region": "North Kolkata",
     "address": "Kumartuli Sarbojanin Durgotsab, Kumartuli Durgotsab, North Kolkata, Kolkata, West Bengal, 700005, India",
     "latitude": 22.598823,
@@ -1160,7 +1160,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 35,
     "name": "Lake View Park Sarbojanin Durgotsav Samity",
-    "bengaliName": "",
+    "bengaliName": "লেক ভিউ পার্ক সর্বজনীন দুর্গোৎসব সমিতি",
     "region": "North Kolkata",
     "address": "Lake View Park Sarbojanin Durgotsav Samity, Lake View Park Samity, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.608245,
@@ -1194,7 +1194,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 36,
     "name": "Mahalla Sarbojanin Durgautsab Samity",
-    "bengaliName": "",
+    "bengaliName": "মহাল্লা সর্বজনীন দুর্গোৎসব সমিতি",
     "region": "North Kolkata",
     "address": "Mahalla Sarbojanin Durgautsab Samity, Mahalla Durgautsab Samity, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.592012,
@@ -1228,7 +1228,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 37,
     "name": "Mitali Kankurgachi Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "মিতালী কাঁকুড়গাছি দুর্গাপূজা",
     "region": "North Kolkata",
     "address": "Mitali Kankurgachi Durga Puja, Mitali Kankurgachi, North Kolkata, Kolkata, West Bengal, 700064, India",
     "latitude": 22.589834,
@@ -1262,7 +1262,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 38,
     "name": "Nalin Sarkar Street Sarbojanin Durgotsab",
-    "bengaliName": "",
+    "bengaliName": "নলিন সরকার স্ট্রিট সর্বজনীন দুর্গোৎসব",
     "region": "North Kolkata",
     "address": "Nalin Sarkar Street Sarbojanin Durgotsab, Nalin Sarkar Street Durgotsab, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.597612,
@@ -1296,7 +1296,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 39,
     "name": "Nimtala Sarbojanin Durgotsab",
-    "bengaliName": "",
+    "bengaliName": "নিমতলা সর্বজনীন দুর্গোৎসব",
     "region": "North Kolkata",
     "address": "Nimtala Sarbojanin Durgotsab, Nimtala Durgotsab, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.595434,
@@ -1330,7 +1330,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 40,
     "name": "Sreebhumi Sporting Club Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "শ্রীভূমি স্পোর্টিং ক্লাব দুর্গাপূজা",
     "region": "North Kolkata",
     "address": "Sreebhumi Sporting Club Durga Puja, Sreebhumi Sporting, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.599723,
@@ -1364,7 +1364,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 41,
     "name": "Tala Barowari Durgotsab",
-    "bengaliName": "",
+    "bengaliName": "টালা বারোয়ারি দুর্গোৎসব",
     "region": "North Kolkata",
     "address": "Tala Barowari Durgotsab, Tala Barowari Durgotsab, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.607512,
@@ -1398,7 +1398,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 42,
     "name": "Tala Dakshin Pally Durgotsav Committee",
-    "bengaliName": "",
+    "bengaliName": "টালা দক্ষিণ পল্লী দুর্গোৎসব কমিটি",
     "region": "North Kolkata",
     "address": "Tala Dakshin Pally Durgotsav Committee, Tala Dakshin Pally, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.606823,
@@ -1432,7 +1432,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 43,
     "name": "Tala Park 15 Pally Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "টালা পার্ক ১৫ পল্লী দুর্গাপূজা",
     "region": "North Kolkata",
     "address": "Tala Park 15 Pally Durga Puja, Tala Park 15 Pally, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.607145,
@@ -1466,7 +1466,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 44,
     "name": "Telengabagan Sarbojanin Durgotsab",
-    "bengaliName": "",
+    "bengaliName": "তেলঙ্গাবাগান সর্বজনীন দুর্গোৎসব",
     "region": "North Kolkata",
     "address": "Telengabagan Sarbojanin Durgotsab, Telengabagan Durgotsab, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.593212,
@@ -1500,7 +1500,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 45,
     "name": "Ultadanga Jagarani Sangha Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "উল্টোডাঙা জাগরণী সংঘ দুর্গাপূজা",
     "region": "North Kolkata",
     "address": "Ultadanga Jagarani Sangha Durga Puja, Ultadanga Jagarani Sangha, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.592534,
@@ -1534,7 +1534,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 46,
     "name": "Ultadanga Pallyshree Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "উল্টোডাঙা পল্লীশ্রী দুর্গাপূজা",
     "region": "North Kolkata",
     "address": "Ultadanga Pallyshree Durga Puja, Ultadanga Pallyshree, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.592812,
@@ -1568,7 +1568,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 47,
     "name": "Ultadanga Sangrami Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "উল্টোডাঙা সংগ্রামী দুর্গাপূজা",
     "region": "North Kolkata",
     "address": "Ultadanga Sangrami Durga Puja, Ultadanga Sangrami, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.593045,
@@ -1602,7 +1602,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 48,
     "name": "Young Citizens Club Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "ইয়ং সিটিজেন্স ক্লাব দুর্গাপূজা",
     "region": "North Kolkata",
     "address": "Young Citizens Club Durga Puja, Young Citizens, North Kolkata, Kolkata, West Bengal, 700004, India",
     "latitude": 22.598623,
@@ -1636,7 +1636,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 49,
     "name": "21 Pally Sarbojanin Durgotsab Samiti",
-    "bengaliName": "",
+    "bengaliName": "২১ পল্লী সর্বজনীন দুর্গোৎসব সমিতি",
     "region": "South Kolkata",
     "address": "21 Pally Sarbojanin Durgotsab Samiti, 21 Pally Durgotsab Samiti, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.528012,
@@ -1670,7 +1670,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 50,
     "name": "22 Palli Sarodotsav",
-    "bengaliName": "",
+    "bengaliName": "২২ পল্লী শারদোৎসব",
     "region": "South Kolkata",
     "address": "22 Palli Sarodotsav, 22 Palli Sarodotsav, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.527334,
@@ -1704,7 +1704,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 51,
     "name": "25 Pally Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "২৫ পল্লী দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "25 Pally Durga Puja, 25 Pally, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.526645,
@@ -1738,7 +1738,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 52,
     "name": "64 Pally Durgotsab Committee",
-    "bengaliName": "",
+    "bengaliName": "৬৪ পল্লী দুর্গোৎসব কমিটি",
     "region": "South Kolkata",
     "address": "64 Pally Durgotsab Committee, 64 Pally Durgotsab, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.521012,
@@ -1772,7 +1772,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 53,
     "name": "66 Pally Sarbojanin Durgotsab Committee",
-    "bengaliName": "",
+    "bengaliName": "৬৬ পল্লী সর্বজনীন দুর্গোৎসব কমিটি",
     "region": "South Kolkata",
     "address": "66 Pally Sarbojanin Durgotsab Committee, 66 Pally Durgotsab, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.520712,
@@ -1806,7 +1806,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 54,
     "name": "70 Pally Sarbojanin Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "৭০ পল্লী সর্বজনীন দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "70 Pally Sarbojanin Durga Puja, 70 Pally, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.521434,
@@ -1840,7 +1840,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 55,
     "name": "95 Pally Jodhpur Park Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "৯৫ পল্লী যোধপুর পার্ক দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "95 Pally Jodhpur Park Durga Puja, 95 Pally Jodhpur Park, South Kolkata, Kolkata, West Bengal, 700029, India",
     "latitude": 22.502812,
@@ -1874,7 +1874,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 56,
     "name": "Abasar Sarbojanin Durgotsab Committee",
-    "bengaliName": "",
+    "bengaliName": "অবসর সর্বজনীন দুর্গোৎসব কমিটি",
     "region": "South Kolkata",
     "address": "Abasar Sarbojanin Durgotsab Committee, Abasar Durgotsab, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.525034,
@@ -1908,7 +1908,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 57,
     "name": "Abasorika Durgotsav Committee",
-    "bengaliName": "",
+    "bengaliName": "অবসরিকা দুর্গোৎসব কমিটি",
     "region": "South Kolkata",
     "address": "Abasorika Durgotsav Committee, Abasorika, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.524312,
@@ -1942,7 +1942,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 58,
     "name": "Adi Ballygunge Sarbojanin Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "আদি বালিগঞ্জ সর্বজনীন দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Adi Ballygunge Sarbojanin Durga Puja, Adi Ballygunge, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.521823,
@@ -1976,7 +1976,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 59,
     "name": "Adi Dakshin Kalikata Barowari Samittee",
-    "bengaliName": "",
+    "bengaliName": "আদি দক্ষিণ কলিকাতা বারোয়ারি সমিতি",
     "region": "South Kolkata",
     "address": "Adi Dakshin Kalikata Barowari Samittee, Adi Dakshin Kalikata Barowari Samittee, South Kolkata, Kolkata, West Bengal, 700025, India",
     "latitude": 22.519045,
@@ -2010,7 +2010,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 60,
     "name": "Agradut Udaya Sangha Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "অগ্রদূত উদয় সংঘ দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Agradut Udaya Sangha Durga Puja, Agradut Udaya Sangha, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.518312,
@@ -2044,7 +2044,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 61,
     "name": "Arunodaya Adhibashi Brinder Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "অরুণোদয় অধিবাসী বৃন্দের দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Arunodaya Adhibashi Brinder Durga Puja, Arunodaya Adhibashi Brinder, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.517634,
@@ -2078,7 +2078,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 62,
     "name": "Babu Bagan Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "বাবুবাগান দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Babu Bagan Durga Puja, Babu Bagan, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.504012,
@@ -2112,7 +2112,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 63,
     "name": "Badamtala Ashar Sangha Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "বাদামতলা আষাঢ় সংঘ দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Badamtala Ashar Sangha Durga Puja, Badamtala Ashar Sangha, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.520423,
@@ -2146,7 +2146,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 64,
     "name": "Baghajatin B and C Block Durgotsav Committee",
-    "bengaliName": "",
+    "bengaliName": "বাঘাযতীন বি ও সি ব্লক দুর্গোৎসব কমিটি",
     "region": "South Kolkata",
     "address": "Baghajatin B and C Block Durgotsav Committee, Baghajatin B and C Block, South Kolkata, Kolkata, West Bengal, 700047, India",
     "latitude": 22.485012,
@@ -2180,7 +2180,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 65,
     "name": "Baghajatin Tarun Sangha Durgotsav",
-    "bengaliName": "",
+    "bengaliName": "বাঘাযতীন তরুণ সংঘ দুর্গোৎসব",
     "region": "South Kolkata",
     "address": "Baghajatin Tarun Sangha Durgotsav, Baghajatin Tarun Sangha, South Kolkata, Kolkata, West Bengal, 700047, India",
     "latitude": 22.484334,
@@ -2214,7 +2214,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 66,
     "name": "Baishnabghata Paschimpara Sarbojanin Durgotsab",
-    "bengaliName": "",
+    "bengaliName": "বৈষ্ণবঘাটা পশ্চিমপাড়া সর্বজনীন দুর্গোৎসব",
     "region": "South Kolkata",
     "address": "Baishnabghata Paschimpara Sarbojanin Durgotsab, Baishnabghata Paschimpara Durgotsab, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.476012,
@@ -2248,7 +2248,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 67,
     "name": "Ballygunge Cultural Association Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "বালিগঞ্জ কালচারাল অ্যাসোসিয়েশন দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Ballygunge Cultural Association Durga Puja, Ballygunge Cultural Association, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.519823,
@@ -2282,7 +2282,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 68,
     "name": "Ballygunge Pally Sarbojanin Durgotsab Committee",
-    "bengaliName": "",
+    "bengaliName": "বালিগঞ্জ পল্লী সর্বজনীন দুর্গোৎসব কমিটি",
     "region": "South Kolkata",
     "address": "Ballygunge Pally Sarbojanin Durgotsab Committee, Ballygunge Pally Durgotsab, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.519145,
@@ -2316,7 +2316,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 69,
     "name": "Bansdroni Sammilita Sarbojanin Durgotsab Committee",
-    "bengaliName": "",
+    "bengaliName": "বাঁশদ্রোণী সম্মিলিত সর্বজনীন দুর্গোৎসব কমিটি",
     "region": "South Kolkata",
     "address": "Bansdroni Sammilita Sarbojanin Durgotsab Committee, Bansdroni Sammilita Durgotsab, South Kolkata, Kolkata, West Bengal, 700047, India",
     "latitude": 22.468012,
@@ -2350,7 +2350,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 70,
     "name": "Bediadanga Sarbojanin Durgotsav Committee",
-    "bengaliName": "",
+    "bengaliName": "বেদিয়াড়াঙা সর্বজনীন দুর্গোৎসব কমিটি",
     "region": "South Kolkata",
     "address": "Bediadanga Sarbojanin Durgotsav Committee, Bediadanga, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.511012,
@@ -2384,7 +2384,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 71,
     "name": "Beltala Sarbojanin Durgotsab",
-    "bengaliName": "",
+    "bengaliName": "বেলতলা সর্বজনীন দুর্গোৎসব",
     "region": "South Kolkata",
     "address": "Beltala Sarbojanin Durgotsab, Beltala Durgotsab, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.527012,
@@ -2418,7 +2418,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 72,
     "name": "Bengal United Club Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "বেঙ্গল ইউনাইটেড ক্লাব দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Bengal United Club Durga Puja, Bengal United, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.526334,
@@ -2452,7 +2452,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 73,
     "name": "Bhawanipore Mahapuja Samity",
-    "bengaliName": "",
+    "bengaliName": "ভবানীপুর মহাপূজা সমিতি",
     "region": "South Kolkata",
     "address": "Bhawanipore Mahapuja Samity, Bhawanipore Mahapuja Samity, South Kolkata, Kolkata, West Bengal, 700025, India",
     "latitude": 22.535012,
@@ -2486,7 +2486,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 74,
     "name": "Bhowanipore De Bari Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "ভবানীপুর দে বাড়ি দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Bhowanipore De Bari Durga Puja, Bhowanipore De Bari, South Kolkata, Kolkata, West Bengal, 700025, India",
     "latitude": 22.534334,
@@ -2520,7 +2520,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 75,
     "name": "Bhowanipore Mitra Bari Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "ভবানীপুর মিত্র বাড়ি দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Bhowanipore Mitra Bari Durga Puja, Bhowanipore Mitra Bari, South Kolkata, Kolkata, West Bengal, 700025, India",
     "latitude": 22.533645,
@@ -2554,7 +2554,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 76,
     "name": "Bhowanipur 75 Palli Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "ভবানীপুর ৭৫ পল্লী দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Bhowanipur 75 Palli Durga Puja, Bhowanipur 75 Palli, South Kolkata, Kolkata, West Bengal, 700025, India",
     "latitude": 22.532012,
@@ -2588,7 +2588,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 77,
     "name": "Bhowanipur Muktadal Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "ভবানীপুর মুক্তদল দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Bhowanipur Muktadal Durga Puja, Bhowanipur Muktadal, South Kolkata, Kolkata, West Bengal, 700025, India",
     "latitude": 22.531334,
@@ -2622,7 +2622,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 78,
     "name": "Bhowanipur Ritwik Club Durga Puja Committee",
-    "bengaliName": "",
+    "bengaliName": "ভবানীপুর ঋত্বিক ক্লাব দুর্গাপূজা কমিটি",
     "region": "South Kolkata",
     "address": "Bhowanipur Ritwik Club Durga Puja Committee, Bhowanipur Ritwik, South Kolkata, Kolkata, West Bengal, 700025, India",
     "latitude": 22.530645,
@@ -2656,7 +2656,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 79,
     "name": "Bhowanipur Sarbojanin Durgotsav",
-    "bengaliName": "",
+    "bengaliName": "ভবানীপুর সর্বজনীন দুর্গোৎসব",
     "region": "South Kolkata",
     "address": "Bhowanipur Sarbojanin Durgotsav, Bhowanipur, South Kolkata, Kolkata, West Bengal, 700025, India",
     "latitude": 22.529012,
@@ -2690,7 +2690,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 80,
     "name": "Bhowanipur Students Club Sarbojanin Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "ভবানীপুর স্টুডেন্টস ক্লাব সর্বজনীন দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Bhowanipur Students Club Sarbojanin Durga Puja, Bhowanipur Students, South Kolkata, Kolkata, West Bengal, 700025, India",
     "latitude": 22.528334,
@@ -2724,7 +2724,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 81,
     "name": "Bhowanipur Swadhin Sangha Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "ভবানীপুর স্বাধীন সংঘ দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Bhowanipur Swadhin Sangha Durga Puja, Bhowanipur Swadhin Sangha, South Kolkata, Kolkata, West Bengal, 700025, India",
     "latitude": 22.527645,
@@ -2758,7 +2758,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 82,
     "name": "Bhowanipur Udayan Club Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "ভবানীপুর উদয়ন ক্লাব দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Bhowanipur Udayan Club Durga Puja, Bhowanipur Udayan, South Kolkata, Kolkata, West Bengal, 700025, India",
     "latitude": 22.526012,
@@ -2792,7 +2792,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 83,
     "name": "Chetla Agrani Club Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "চেতলা অগ্রণী ক্লাব দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Chetla Agrani Club Durga Puja, Chetla Agrani, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.522234,
@@ -2826,7 +2826,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 84,
     "name": "Chetla Sarbasadharaner Durgotsab",
-    "bengaliName": "",
+    "bengaliName": "চেতলা সর্বসাধারণের দুর্গোৎসব",
     "region": "South Kolkata",
     "address": "Chetla Sarbasadharaner Durgotsab, Chetla Sarbasadharaner Durgotsab, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.521512,
@@ -2860,7 +2860,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 85,
     "name": "Dakshin Kolkata Sarbojanin Durgotsab",
-    "bengaliName": "",
+    "bengaliName": "দক্ষিণ কলকাতা সর্বজনীন দুর্গোৎসব",
     "region": "South Kolkata",
     "address": "Dakshin Kolkata Sarbojanin Durgotsab, Dakshin Kolkata Durgotsab, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.518012,
@@ -2894,7 +2894,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 86,
     "name": "Deshapriya Park Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "দেশপ্রিয় পার্ক দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Deshapriya Park Durga Puja, Deshapriya Park, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.518123,
@@ -2928,7 +2928,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 87,
     "name": "Dhakuria Pragati Sangha Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "ঢাকুরিয়া প্রগতি সংঘ দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Dhakuria Pragati Sangha Durga Puja, Dhakuria Pragati Sangha, South Kolkata, Kolkata, West Bengal, 700029, India",
     "latitude": 22.506012,
@@ -2962,7 +2962,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 88,
     "name": "Dhakuria Sarbojanin Durgotsab",
-    "bengaliName": "",
+    "bengaliName": "ঢাকুরিয়া সর্বজনীন দুর্গোৎসব",
     "region": "South Kolkata",
     "address": "Dhakuria Sarbojanin Durgotsab, Dhakuria Durgotsab, South Kolkata, Kolkata, West Bengal, 700029, India",
     "latitude": 22.505334,
@@ -2996,7 +2996,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 89,
     "name": "Ekdalia Evergreen Club Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "একডালিয়া এভারগ্রিন ক্লাব দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Ekdalia Evergreen Club Durga Puja, Ekdalia Evergreen, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.518612,
@@ -3030,7 +3030,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 90,
     "name": "Falguni Sangha Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "ফাল্গুনী সংঘ দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Falguni Sangha Durga Puja, Falguni Sangha, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.516012,
@@ -3064,7 +3064,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 91,
     "name": "Garfa Sarbojanin Durgotsav",
-    "bengaliName": "",
+    "bengaliName": "গড়ফা সর্বজনীন দুর্গোৎসব",
     "region": "South Kolkata",
     "address": "Garfa Sarbojanin Durgotsav, Garfa, South Kolkata, Kolkata, West Bengal, 700084, India",
     "latitude": 22.501012,
@@ -3093,7 +3093,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 92,
     "name": "Golpark Sarbojanin Durgotsab Committee",
-    "bengaliName": "",
+    "bengaliName": "গোলপার্ক সর্বজনীন দুর্গোৎসব কমিটি",
     "region": "South Kolkata",
     "address": "Golpark Sarbojanin Durgotsab Committee, Golpark Durgotsab, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.514012,
@@ -3127,7 +3127,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 93,
     "name": "Gopal Nagar Kalyan Sangha Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "গোপাল নগর কল্যাণ সংঘ দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Gopal Nagar Kalyan Sangha Durga Puja, Gopal Nagar Kalyan Sangha, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.523012,
@@ -3161,7 +3161,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 94,
     "name": "Harish Park Sarbojanin Durgotsab Samity",
-    "bengaliName": "",
+    "bengaliName": "হরিশ পার্ক সর্বজনীন দুর্গোৎসব সমিতি",
     "region": "South Kolkata",
     "address": "Harish Park Sarbojanin Durgotsab Samity, Harish Park Durgotsab Samity, South Kolkata, Kolkata, West Bengal, 700025, India",
     "latitude": 22.531012,
@@ -3195,7 +3195,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 95,
     "name": "Hindustan Pally Durga Puja Committee",
-    "bengaliName": "",
+    "bengaliName": "হিন্দুস্থান পল্লী দুর্গাপূজা কমিটি",
     "region": "South Kolkata",
     "address": "Hindustan Pally Durga Puja Committee, Hindustan Pally, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.517012,
@@ -3229,7 +3229,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 96,
     "name": "Jubamaitry Kalighat Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "যুবমৈত্রী কালীঘাট দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Jubamaitry Kalighat Durga Puja, Jubamaitry Kalighat, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.521212,
@@ -3263,7 +3263,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 97,
     "name": "Kalighat Nepal Bhattacharjee Street Club",
-    "bengaliName": "",
+    "bengaliName": "কালীঘাট নেপাল ভট্টাচার্য স্ট্রিট ক্লাব",
     "region": "South Kolkata",
     "address": "Kalighat Nepal Bhattacharjee Street Club, Kalighat Nepal Bhattacharjee Street, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.520534,
@@ -3297,7 +3297,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 98,
     "name": "Kasba R.K. Chatterjee Road Adhibasi Brinda Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "কসবা আর. কে. চ্যাটার্জী রোড অধিবাসী বৃন্দ দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Kasba R.K. Chatterjee Road Adhibasi Brinda Durga Puja, Kasba R.K. Chatterjee Road Adhibasi Brinda, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.513012,
@@ -3331,7 +3331,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 99,
     "name": "Kasba Renaissance Club",
-    "bengaliName": "",
+    "bengaliName": "কসবা রেনেসাঁস ক্লাব",
     "region": "South Kolkata",
     "address": "Kasba Renaissance Club, Kasba Renaissance, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.512334,
@@ -3365,7 +3365,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 100,
     "name": "Kasba Shakti Sangha Pallybasi Durgotsav Samity",
-    "bengaliName": "",
+    "bengaliName": "কসবা শক্তি সংঘ পল্লীবাসী দুর্গোৎসব সমিতি",
     "region": "South Kolkata",
     "address": "Kasba Shakti Sangha Pallybasi Durgotsav Samity, Kasba Shakti Sangha Pallybasi Samity, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.511645,
@@ -3399,7 +3399,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 101,
     "name": "Ketopole Sammilani Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "কেটোপোল সম্মিলনী দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Ketopole Sammilani Durga Puja, Ketopole Sammilani, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.508012,
@@ -3433,7 +3433,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 102,
     "name": "Keyatala Pally Samity Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "কেয়াতলা পল্লী সমিতি দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Keyatala Pally Samity Durga Puja, Keyatala Pally Samity, South Kolkata, Kolkata, West Bengal, 700029, India",
     "latitude": 22.513012,
@@ -3467,7 +3467,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 103,
     "name": "Kheyali Sangha Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "খেয়ালী সংঘ দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Kheyali Sangha Durga Puja, Kheyali Sangha, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.512334,
@@ -3501,7 +3501,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 104,
     "name": "Khidderpore Sarbojanin Durgotsab",
-    "bengaliName": "",
+    "bengaliName": "খিদিরপুর সর্বজনীন দুর্গোৎসব",
     "region": "South Kolkata",
     "address": "Khidderpore Sarbojanin Durgotsab, Khidderpore Durgotsab, South Kolkata, Kolkata, West Bengal, 700027, India",
     "latitude": 22.538012,
@@ -3535,7 +3535,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 105,
     "name": "Khidderpur 75 Pally Sarbojanin Durgotsab Committee",
-    "bengaliName": "",
+    "bengaliName": "খিদিরপুর ৭৫ পল্লী সর্বজনীন দুর্গোৎসব কমিটি",
     "region": "South Kolkata",
     "address": "Khidderpur 75 Pally Sarbojanin Durgotsab Committee, Khidderpur 75 Pally Durgotsab, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.537334,
@@ -3569,7 +3569,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 106,
     "name": "Kidderpore Jubaghosthi Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "খিদিরপুর যুবগোষ্ঠী দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Kidderpore Jubaghosthi Durga Puja, Kidderpore Jubaghosthi, South Kolkata, Kolkata, West Bengal, 700027, India",
     "latitude": 22.536645,
@@ -3603,7 +3603,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 107,
     "name": "Kidderpore Pally Saradiya Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "খিদিরপুর পল্লী শারদীয়া দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Kidderpore Pally Saradiya Durga Puja, Kidderpore Pally Saradiya, South Kolkata, Kolkata, West Bengal, 700027, India",
     "latitude": 22.535012,
@@ -3637,7 +3637,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 108,
     "name": "Lake Gardens Peoples Association Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "লেক গার্ডেনস পিপলস অ্যাসোসিয়েশন দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Lake Gardens Peoples Association Durga Puja, Lake Gardens Peoples Association, South Kolkata, Kolkata, West Bengal, 700029, India",
     "latitude": 22.507012,
@@ -3671,7 +3671,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 109,
     "name": "Lake Youth Corner Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "লেক ইউথ কর্নার দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Lake Youth Corner Durga Puja, Lake Youth Corner, South Kolkata, Kolkata, West Bengal, 700029, India",
     "latitude": 22.506334,
@@ -3705,7 +3705,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 110,
     "name": "Mahamayatala Sarbojanin Durgotsab",
-    "bengaliName": "",
+    "bengaliName": "মহামায়াতলা সর্বজনীন দুর্গোৎসব",
     "region": "South Kolkata",
     "address": "Mahamayatala Sarbojanin Durgotsab, Mahamayatala Durgotsab, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.454012,
@@ -3739,7 +3739,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 111,
     "name": "Megacity Residents Puja Committee",
-    "bengaliName": "",
+    "bengaliName": "মেগাসিটি রেসিডেন্টস পূজা কমিটি",
     "region": "South Kolkata",
     "address": "Megacity Residents Puja Committee, Megacity Residents Puja, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.451012,
@@ -3773,7 +3773,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 112,
     "name": "Mohila Mahal Club Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "মহিলা মহল ক্লাব দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Mohila Mahal Club Durga Puja, Mohila Mahal, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.511012,
@@ -3807,7 +3807,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 113,
     "name": "Monohar Pukur Baisakhi Sangha",
-    "bengaliName": "",
+    "bengaliName": "মনোহর পুকুর বৈশাখী সংঘ",
     "region": "South Kolkata",
     "address": "Monohar Pukur Baisakhi Sangha, Monohar Pukur Baisakhi Sangha, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.518012,
@@ -3841,7 +3841,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 114,
     "name": "Mudiali Club Sarbojanin Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "মুদিয়ালী ক্লাব সর্বজনীন দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Mudiali Club Sarbojanin Durga Puja, Mudiali, South Kolkata, Kolkata, West Bengal, 700029, India",
     "latitude": 22.513512,
@@ -3875,7 +3875,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 115,
     "name": "N.S.C. Sports Club Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "এন.এস.সি. স্পোর্টস ক্লাব দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "N.S.C. Sports Club Durga Puja, N.S.C. Sports, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.510012,
@@ -3909,7 +3909,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 116,
     "name": "Naktala Udayan Sangha Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "নাকতলা উদয়ন সংঘ দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Naktala Udayan Sangha Durga Puja, Naktala Udayan Sangha, South Kolkata, Kolkata, West Bengal, 700084, India",
     "latitude": 22.472712,
@@ -3943,7 +3943,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 117,
     "name": "Naskarpara Sarbojanin Durgotsav",
-    "bengaliName": "",
+    "bengaliName": "নস্করপাড়া সর্বজনীন দুর্গোৎসব",
     "region": "South Kolkata",
     "address": "Naskarpara Sarbojanin Durgotsav, Naskarpara, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.469012,
@@ -3977,7 +3977,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 118,
     "name": "New Alipore Suruchi Sangha Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "নিউ আলিপুর সুরুচি সংঘ দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "New Alipore Suruchi Sangha Durga Puja, New Alipore Suruchi Sangha, South Kolkata, Kolkata, West Bengal, 700027, India",
     "latitude": 22.517345,
@@ -4011,7 +4011,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 119,
     "name": "New Santoshpur Adi Durgotsab",
-    "bengaliName": "",
+    "bengaliName": "নিউ সন্তোষপুর আদি দুর্গোৎসব",
     "region": "South Kolkata",
     "address": "New Santoshpur Adi Durgotsab, New Santoshpur Adi Durgotsab, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.492012,
@@ -4045,7 +4045,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 120,
     "name": "Paddapukur Barwari Samity",
-    "bengaliName": "",
+    "bengaliName": "পদ্মপুকুর বারোয়ারি সমিতি",
     "region": "South Kolkata",
     "address": "Paddapukur Barwari Samity, Paddapukur Barwari Samity, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.533012,
@@ -4079,7 +4079,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 121,
     "name": "Paddapukur Youth Association Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "পদ্মপুকুর ইউথ অ্যাসোসিয়েশন দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Paddapukur Youth Association Durga Puja, Paddapukur Youth Association, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.532334,
@@ -4113,7 +4113,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 122,
     "name": "Pally Mangal Samity",
-    "bengaliName": "",
+    "bengaliName": "পল্লী মঙ্গল সমিতি",
     "region": "South Kolkata",
     "address": "Pally Mangal Samity, Pally Mangal Samity, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.531645,
@@ -4147,7 +4147,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 123,
     "name": "Panchanna Gram Adhibasibrinda",
-    "bengaliName": "",
+    "bengaliName": "পঞ্চান্ন গ্রাম অধিবাসী বৃন্দ",
     "region": "South Kolkata",
     "address": "Panchanna Gram Adhibasibrinda, Panchanna Gram Adhibasibrinda, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.508012,
@@ -4181,7 +4181,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 124,
     "name": "Paschim Putiary Sarbojanin Nabo Durgotsav",
-    "bengaliName": "",
+    "bengaliName": "পশ্চিম পুটিয়ারী সর্বজনীন নব দুর্গোৎসব",
     "region": "South Kolkata",
     "address": "Paschim Putiary Sarbojanin Nabo Durgotsav, Paschim Putiary Nabo, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.473012,
@@ -4215,7 +4215,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 125,
     "name": "Patuli Sarbojanin Durgotsab",
-    "bengaliName": "",
+    "bengaliName": "পাটুলী সর্বজনীন দুর্গোৎসব",
     "region": "South Kolkata",
     "address": "Patuli Sarbojanin Durgotsab, Patuli Durgotsab, South Kolkata, Kolkata, West Bengal, 700084, India",
     "latitude": 22.468012,
@@ -4249,7 +4249,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 126,
     "name": "Peyarabagan Sarbojanin Durgotsab",
-    "bengaliName": "",
+    "bengaliName": "পেয়ারাবাগান সর্বজনীন দুর্গোৎসব",
     "region": "South Kolkata",
     "address": "Peyarabagan Sarbojanin Durgotsab, Peyarabagan Durgotsab, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.515012,
@@ -4283,7 +4283,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 127,
     "name": "Picnic Sunrise Club",
-    "bengaliName": "",
+    "bengaliName": "পিকনিক সানরাইজ ক্লাব",
     "region": "South Kolkata",
     "address": "Picnic Sunrise Club, Picnic Sunrise, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.514012,
@@ -4317,7 +4317,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 128,
     "name": "Pragati Sangha Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "প্রগতি সংঘ দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Pragati Sangha Durga Puja, Pragati Sangha, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.513334,
@@ -4351,7 +4351,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 129,
     "name": "Pragati Sangha Durgotsab Committee",
-    "bengaliName": "",
+    "bengaliName": "প্রগতি সংঘ দুর্গোৎসব কমিটি",
     "region": "South Kolkata",
     "address": "Pragati Sangha Durgotsab Committee, Pragati Sangha Durgotsab, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.512645,
@@ -4385,7 +4385,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 130,
     "name": "Purbachal Residents Sarbojanin Durgotsav",
-    "bengaliName": "",
+    "bengaliName": "পূর্বাচল রেসিডেন্টস সর্বজনীন দুর্গোৎসব",
     "region": "South Kolkata",
     "address": "Purbachal Residents Sarbojanin Durgotsav, Purbachal Residents, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.478012,
@@ -4419,7 +4419,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 131,
     "name": "Putiary Sarbojanin Durgotsab Committee",
-    "bengaliName": "",
+    "bengaliName": "পুটিয়ারী সর্বজনীন দুর্গোৎসব কমিটি",
     "region": "South Kolkata",
     "address": "Putiary Sarbojanin Durgotsab Committee, Putiary Durgotsab, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.472012,
@@ -4453,7 +4453,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 132,
     "name": "Ramgarh Satapally Sarbojanin Durgotsav Committee",
-    "bengaliName": "",
+    "bengaliName": "রামগড় শতপল্লী সর্বজনীন দুর্গোৎসব কমিটি",
     "region": "South Kolkata",
     "address": "Ramgarh Satapally Sarbojanin Durgotsav Committee, Ramgarh Satapally, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.481012,
@@ -4487,7 +4487,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 133,
     "name": "Rashbehari Suhrid Sangha",
-    "bengaliName": "",
+    "bengaliName": "রাসবিহারী সুহৃদ সংঘ",
     "region": "South Kolkata",
     "address": "Rashbehari Suhrid Sangha, Rashbehari Suhrid Sangha, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.518012,
@@ -4521,7 +4521,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 134,
     "name": "Russa Madhyapally Sarbojanin Durgotsav",
-    "bengaliName": "",
+    "bengaliName": "রুসা মধ্যপল্লী সর্বজনীন দুর্গোৎসব",
     "region": "South Kolkata",
     "address": "Russa Madhyapally Sarbojanin Durgotsav, Russa Madhyapally, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.493012,
@@ -4555,7 +4555,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 135,
     "name": "Sahapur Suhrid Sangha Durga Puja Committee",
-    "bengaliName": "",
+    "bengaliName": "সাহাপুর সুহৃদ সংঘ দুর্গাপূজা কমিটি",
     "region": "South Kolkata",
     "address": "Sahapur Suhrid Sangha Durga Puja Committee, Sahapur Suhrid Sangha, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.503012,
@@ -4589,7 +4589,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 136,
     "name": "Sammilani Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "সম্মিলনী দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Sammilani Durga Puja, Sammilani, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.502334,
@@ -4623,7 +4623,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 137,
     "name": "Sanghasree Kalighat Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "সংঘশ্রী কালীঘাট দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Sanghasree Kalighat Durga Puja, Sanghasree Kalighat, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.522012,
@@ -4657,7 +4657,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 138,
     "name": "Santoshpur Avenue South",
-    "bengaliName": "",
+    "bengaliName": "সন্তোষপুর অ্যাভিনিউ সাউথ",
     "region": "South Kolkata",
     "address": "Santoshpur Avenue South, Santoshpur Avenue South, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.495012,
@@ -4691,7 +4691,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 139,
     "name": "Santoshpur Lake Pally Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "সন্তোষপুর লেক পল্লী দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Santoshpur Lake Pally Durga Puja, Santoshpur Lake Pally, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.494334,
@@ -4725,7 +4725,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 140,
     "name": "Santoshpur Trikon Park Durgotsab",
-    "bengaliName": "",
+    "bengaliName": "সন্তোষপুর ত্রিকোণ পার্ক দুর্গোৎসব",
     "region": "South Kolkata",
     "address": "Santoshpur Trikon Park Durgotsab, Santoshpur Trikon Park Durgotsab, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.493645,
@@ -4759,7 +4759,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 141,
     "name": "Shibmandir Sarbojanin Durgotsab Samiti",
-    "bengaliName": "",
+    "bengaliName": "শিবমন্দির সর্বজনীন দুর্গোৎসব সমিতি",
     "region": "South Kolkata",
     "address": "Shibmandir Sarbojanin Durgotsab Samiti, Shibmandir Durgotsab Samiti, South Kolkata, Kolkata, West Bengal, 700029, India",
     "latitude": 22.515234,
@@ -4793,7 +4793,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 142,
     "name": "Singhi Park Sarbojanin Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "সিংহী পার্ক সর্বজনীন দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Singhi Park Sarbojanin Durga Puja, Singhi Park, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.519323,
@@ -4827,7 +4827,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 143,
     "name": "Sonarpur Sarbojanin Durgotsav Puja Committee",
-    "bengaliName": "",
+    "bengaliName": "সোনারপুর সর্বজনীন দুর্গোৎসব পূজা কমিটি",
     "region": "South Kolkata",
     "address": "Sonarpur Sarbojanin Durgotsav Puja Committee, Sonarpur Puja, South Kolkata, Kolkata, West Bengal, 700084, India",
     "latitude": 22.443012,
@@ -4856,7 +4856,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 144,
     "name": "Sri Sri Sarbojanin Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "শ্রী শ্রী সর্বজনীন দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Sri Sri Sarbojanin Durga Puja, Sri Sri, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.520012,
@@ -4890,7 +4890,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 145,
     "name": "Surya Nagar Sarbojanin Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "সূর্য নগর সর্বজনীন দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Surya Nagar Sarbojanin Durga Puja, Surya Nagar, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.464012,
@@ -4924,7 +4924,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 146,
     "name": "Tridhara Sammilani Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "ত্রিধারা সম্মিলনী দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Tridhara Sammilani Durga Puja, Tridhara Sammilani, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.519745,
@@ -4958,7 +4958,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 147,
     "name": "Tulipians Durgotsav",
-    "bengaliName": "",
+    "bengaliName": "টিউলিপিয়ানস দুর্গোৎসব",
     "region": "South Kolkata",
     "address": "Tulipians Durgotsav, Tulipians, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.519012,
@@ -4992,7 +4992,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 148,
     "name": "Udayan Kidderpore Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "উদয়ন খিদিরপুর দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Udayan Kidderpore Durga Puja, Udayan Kidderpore, South Kolkata, Kolkata, West Bengal, 700027, India",
     "latitude": 22.534012,
@@ -5026,7 +5026,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 149,
     "name": "Upohar Utsav Committee",
-    "bengaliName": "",
+    "bengaliName": "উপহার উৎসব কমিটি",
     "region": "South Kolkata",
     "address": "Upohar Utsav Committee, Upohar Utsav, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.466012,
@@ -5060,7 +5060,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 150,
     "name": "VIP Nagar Sarbojanin Durga Puja Committee",
-    "bengaliName": "",
+    "bengaliName": "ভিআইপি নগর সর্বজনীন দুর্গাপূজা কমিটি",
     "region": "South Kolkata",
     "address": "VIP Nagar Sarbojanin Durga Puja Committee, VIP Nagar, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.516012,
@@ -5094,7 +5094,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 151,
     "name": "Westend Park Sarbojanin Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "ওয়েস্টএন্ড পার্ক সর্বজনীন দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Westend Park Sarbojanin Durga Puja, Westend Park, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.521012,
@@ -5128,7 +5128,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 152,
     "name": "14 Pally Udayan Sangha",
-    "bengaliName": "",
+    "bengaliName": "১৪ পল্লী উদয়ন সংঘ",
     "region": "Central Kolkata",
     "address": "14 Pally Udayan Sangha, 14 Pally Udayan Sangha, Central Kolkata, Kolkata, West Bengal, 700007, India",
     "latitude": 22.579012,
@@ -5162,7 +5162,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 153,
     "name": "37 Pally Sarbojanin Durgotsab",
-    "bengaliName": "",
+    "bengaliName": "৩৭ পল্লী সর্বজনীন দুর্গোৎসব",
     "region": "Central Kolkata",
     "address": "37 Pally Sarbojanin Durgotsab, 37 Pally Durgotsab, Central Kolkata, Kolkata, West Bengal, 700007, India",
     "latitude": 22.578334,
@@ -5196,7 +5196,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 154,
     "name": "47 Pally Jubak Brinda Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "৪৭ পল্লী যুবক বৃন্দ দুর্গাপূজা",
     "region": "Central Kolkata",
     "address": "47 Pally Jubak Brinda Durga Puja, 47 Pally Jubak Brinda, Central Kolkata, Kolkata, West Bengal, 700007, India",
     "latitude": 22.577645,
@@ -5230,7 +5230,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 155,
     "name": "Central Calcutta Youth Association",
-    "bengaliName": "",
+    "bengaliName": "সেন্ট্রাল ক্যালকাটা ইউথ অ্যাসোসিয়েশন",
     "region": "Central Kolkata",
     "address": "Central Calcutta Youth Association, Central Calcutta Youth Association, Central Kolkata, Kolkata, West Bengal, 700012, India",
     "latitude": 22.569012,
@@ -5264,7 +5264,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 156,
     "name": "College Square Sarbojanin Durgotsav",
-    "bengaliName": "",
+    "bengaliName": "কলেজ স্কয়ার সর্বজনীন দুর্গোৎসব",
     "region": "Central Kolkata",
     "address": "College Square Sarbojanin Durgotsav, College Square, Central Kolkata, Kolkata, West Bengal, 700007, India",
     "latitude": 22.573912,
@@ -5298,7 +5298,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 157,
     "name": "Entally Matribhumi Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "এন্টালী মাতৃভূমি দুর্গাপূজা",
     "region": "Central Kolkata",
     "address": "Entally Matribhumi Durga Puja, Entally Matribhumi, Central Kolkata, Kolkata, West Bengal, 700014, India",
     "latitude": 22.564012,
@@ -5332,7 +5332,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 158,
     "name": "Entally Sarbojanin Sri Sri Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "এন্টালী সর্বজনীন শ্রী শ্রী দুর্গাপূজা",
     "region": "Central Kolkata",
     "address": "Entally Sarbojanin Sri Sri Durga Puja, Entally Sri Sri, Central Kolkata, Kolkata, West Bengal, 700014, India",
     "latitude": 22.563334,
@@ -5366,7 +5366,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 159,
     "name": "Interact Club of Chowringhee High School Sarbojanin Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "ইন্টারঅ্যাক্ট ক্লাব অফ চৌরঙ্গী হাই স্কুল সর্বজনীন দুর্গাপূজা",
     "region": "Central Kolkata",
     "address": "Interact Club of Chowringhee High School Sarbojanin Durga Puja, Interact of Chowringhee High School, Central Kolkata, Kolkata, West Bengal, 700069, India",
     "latitude": 22.556012,
@@ -5400,7 +5400,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 160,
     "name": "Kanai Dhar Lane Adhibasi Brinda",
-    "bengaliName": "",
+    "bengaliName": "কানাই ধর লেন অধিবাসী বৃন্দ",
     "region": "Central Kolkata",
     "address": "Kanai Dhar Lane Adhibasi Brinda, Kanai Dhar Lane Adhibasi Brinda, Central Kolkata, Kolkata, West Bengal, 700012, India",
     "latitude": 22.568012,
@@ -5434,7 +5434,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 161,
     "name": "Machua Bazar Sarbajanik Durga Puja Samity",
-    "bengaliName": "",
+    "bengaliName": "মাছুয়া বাজার সর্বজনীন দুর্গাপূজা সমিতি",
     "region": "Central Kolkata",
     "address": "Machua Bazar Sarbajanik Durga Puja Samity, Machua Bazar Sarbajanik Samity, Central Kolkata, Kolkata, West Bengal, 700007, India",
     "latitude": 22.581012,
@@ -5468,7 +5468,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 162,
     "name": "Md. Ali Park Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "মহম্মদ আলী পার্ক দুর্গাপূজা",
     "region": "Central Kolkata",
     "address": "Md. Ali Park Durga Puja, Md. Ali Park, Central Kolkata, Kolkata, West Bengal, 700007, India",
     "latitude": 22.578623,
@@ -5502,7 +5502,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 163,
     "name": "New Market Sarbojanin Sri Sri Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "নিউ মার্কেট সর্বজনীন শ্রী শ্রী দুর্গাপূজা",
     "region": "Central Kolkata",
     "address": "New Market Sarbojanin Sri Sri Durga Puja, New Market Sri Sri, Central Kolkata, Kolkata, West Bengal, 700069, India",
     "latitude": 22.560012,
@@ -5536,7 +5536,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 164,
     "name": "Pallir Yubak Brinda Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "পল্লীর যুবক বৃন্দ দুর্গাপূজা",
     "region": "Central Kolkata",
     "address": "Pallir Yubak Brinda Durga Puja, Pallir Yubak Brinda, Central Kolkata, Kolkata, West Bengal, 700069, India",
     "latitude": 22.559334,
@@ -5570,7 +5570,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 165,
     "name": "Santosh Mitra Square Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "সন্তোষ মিত্র স্কয়ার দুর্গাপূজা",
     "region": "Central Kolkata",
     "address": "Santosh Mitra Square Durga Puja, Santosh Mitra Square, Central Kolkata, Kolkata, West Bengal, 700014, India",
     "latitude": 22.567834,
@@ -5604,7 +5604,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 166,
     "name": "Shishu Palan Foundation",
-    "bengaliName": "",
+    "bengaliName": "শিশু পালন ফাউন্ডেশন",
     "region": "Central Kolkata",
     "address": "Shishu Palan Foundation, Shishu Palan Foundation, Central Kolkata, Kolkata, West Bengal, 700007, India",
     "latitude": 22.577012,
@@ -5638,7 +5638,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 167,
     "name": "Wellington Nagarik Kalyan Samity Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "ওয়েলিংটন নাগরিক কল্যাণ সমিতি দুর্গাপূজা",
     "region": "Central Kolkata",
     "address": "Wellington Nagarik Kalyan Samity Durga Puja, Wellington Nagarik Kalyan Samity, Central Kolkata, Kolkata, West Bengal, 700069, India",
     "latitude": 22.563012,
@@ -5672,7 +5672,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 168,
     "name": "Shimla Byam Samity",
-    "bengaliName": "",
+    "bengaliName": "শিমলা ব্যায়াম সমিতি",
     "region": "Central Kolkata",
     "address": "Shimla Byam Samity, Shimla Byam Samity, Central Kolkata, Kolkata, West Bengal, 700007, India",
     "latitude": 22.585012,
@@ -5706,7 +5706,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 169,
     "name": "Singhi Bagan Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "সিংহী বাগান দুর্গাপূজা",
     "region": "Central Kolkata",
     "address": "Singhi Bagan Durga Puja, Singhi Bagan, Central Kolkata, Kolkata, West Bengal, 700007, India",
     "latitude": 22.584334,
@@ -5740,7 +5740,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 170,
     "name": "Beliaghata 33 Palli Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "বেলেঘাটা ৩৩ পল্লী দুর্গাপূজা",
     "region": "Central Kolkata",
     "address": "Beliaghata 33 Palli Durga Puja, Beliaghata 33 Palli, Central Kolkata, Kolkata, West Bengal, 700014, India",
     "latitude": 22.568012,
@@ -5774,7 +5774,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 171,
     "name": "Entally Sarbojanin",
-    "bengaliName": "",
+    "bengaliName": "এন্টালী সর্বজনীন",
     "region": "Central Kolkata",
     "address": "Entally Sarbojanin, Entally, Central Kolkata, Kolkata, West Bengal, 700014, India",
     "latitude": 22.562012,
@@ -5808,7 +5808,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 172,
     "name": "AJ Block Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "এজে ব্লক দুর্গাপূজা",
     "region": "East Kolkata & Salt Lake",
     "address": "AJ Block Durga Puja, AJ Block, East Kolkata & Salt Lake, Kolkata, West Bengal, 700064, India",
     "latitude": 22.588012,
@@ -5841,7 +5841,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 173,
     "name": "BD Block Sarbojanin Durgotsab Committee",
-    "bengaliName": "",
+    "bengaliName": "বিডি ব্লক সর্বজনীন দুর্গোৎসব কমিটি",
     "region": "East Kolkata & Salt Lake",
     "address": "BD Block Sarbojanin Durgotsab Committee, BD Block Durgotsab, East Kolkata & Salt Lake, Kolkata, West Bengal, 700064, India",
     "latitude": 22.587334,
@@ -5874,7 +5874,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 174,
     "name": "BJ Block Saradotsav Committee",
-    "bengaliName": "",
+    "bengaliName": "বিজে ব্লক শারদোৎসব কমিটি",
     "region": "East Kolkata & Salt Lake",
     "address": "BJ Block Saradotsav Committee, BJ Block Saradotsav, East Kolkata & Salt Lake, Kolkata, West Bengal, 700064, India",
     "latitude": 22.584312,
@@ -5907,7 +5907,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 175,
     "name": "BL Block Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "বিএল ব্লক দুর্গাপূজা",
     "region": "East Kolkata & Salt Lake",
     "address": "BL Block Durga Puja, BL Block, East Kolkata & Salt Lake, Kolkata, West Bengal, 700064, India",
     "latitude": 22.586645,
@@ -5940,7 +5940,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 176,
     "name": "EKTP Phase 2 Abasik Puja Samity",
-    "bengaliName": "",
+    "bengaliName": "ইকেটিপি ফেজ ২ আবাসিক পূজা সমিতি",
     "region": "East Kolkata & Salt Lake",
     "address": "EKTP Phase 2 Abasik Puja Samity, EKTP Phase 2 Abasik Puja Samity, East Kolkata & Salt Lake, Kolkata, West Bengal, 700064, India",
     "latitude": 22.548012,
@@ -5973,7 +5973,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 177,
     "name": "Jawpur Bayam Samity Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "জাওপুর ব্যায়াম সমিতি দুর্গাপূজা",
     "region": "East Kolkata & Salt Lake",
     "address": "Jawpur Bayam Samity Durga Puja, Jawpur Bayam Samity, East Kolkata & Salt Lake, Kolkata, West Bengal, 700064, India",
     "latitude": 22.618012,
@@ -6006,7 +6006,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 178,
     "name": "Judge Bagan Sarbojanin Durgotsab",
-    "bengaliName": "",
+    "bengaliName": "জাজ বাগান সর্বজনীন দুর্গোৎসব",
     "region": "East Kolkata & Salt Lake",
     "address": "Judge Bagan Sarbojanin Durgotsab, Judge Bagan Durgotsab, East Kolkata & Salt Lake, Kolkata, West Bengal, 700064, India",
     "latitude": 22.582012,
@@ -6039,7 +6039,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 179,
     "name": "Kanjial Para Puja Samity Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "কাঞ্জিয়াল পাড়া পূজা সমিতি দুর্গাপূজা",
     "region": "East Kolkata & Salt Lake",
     "address": "Kanjial Para Puja Samity Durga Puja, Kanjial Para Puja Samity, East Kolkata & Salt Lake, Kolkata, West Bengal, 700064, India",
     "latitude": 22.581334,
@@ -6072,7 +6072,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 180,
     "name": "Nabapally Adhibashi Brinda Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "নবপল্লী অধিবাসী বৃন্দ দুর্গাপূজা",
     "region": "East Kolkata & Salt Lake",
     "address": "Nabapally Adhibashi Brinda Durga Puja, Nabapally Adhibashi Brinda, East Kolkata & Salt Lake, Kolkata, West Bengal, 700064, India",
     "latitude": 22.580645,
@@ -6105,7 +6105,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 181,
     "name": "Netaji Sporting Club Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "নেতাজী স্পোর্টিং ক্লাব দুর্গাপূজা",
     "region": "East Kolkata & Salt Lake",
     "address": "Netaji Sporting Club Durga Puja, Netaji Sporting, East Kolkata & Salt Lake, Kolkata, West Bengal, 700064, India",
     "latitude": 22.579012,
@@ -6138,7 +6138,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 182,
     "name": "Prafulla Kanan Sarbojanin Durgotsab",
-    "bengaliName": "",
+    "bengaliName": "প্রফুল্ল কানন সর্বজনীন দুর্গোৎসব",
     "region": "East Kolkata & Salt Lake",
     "address": "Prafulla Kanan Sarbojanin Durgotsab, Prafulla Kanan Durgotsab, East Kolkata & Salt Lake, Kolkata, West Bengal, 700064, India",
     "latitude": 22.605012,
@@ -6171,7 +6171,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 183,
     "name": "Purba Kalikata Sarbojanin Durgotsav",
-    "bengaliName": "",
+    "bengaliName": "পূর্ব কলিকাতা সর্বজনীন দুর্গোৎসব",
     "region": "East Kolkata & Salt Lake",
     "address": "Purba Kalikata Sarbojanin Durgotsav, Purba Kalikata, East Kolkata & Salt Lake, Kolkata, West Bengal, 700064, India",
     "latitude": 22.571012,
@@ -6204,7 +6204,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 184,
     "name": "Purbanchal Prabhati Sangha Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "পূর্বাঞ্চল প্রভাতী সংঘ দুর্গাপূজা",
     "region": "East Kolkata & Salt Lake",
     "address": "Purbanchal Prabhati Sangha Durga Puja, Purbanchal Prabhati Sangha, East Kolkata & Salt Lake, Kolkata, West Bengal, 700064, India",
     "latitude": 22.570334,
@@ -6237,7 +6237,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 185,
     "name": "Sixemes Cooperative Housing Durgotsav",
-    "bengaliName": "",
+    "bengaliName": "সিমেক্স কো-অপারেটিভ হাউজিং দুর্গোৎসব",
     "region": "East Kolkata & Salt Lake",
     "address": "Sixemes Cooperative Housing Durgotsav, Sixemes Cooperative Housing, East Kolkata & Salt Lake, Kolkata, West Bengal, 700064, India",
     "latitude": 22.585012,
@@ -6270,7 +6270,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 186,
     "name": "Sree Sree Durga Puja Committee, Rabindrapally",
-    "bengaliName": "",
+    "bengaliName": "শ্রী শ্রী দুর্গাপূজা কমিটি, রবীন্দ্রপল্লী",
     "region": "East Kolkata & Salt Lake",
     "address": "Sree Sree Durga Puja Committee, Rabindrapally, Sree Sree, Rabindrapally, East Kolkata & Salt Lake, Kolkata, West Bengal, 700064, India",
     "latitude": 22.602012,
@@ -6303,7 +6303,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 187,
     "name": "New Town Sarbojanin",
-    "bengaliName": "",
+    "bengaliName": "নিউ টাউন সর্বজনীন",
     "region": "East Kolkata & Salt Lake",
     "address": "New Town Sarbojanin, New Town, East Kolkata & Salt Lake, Kolkata, West Bengal, 700091, India",
     "latitude": 22.586012,
@@ -6337,7 +6337,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 188,
     "name": "AK Block Salt Lake",
-    "bengaliName": "",
+    "bengaliName": "একে ব্লক সল্টলেক",
     "region": "East Kolkata & Salt Lake",
     "address": "AK Block Salt Lake, AK Block Salt Lake, East Kolkata & Salt Lake, Kolkata, West Bengal, 700064, India",
     "latitude": 22.589012,
@@ -6370,7 +6370,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 189,
     "name": "Mitali Sangha Kankurgachi",
-    "bengaliName": "",
+    "bengaliName": "মিতালী সংঘ কাঁকুড়গাছি",
     "region": "East Kolkata & Salt Lake",
     "address": "Mitali Sangha Kankurgachi, Mitali Sangha Kankurgachi, East Kolkata & Salt Lake, Kolkata, West Bengal, 700064, India",
     "latitude": 22.588012,
@@ -6404,7 +6404,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 190,
     "name": "2 No Basudebpur Sarbojanin Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "২ নং বাসুদেবপুর সর্বজনীন দুর্গাপূজা",
     "region": "Behala",
     "address": "2 No Basudebpur Sarbojanin Durga Puja, 2 No Basudebpur, Behala, Kolkata, West Bengal, 700034, India",
     "latitude": 22.496012,
@@ -6438,7 +6438,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 191,
     "name": "7er Pally Sarbojanin Durga Puja Committee",
-    "bengaliName": "",
+    "bengaliName": "৭ এর পল্লী সর্বজনীন দুর্গাপূজা কমিটি",
     "region": "Behala",
     "address": "7er Pally Sarbojanin Durga Puja Committee, 7er Pally, Behala, Kolkata, West Bengal, 700034, India",
     "latitude": 22.495334,
@@ -6472,7 +6472,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 192,
     "name": "Acharya Prafulla Sangha",
-    "bengaliName": "",
+    "bengaliName": "আচার্য প্রফুল্ল সংঘ",
     "region": "Behala",
     "address": "Acharya Prafulla Sangha, Acharya Prafulla Sangha, Behala, Kolkata, West Bengal, 700034, India",
     "latitude": 22.494645,
@@ -6506,7 +6506,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 193,
     "name": "Ajeya Sanghati Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "অজেয় সংহতি দুর্গাপূজা",
     "region": "Behala",
     "address": "Ajeya Sanghati Durga Puja, Ajeya Sanghati, Behala, Kolkata, West Bengal, 700034, India",
     "latitude": 22.493012,
@@ -6540,7 +6540,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 194,
     "name": "Barisha Kumarpara Youngs' Club Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "বড়িশা কুমারপাড়া ইয়ংস ক্লাব দুর্গাপূজা",
     "region": "Behala",
     "address": "Barisha Kumarpara Youngs' Club Durga Puja, Barisha Kumarpara Youngs', Behala, Kolkata, West Bengal, 700038, India",
     "latitude": 22.483012,
@@ -6574,7 +6574,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 195,
     "name": "Barisha Maitree Sangha Durgotsab",
-    "bengaliName": "",
+    "bengaliName": "বড়িশা মৈত্রী সংঘ দুর্গোৎসব",
     "region": "Behala",
     "address": "Barisha Maitree Sangha Durgotsab, Barisha Maitree Sangha Durgotsab, Behala, Kolkata, West Bengal, 700038, India",
     "latitude": 22.482334,
@@ -6608,7 +6608,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 196,
     "name": "Barisha Milani Sangha Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "বড়িশা মিলনী সংঘ দুর্গাপূজা",
     "region": "Behala",
     "address": "Barisha Milani Sangha Durga Puja, Barisha Milani Sangha, Behala, Kolkata, West Bengal, 700038, India",
     "latitude": 22.481645,
@@ -6642,7 +6642,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 197,
     "name": "Barisha Netaji Sangha Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "বড়িশা নেতাজী সংঘ দুর্গাপূজা",
     "region": "Behala",
     "address": "Barisha Netaji Sangha Durga Puja, Barisha Netaji Sangha, Behala, Kolkata, West Bengal, 700038, India",
     "latitude": 22.480012,
@@ -6676,7 +6676,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 198,
     "name": "Barisha Sarbojanin Durgotsab",
-    "bengaliName": "",
+    "bengaliName": "বড়িশা সর্বজনীন দুর্গোৎসব",
     "region": "Behala",
     "address": "Barisha Sarbojanin Durgotsab, Barisha Durgotsab, Behala, Kolkata, West Bengal, 700038, India",
     "latitude": 22.479334,
@@ -6710,7 +6710,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 199,
     "name": "Barisha Saterpalli Sammilani Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "বড়িশা সতেরপল্লী সম্মিলনী দুর্গাপূজা",
     "region": "Behala",
     "address": "Barisha Saterpalli Sammilani Durga Puja, Barisha Saterpalli Sammilani, Behala, Kolkata, West Bengal, 700038, India",
     "latitude": 22.478645,
@@ -6744,7 +6744,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 200,
     "name": "Behala 11 Pally Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "বেহালা ১১ পল্লী দুর্গাপূজা",
     "region": "Behala",
     "address": "Behala 11 Pally Durga Puja, Behala 11 Pally, Behala, Kolkata, West Bengal, 700034, India",
     "latitude": 22.492012,
@@ -6778,7 +6778,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 201,
     "name": "Haridevpur 41 Palli",
-    "bengaliName": "",
+    "bengaliName": "হরিদেবপুর ৪১ পল্লী",
     "region": "Haridevpur",
     "address": "Haridevpur 41 Palli, Haridevpur 41 Palli, Haridevpur, Kolkata, West Bengal, 700033, India",
     "latitude": 22.480534,
@@ -6812,7 +6812,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 202,
     "name": "Vivekananda Park Athletic Club Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "বিবেকানন্দ পার্ক অ্যাথলেটিক ক্লাব দুর্গাপূজা",
     "region": "Haridevpur",
     "address": "Vivekananda Park Athletic Club Durga Puja, Vivekananda Park Athletic, Haridevpur, Kolkata, West Bengal, 700033, India",
     "latitude": 22.479812,
@@ -6846,7 +6846,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 203,
     "name": "Haridevpur Nabinsathi Club",
-    "bengaliName": "",
+    "bengaliName": "হরিদেবপুর নবীনসাথী ক্লাব",
     "region": "Haridevpur",
     "address": "Haridevpur Nabinsathi Club, Haridevpur Nabinsathi, Haridevpur, Kolkata, West Bengal, 700033, India",
     "latitude": 22.479134,
@@ -6880,7 +6880,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 204,
     "name": "Sodepur Jatiya Sangha Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "সোদপুর জাতীয় সংঘ দুর্গাপূজা",
     "region": "Haridevpur",
     "address": "Sodepur Jatiya Sangha Durga Puja, Sodepur Jatiya Sangha, Haridevpur, Kolkata, West Bengal, 700033, India",
     "latitude": 22.477012,
@@ -6914,7 +6914,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 205,
     "name": "Adarsha Samiti Club Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "আদর্শ সমিতি ক্লাব দুর্গাপূজা",
     "region": "Haridevpur",
     "address": "Adarsha Samiti Club Durga Puja, Adarsha Samiti, Haridevpur, Kolkata, West Bengal, 700033, India",
     "latitude": 22.476334,
@@ -6948,7 +6948,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 206,
     "name": "Haridevpur Vivekananda Park",
-    "bengaliName": "",
+    "bengaliName": "হরিদেবপুর বিবেকানন্দ পার্ক",
     "region": "Haridevpur",
     "address": "Haridevpur Vivekananda Park, Haridevpur Vivekananda Park, Haridevpur, Kolkata, West Bengal, 700033, India",
     "latitude": 22.475645,
@@ -6982,7 +6982,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 207,
     "name": "Haridevpur Friends Club Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "হরিদেবপুর ফ্রেন্ডস ক্লাব দুর্গাপূজা",
     "region": "Haridevpur",
     "address": "Haridevpur Friends Club Durga Puja, Haridevpur Friends, Haridevpur, Kolkata, West Bengal, 700033, India",
     "latitude": 22.474012,
@@ -7016,7 +7016,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 208,
     "name": "Haridevpur Paschimpara Sarbojanin",
-    "bengaliName": "",
+    "bengaliName": "হরিদেবপুর পশ্চিমপাড়া সর্বজনীন",
     "region": "Haridevpur",
     "address": "Haridevpur Paschimpara Sarbojanin, Haridevpur Paschimpara, Haridevpur, Kolkata, West Bengal, 700033, India",
     "latitude": 22.473334,
@@ -7050,7 +7050,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 209,
     "name": "Haridevpur New Sporting Club",
-    "bengaliName": "",
+    "bengaliName": "হরিদেবপুর নিউ স্পোর্টিং ক্লাব",
     "region": "Haridevpur",
     "address": "Haridevpur New Sporting Club, Haridevpur New Sporting, Haridevpur, Kolkata, West Bengal, 700033, India",
     "latitude": 22.472645,
@@ -7084,7 +7084,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 210,
     "name": "Dum Dum Park Tarun Sangha",
-    "bengaliName": "",
+    "bengaliName": "দমদম পার্ক তরুণ সংঘ",
     "region": "Dum Dum / South Dumdum",
     "address": "Dum Dum Park Tarun Sangha, Dum Dum Park Tarun Sangha, Dum Dum / South Dumdum, Kolkata, West Bengal, 700055, India",
     "latitude": 22.611123,
@@ -7118,7 +7118,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 211,
     "name": "Dum Dum Park Bharat Chakra",
-    "bengaliName": "",
+    "bengaliName": "দমদম পার্ক ভারত চক্র",
     "region": "Dum Dum / South Dumdum",
     "address": "Dum Dum Park Bharat Chakra, Dum Dum Park Bharat Chakra, Dum Dum / South Dumdum, Kolkata, West Bengal, 700055, India",
     "latitude": 22.610512,
@@ -7152,7 +7152,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 212,
     "name": "Dum Dum Park Yubak Brinda",
-    "bengaliName": "",
+    "bengaliName": "দমদম পার্ক যুবক বৃন্দ",
     "region": "Dum Dum / South Dumdum",
     "address": "Dum Dum Park Yubak Brinda, Dum Dum Park Yubak Brinda, Dum Dum / South Dumdum, Kolkata, West Bengal, 700055, India",
     "latitude": 22.609834,
@@ -7186,7 +7186,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 213,
     "name": "Dum Dum Park Sarbojanin Durga Puja Samity",
-    "bengaliName": "",
+    "bengaliName": "দমদম পার্ক সর্বজনীন দুর্গাপূজা সমিতি",
     "region": "Dum Dum / South Dumdum",
     "address": "Dum Dum Park Sarbojanin Durga Puja Samity, Dum Dum Park Samity, Dum Dum / South Dumdum, Kolkata, West Bengal, 700055, India",
     "latitude": 22.609145,
@@ -7220,7 +7220,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 214,
     "name": "Dakshindari Youth",
-    "bengaliName": "",
+    "bengaliName": "দক্ষিণদাঁড়ি ইউথ",
     "region": "Dum Dum / South Dumdum",
     "address": "Dakshindari Youth, Dakshindari Youth, Dum Dum / South Dumdum, Kolkata, West Bengal, 700055, India",
     "latitude": 22.603012,
@@ -7253,7 +7253,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 215,
     "name": "Dum Dum Tarun Dal",
-    "bengaliName": "",
+    "bengaliName": "দমদম তরুণ দল",
     "region": "Dum Dum / South Dumdum",
     "address": "Dum Dum Tarun Dal, Dum Dum Tarun Dal, Dum Dum / South Dumdum, Kolkata, West Bengal, 700055, India",
     "latitude": 22.621012,
@@ -7286,7 +7286,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 216,
     "name": "Dum Dum Tarun Sangha",
-    "bengaliName": "",
+    "bengaliName": "দমদম তরুণ সংঘ",
     "region": "Dum Dum / South Dumdum",
     "address": "Dum Dum Tarun Sangha, Dum Dum Tarun Sangha, Dum Dum / South Dumdum, Kolkata, West Bengal, 700055, India",
     "latitude": 22.620334,
@@ -7319,7 +7319,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 217,
     "name": "Dum Dum Motijheel College Para Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "দমদম মতিঝিল কলেজ পাড়া দুর্গাপূজা",
     "region": "Dum Dum / South Dumdum",
     "address": "Dum Dum Motijheel College Para Durga Puja, Dum Dum Motijheel College Para, Dum Dum / South Dumdum, Kolkata, West Bengal, 700055, India",
     "latitude": 22.623012,
@@ -7352,7 +7352,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 218,
     "name": "Dum Dum Park Bharat Mata Puja",
-    "bengaliName": "",
+    "bengaliName": "দমদম পার্ক ভারত মাতা পূজা",
     "region": "Dum Dum / South Dumdum",
     "address": "Dum Dum Park Bharat Mata Puja, Dum Dum Park Bharat Mata Puja, Dum Dum / South Dumdum, Kolkata, West Bengal, 700055, India",
     "latitude": 22.610012,
@@ -7386,7 +7386,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 219,
     "name": "Nagerbazar Sarbojanin Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "নাগেরবাজার সর্বজনীন দুর্গাপূজা",
     "region": "Dum Dum / South Dumdum",
     "address": "Nagerbazar Sarbojanin Durga Puja, Nagerbazar, Dum Dum / South Dumdum, Kolkata, West Bengal, 700055, India",
     "latitude": 22.628012,
@@ -7420,7 +7420,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 220,
     "name": "New Town Sarbojanin Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "নিউ টাউন সর্বজনীন দুর্গাপূজা",
     "region": "New Town",
     "address": "New Town Sarbojanin Durga Puja, New Town, New Town, Kolkata, West Bengal, 700091, India",
     "latitude": 22.586012,
@@ -7454,7 +7454,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 221,
     "name": "New Town Durga Puja Committee, BG Block",
-    "bengaliName": "",
+    "bengaliName": "নিউ টাউন দুর্গাপূজা কমিটি, বিজি ব্লক",
     "region": "New Town",
     "address": "New Town Durga Puja Committee, BG Block, New Town, BG Block, New Town, Kolkata, West Bengal, 700091, India",
     "latitude": 22.585334,
@@ -7488,7 +7488,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 222,
     "name": "AA 1D Sarbojanin Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "এএ ১ডি সর্বজনীন দুর্গাপূজা",
     "region": "New Town",
     "address": "AA 1D Sarbojanin Durga Puja, AA 1D, New Town, Kolkata, West Bengal, 700091, India",
     "latitude": 22.584645,
@@ -7522,7 +7522,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 223,
     "name": "BD Block Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "বিডি ব্লক দুর্গাপূজা",
     "region": "New Town",
     "address": "BD Block Durga Puja, BD Block, New Town, Kolkata, West Bengal, 700064, India",
     "latitude": 22.587012,
@@ -7555,7 +7555,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 224,
     "name": "CD Block Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "সিডি ব্লক দুর্গাপূজা",
     "region": "New Town",
     "address": "CD Block Durga Puja, CD Block, New Town, Kolkata, West Bengal, 700091, India",
     "latitude": 22.586334,
@@ -7589,7 +7589,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 225,
     "name": "DB Block Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "ডিবি ব্লক দুর্গাপূজা",
     "region": "New Town",
     "address": "DB Block Durga Puja, DB Block, New Town, Kolkata, West Bengal, 700091, India",
     "latitude": 22.585645,
@@ -7623,7 +7623,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 226,
     "name": "BA Block Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "বিএ ব্লক দুর্গাপূজা",
     "region": "New Town",
     "address": "BA Block Durga Puja, BA Block, New Town, Kolkata, West Bengal, 700091, India",
     "latitude": 22.584012,
@@ -7657,7 +7657,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 227,
     "name": "CG Block Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "সিজি ব্লক দুর্গাপূজা",
     "region": "New Town",
     "address": "CG Block Durga Puja, CG Block, New Town, Kolkata, West Bengal, 700091, India",
     "latitude": 22.583334,
@@ -7691,7 +7691,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 228,
     "name": "B Block Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "বি ব্লক দুর্গাপূজা",
     "region": "New Town",
     "address": "B Block Durga Puja, B Block, New Town, Kolkata, West Bengal, 700091, India",
     "latitude": 22.582645,
@@ -7725,7 +7725,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 229,
     "name": "New Town Action Area 1 Puja Committee",
-    "bengaliName": "",
+    "bengaliName": "নিউ টাউন অ্যাকশন এরিয়া ১ পূজা কমিটি",
     "region": "New Town",
     "address": "New Town Action Area 1 Puja Committee, New Town Action Area 1 Puja, New Town, Kolkata, West Bengal, 700091, India",
     "latitude": 22.581012,
@@ -7759,7 +7759,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 230,
     "name": "AK Block Salt Lake Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "একে ব্লক সল্টলেক দুর্গাপূজা",
     "region": "Salt Lake",
     "address": "AK Block Salt Lake Durga Puja, AK Block Salt Lake, Salt Lake, Kolkata, West Bengal, 700064, India",
     "latitude": 22.589012,
@@ -7792,7 +7792,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 231,
     "name": "BD Block Sarbojanin Durgotsab",
-    "bengaliName": "",
+    "bengaliName": "বিডি ব্লক সল্টলেক সর্বজনীন দুর্গোৎসব",
     "region": "Salt Lake",
     "address": "BD Block Sarbojanin Durgotsab, BD Block Durgotsab, Salt Lake, Kolkata, West Bengal, 700064, India",
     "latitude": 22.587334,
@@ -7825,7 +7825,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 232,
     "name": "BJ Block Saradotsav",
-    "bengaliName": "",
+    "bengaliName": "বিজে ব্লক সল্টলেক শারদোৎসব",
     "region": "Salt Lake",
     "address": "BJ Block Saradotsav, BJ Block Saradotsav, Salt Lake, Kolkata, West Bengal, 700064, India",
     "latitude": 22.584312,
@@ -7858,7 +7858,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 233,
     "name": "FD Block Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "এফডি ব্লক সল্টলেক দুর্গাপূজা",
     "region": "Salt Lake",
     "address": "FD Block Durga Puja, FD Block, Salt Lake, Kolkata, West Bengal, 700064, India",
     "latitude": 22.576534,
@@ -7891,7 +7891,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 234,
     "name": "HB Block Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "এইচবি ব্লক সল্টলেক দুর্গাপূজা",
     "region": "Salt Lake",
     "address": "HB Block Durga Puja, HB Block, Salt Lake, Kolkata, West Bengal, 700064, India",
     "latitude": 22.582012,
@@ -7924,7 +7924,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 235,
     "name": "EC Block Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "ইসি ব্লক সল্টলেক দুর্গাপূজা",
     "region": "Salt Lake",
     "address": "EC Block Durga Puja, EC Block, Salt Lake, Kolkata, West Bengal, 700064, India",
     "latitude": 22.581334,
@@ -7957,7 +7957,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 236,
     "name": "EE Block Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "ইই ব্লক সল্টলেক দুর্গাপূজা",
     "region": "Salt Lake",
     "address": "EE Block Durga Puja, EE Block, Salt Lake, Kolkata, West Bengal, 700064, India",
     "latitude": 22.580645,
@@ -7990,7 +7990,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 237,
     "name": "Salt Lake Labony Estate Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "সল্টলেক লাবণী এস্টেট দুর্গাপূজা",
     "region": "Salt Lake",
     "address": "Salt Lake Labony Estate Durga Puja, Salt Lake Labony Estate, Salt Lake, Kolkata, West Bengal, 700064, India",
     "latitude": 22.585012,
@@ -8024,7 +8024,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 238,
     "name": "Behala Nutan Dal Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "বেহালা নতুন দল দুর্গাপূজা",
     "region": "Behala",
     "address": "Behala Nutan Dal Durga Puja, Behala Nutan Dal, Behala, Kolkata, West Bengal, 700034, India",
     "latitude": 22.489012,
@@ -8058,7 +8058,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 239,
     "name": "Behala Friends Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "বেহালা ফ্রেন্ডস দুর্গাপূজা",
     "region": "Behala",
     "address": "Behala Friends Durga Puja, Behala Friends, Behala, Kolkata, West Bengal, 700034, India",
     "latitude": 22.493012,
@@ -8092,7 +8092,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 240,
     "name": "Behala Club Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "বেহালা ক্লাব দুর্গাপূজা",
     "region": "Behala",
     "address": "Behala Club Durga Puja, Behala, Behala, Kolkata, West Bengal, 700034, India",
     "latitude": 22.492334,
@@ -8126,7 +8126,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 241,
     "name": "Behala Young Men's Association Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "বেহালা ইয়ং মেনস অ্যাসোসিয়েশন দুর্গাপূজা",
     "region": "Behala",
     "address": "Behala Young Men's Association Durga Puja, Behala Young Men's Association, Behala, Kolkata, West Bengal, 700034, India",
     "latitude": 22.491645,
@@ -8160,7 +8160,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 242,
     "name": "Barisha Club Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "বড়িশা ক্লাব দুর্গাপূজা",
     "region": "Behala",
     "address": "Barisha Club Durga Puja, Barisha, Behala, Kolkata, West Bengal, 700038, India",
     "latitude": 22.482123,
@@ -8194,7 +8194,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 243,
     "name": "Barisha Janakalyan Sangha Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "বড়িশা জনকল্যাণ সংঘ দুর্গাপূজা",
     "region": "Behala",
     "address": "Barisha Janakalyan Sangha Durga Puja, Barisha Janakalyan Sangha, Behala, Kolkata, West Bengal, 700038, India",
     "latitude": 22.480012,
@@ -8228,7 +8228,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 244,
     "name": "Mudiali Club Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "মুদিয়ালী ক্লাব দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Mudiali Club Durga Puja, Mudiali, South Kolkata, Kolkata, West Bengal, 700029, India",
     "latitude": 22.513512,
@@ -8262,7 +8262,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 245,
     "name": "Hazra Park Sarbojanin Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "হাজরা পার্ক সর্বজনীন দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Hazra Park Sarbojanin Durga Puja, Hazra Park, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.524012,
@@ -8296,7 +8296,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 246,
     "name": "Bosepukur Sitala Mandir Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "বোসপুকুর শীতলা মন্দির দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Bosepukur Sitala Mandir Durga Puja, Bosepukur Sitala Mandir, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.515512,
@@ -8330,7 +8330,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 247,
     "name": "Rajdanga Naba Udayan Sangha Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "রাজডাঙা নব উদয়ন সংঘ দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Rajdanga Naba Udayan Sangha Durga Puja, Rajdanga Naba Udayan Sangha, South Kolkata, Kolkata, West Bengal, 700026, India",
     "latitude": 22.511012,
@@ -8364,7 +8364,7 @@ export const GENERATED_PANDALS: Pandal[] = [
   {
     "id": 248,
     "name": "Shibmandir Durga Puja",
-    "bengaliName": "",
+    "bengaliName": "শিবমন্দির দুর্গাপূজা",
     "region": "South Kolkata",
     "address": "Shibmandir Durga Puja, Shibmandir, South Kolkata, Kolkata, West Bengal, 700029, India",
     "latitude": 22.515234,

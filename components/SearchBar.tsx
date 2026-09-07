@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { searchPandals } from '../lib/api';
 import { Pandal, MetroStation } from '../lib/types';
 import { IconSearch, IconMetro, IconMapPin, IconSparkles } from './Icons';
+import { useLanguage } from '../lib/language-context';
 
 interface SearchBarProps {
   placeholder?: string;
@@ -15,13 +16,17 @@ interface SearchBarProps {
 }
 
 export default function SearchBar({
-  placeholder = 'Search 248+ pandals, metro stations, areas...',
+  placeholder,
   initialValue = '',
   onSelectPandal,
   className = '',
   autoFocus = false,
 }: SearchBarProps) {
   const router = useRouter();
+  const { t, tPandalName, tMetroName, tRegion } = useLanguage();
+  const defaultPlaceholder = t('search_pandals_placeholder', 'Search 248+ pandals, metro stations, areas...');
+  const activePlaceholder = placeholder || defaultPlaceholder;
+
   const [query, setQuery] = useState(initialValue);
   const [suggestions, setSuggestions] = useState<{
     pandals: Pandal[];
@@ -86,7 +91,7 @@ export default function SearchBar({
             onFocus={() => {
               if (query.trim()) setIsOpen(true);
             }}
-            placeholder={placeholder}
+            placeholder={activePlaceholder}
             autoFocus={autoFocus}
             style={{ fontSize: '0.95rem' }}
           />
@@ -103,7 +108,7 @@ export default function SearchBar({
             </button>
           )}
           <button type="submit" className="btn btn-vermilion btn-sm" style={{ padding: '8px 14px' }}>
-            Search
+            {t('search', 'Search')}
           </button>
         </div>
       </form>
@@ -130,7 +135,7 @@ export default function SearchBar({
           {suggestions.pandals.length > 0 && (
             <div>
               <div style={{ padding: '8px 16px 4px', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#B3261E' }}>
-                Puja Pandals
+                {t('explore_pandals', 'Puja Pandals')}
               </div>
               {suggestions.pandals.slice(0, 5).map(p => (
                 <div
@@ -157,15 +162,15 @@ export default function SearchBar({
                 >
                   <div>
                     <div style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--foreground)' }}>
-                      {p.name}
+                      {tPandalName(p)}
                     </div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--taupe)' }}>
-                      {p.region} • 🚇 {p.nearestMetro}
+                      {tRegion(p.region)} • 🚇 {p.nearestMetro}
                     </div>
                   </div>
                   {p.famous && (
                     <span className="badge badge-famous" style={{ fontSize: '0.65rem' }}>
-                      <IconSparkles size={10} /> Iconic
+                      <IconSparkles size={10} /> {t('famous_badge', 'Iconic')}
                     </span>
                   )}
                 </div>
@@ -177,7 +182,7 @@ export default function SearchBar({
           {suggestions.metroStations.length > 0 && (
             <div>
               <div style={{ padding: '10px 16px 4px', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#155799' }}>
-                Metro Stations
+                {t('metro_guide', 'Metro Stations')}
               </div>
               {suggestions.metroStations.slice(0, 3).map(m => (
                 <div
@@ -199,8 +204,8 @@ export default function SearchBar({
                 >
                   <IconMetro size={18} color="#155799" />
                   <div>
-                    <div style={{ fontWeight: 600, fontSize: '0.88rem' }}>{m.name} Metro Station</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--taupe)' }}>{m.bengaliName} • {m.line}</div>
+                    <div style={{ fontWeight: 600, fontSize: '0.88rem' }}>{tMetroName(m)}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--taupe)' }}>{m.line}</div>
                   </div>
                 </div>
               ))}
@@ -211,7 +216,7 @@ export default function SearchBar({
           {suggestions.areas.length > 0 && (
             <div>
               <div style={{ padding: '10px 16px 4px', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#B08D57' }}>
-                Kolkata Regions
+                {t('filter_by_region', 'Kolkata Regions')}
               </div>
               {suggestions.areas.slice(0, 3).map(a => (
                 <div
@@ -232,7 +237,7 @@ export default function SearchBar({
                   onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                 >
                   <IconMapPin size={16} color="#B08D57" />
-                  <span>{a}</span>
+                  <span>{tRegion(a)}</span>
                 </div>
               ))}
             </div>

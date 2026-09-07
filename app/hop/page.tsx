@@ -6,11 +6,13 @@ import { useAuth } from '../../lib/auth-context';
 import { useToast } from '../../lib/toast-context';
 import { createHopRoom, getUserActiveRooms, HopRoom } from '../../lib/hop-room';
 import { getOrSetHopUserId, getHopDisplayName, setHopDisplayName } from '../../lib/guest-id';
+import { useLanguage } from '../../lib/language-context';
 
 export default function HopHubPage() {
   const router = useRouter();
   const { user } = useAuth();
   const { showToast } = useToast();
+  const { language, t } = useLanguage();
 
   // Create Room State
   const [roomName, setRoomName] = useState('');
@@ -51,11 +53,11 @@ export default function HopHubPage() {
   const handleCreateRoom = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!roomName.trim()) {
-      showToast('Please enter a room name', 'warning');
+      showToast(language === 'bn' ? 'দয়া করে একটি রুমের নাম দিন' : 'Please enter a room name', 'warning');
       return;
     }
     if (!displayName.trim()) {
-      showToast('Please enter your name', 'warning');
+      showToast(language === 'bn' ? 'দয়া করে আপনার নাম দিন' : 'Please enter your name', 'warning');
       return;
     }
 
@@ -72,9 +74,9 @@ export default function HopHubPage() {
       });
 
       if (error || !room) {
-        showToast(error || 'Failed to create room', 'error');
+        showToast(error || (language === 'bn' ? 'রুম তৈরি করা সম্ভব হয়নি' : 'Failed to create room'), 'error');
       } else {
-        showToast(`Room "${room.room_name}" created!`, 'success');
+        showToast(language === 'bn' ? `"${room.room_name}" রুম তৈরি হয়েছে!` : `Room "${room.room_name}" created!`, 'success');
         router.push(`/hop/room/${room.id}`);
       }
     } finally {
@@ -86,7 +88,7 @@ export default function HopHubPage() {
     e.preventDefault();
     const clean = joinCode.trim().toUpperCase();
     if (!clean) {
-      showToast('Please enter a 6-character room code', 'warning');
+      showToast(language === 'bn' ? 'দয়া করে ৬-সংখ্যার রুম কোড দিন' : 'Please enter a 6-character room code', 'warning');
       return;
     }
     setJoining(true);
@@ -115,24 +117,27 @@ export default function HopHubPage() {
               marginBottom: '12px',
             }}
           >
-            <span>📡</span> Live Group Location Sharing • No Login Required
+            <span>📡</span> {language === 'bn' ? 'লাইভ গ্রুপ লোকেশন শেয়ারিং • লগইন বাধ্যতামূলক নয়' : 'Live Group Location Sharing • No Login Required'}
           </div>
           <h1 style={{ fontSize: '2.2rem', fontFamily: 'var(--font-serif)', margin: '0 0 10px', color: 'var(--foreground)' }}>
-            Pandal Hop Room
+            {t('hop_room')}
           </h1>
           <p style={{ fontSize: '0.95rem', color: 'var(--taupe)', maxWidth: '620px', margin: '0 auto' }}>
-            Coordinate pandal hopping with your friends in real-time. Create a temporary room, share your live location on the map, and meet up anywhere in Kolkata.
+            {t('hop_room_tagline')}
           </p>
 
           {/* User Status / Optional Login Notice */}
           <div style={{ marginTop: '12px', fontSize: '12px', color: 'var(--taupe)' }}>
             {user ? (
               <span>
-                Logged in as <strong>{user.name || user.email}</strong> • Your rooms sync across devices
+                {language === 'bn' ? `লগইন করেছেন ${user.name || user.email} হিসেবে • সব ডিভাইসে রুম সিঙ্ক হচ্ছে` : `Logged in as ${user.name || user.email} • Your rooms sync across devices`}
               </span>
             ) : (
               <span>
-                Hopping as guest. <a href="/login" style={{ color: 'var(--vermilion)', fontWeight: 700, textDecoration: 'underline' }}>Sign in with Email OTP</a> to sync across devices (optional).
+                {language === 'bn' ? 'গেস্ট হিসেবে পরিক্রমা করছেন। ' : 'Hopping as guest. '}
+                <a href="/login" style={{ color: 'var(--vermilion)', fontWeight: 700, textDecoration: 'underline' }}>
+                  {language === 'bn' ? 'ইমেল ওটিপি দিয়ে সাইন ইন করুন' : 'Sign in with Email OTP'}
+                </a>
               </span>
             )}
           </div>
@@ -153,20 +158,20 @@ export default function HopHubPage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '18px' }}>
               <span style={{ fontSize: '24px' }}>✨</span>
               <div>
-                <h2 style={{ fontSize: '1.3rem', fontWeight: 700, margin: 0 }}>Create Hop Room</h2>
-                <p style={{ fontSize: '0.8rem', color: 'var(--taupe)', margin: 0 }}>Instant temporary room — zero login required</p>
+                <h2 style={{ fontSize: '1.3rem', fontWeight: 700, margin: 0 }}>{t('create_new_room')}</h2>
+                <p style={{ fontSize: '0.8rem', color: 'var(--taupe)', margin: 0 }}>{language === 'bn' ? 'তাৎক্ষণিক রুম তৈরি করুন' : 'Instant temporary room — zero login required'}</p>
               </div>
             </div>
 
             <form onSubmit={handleCreateRoom} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '6px' }}>
-                  Room Name
+                  {language === 'bn' ? 'রুমের নাম' : 'Room Name'}
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Baghbazar & North Puja Gang"
+                  placeholder={language === 'bn' ? 'যেমন: উত্তর কলকাতার পুজো গ্যাং' : 'e.g. Baghbazar & North Puja Gang'}
                   value={roomName}
                   onChange={e => setRoomName(e.target.value)}
                   style={{ width: '100%', padding: '11px', borderRadius: '6px', border: '1px solid var(--border)', fontSize: '13px', background: '#FFF' }}
@@ -175,7 +180,7 @@ export default function HopHubPage() {
 
               <div>
                 <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '6px' }}>
-                  Your Display Name
+                  {language === 'bn' ? 'আপনার নাম' : 'Your Display Name'}
                 </label>
                 <input
                   type="text"
@@ -189,7 +194,7 @@ export default function HopHubPage() {
 
               <div>
                 <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, marginBottom: '6px' }}>
-                  Room Expiration Duration
+                  {language === 'bn' ? 'রুমের মেয়াদ' : 'Room Expiration Duration'}
                 </label>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
                   {[4, 8, 12, 24].map(hours => (
@@ -208,13 +213,10 @@ export default function HopHubPage() {
                         cursor: 'pointer',
                       }}
                     >
-                      {hours}h
+                      {hours}{language === 'bn' ? 'ঘণ্টা' : 'h'}
                     </button>
                   ))}
                 </div>
-                <span style={{ display: 'block', fontSize: '11px', color: 'var(--taupe)', marginTop: '4px' }}>
-                  Rooms auto-expire to protect location privacy.
-                </span>
               </div>
 
               <button
@@ -233,7 +235,7 @@ export default function HopHubPage() {
                   boxShadow: 'var(--shadow-md)',
                 }}
               >
-                {creating ? 'Creating Room...' : 'Create Hop Room & Get QR'}
+                {creating ? (language === 'bn' ? 'রুম তৈরি হচ্ছে...' : 'Creating Room...') : (language === 'bn' ? 'হপ রুম তৈরি ও কিউআর পান' : 'Create Hop Room & Get QR')}
               </button>
             </form>
           </div>
@@ -250,10 +252,10 @@ export default function HopHubPage() {
               }}
             >
               <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: '0 0 6px' }}>
-                Join with Code
+                {t('join_existing_room')}
               </h3>
               <p style={{ fontSize: '0.8rem', color: 'var(--taupe)', margin: '0 0 14px' }}>
-                Have a 6-character invite code from a friend?
+                {t('enter_room_code')}
               </p>
 
               <form onSubmit={handleJoinWithCode} style={{ display: 'flex', gap: '8px' }}>
@@ -292,7 +294,7 @@ export default function HopHubPage() {
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  Join Room
+                  {language === 'bn' ? 'রুমে যোগ দিন' : 'Join Room'}
                 </button>
               </form>
             </div>
@@ -309,24 +311,24 @@ export default function HopHubPage() {
             >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
                 <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>
-                  Your Active Hop Rooms
+                  {language === 'bn' ? 'আপনার সক্রিয় হপ রুমসমূহ' : 'Your Active Hop Rooms'}
                 </h3>
                 <button
                   type="button"
                   onClick={loadRooms}
                   style={{ background: 'none', border: 'none', fontSize: '12px', color: 'var(--antique-gold)', cursor: 'pointer', fontWeight: 600 }}
                 >
-                  Refresh
+                  {language === 'bn' ? 'রিফ্রেশ' : 'Refresh'}
                 </button>
               </div>
 
               {loadingRooms ? (
                 <div style={{ padding: '20px 0', textAlign: 'center', color: 'var(--taupe)', fontSize: '13px' }}>
-                  Loading active rooms...
+                  {language === 'bn' ? 'রুমগুলো লোড হচ্ছে...' : 'Loading active rooms...'}
                 </div>
               ) : activeRooms.length === 0 ? (
                 <div style={{ padding: '20px 0', textAlign: 'center', color: 'var(--taupe)', fontSize: '13px' }}>
-                  No active rooms yet. Create a room above or enter a code to join one!
+                  {language === 'bn' ? 'কোনো সক্রিয় রুম নেই। নতুন রুম তৈরি করুন বা কোড লিখুন!' : 'No active rooms yet. Create a room above or enter a code to join one!'}
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -355,11 +357,11 @@ export default function HopHubPage() {
                             {r.room_name}
                           </div>
                           <div style={{ fontSize: '11px', color: 'var(--taupe)', marginTop: '2px' }}>
-                            Code: <strong style={{ letterSpacing: '1px' }}>{r.room_code}</strong> • Expires in ~{hoursLeft}h
+                            {language === 'bn' ? 'কোড: ' : 'Code: '}<strong style={{ letterSpacing: '1px' }}>{r.room_code}</strong> • {language === 'bn' ? `বাকি ~${hoursLeft} ঘণ্টা` : `Expires in ~${hoursLeft}h`}
                           </div>
                         </div>
                         <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--vermilion)' }}>
-                          Open Room →
+                          {language === 'bn' ? 'রুম খুলুন →' : 'Open Room →'}
                         </span>
                       </div>
                     );

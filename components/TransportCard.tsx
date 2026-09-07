@@ -1,6 +1,7 @@
 import React from 'react';
 import { formatCurrency, formatDistance, formatDuration } from '../lib/format';
 import { IconMetro, IconBus, IconCab, IconWalk } from './Icons';
+import { useLanguage } from '../lib/language-context';
 
 interface TransportCardProps {
   mode: 'metro' | 'bus' | 'cab' | 'walk' | 'auto';
@@ -25,6 +26,8 @@ export default function TransportCard({
   isRecommended = false,
   notes,
 }: TransportCardProps) {
+  const { language } = useLanguage();
+
   const getIcon = () => {
     switch (mode) {
       case 'metro':
@@ -68,7 +71,7 @@ export default function TransportCard({
             borderRadius: '2px',
           }}
         >
-          Pujo Navigation Top Choice
+          {language === 'bn' ? 'পূজো নেভিগেশন সেরা পছন্দ' : 'Pujo Navigation Top Choice'}
         </span>
       )}
 
@@ -96,10 +99,10 @@ export default function TransportCard({
 
         <div style={{ textAlign: 'right' }}>
           <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.25rem', fontWeight: 700, color: 'var(--foreground)' }}>
-            {fare === 0 ? 'Free' : formatCurrency(fare)}
+            {fare === 0 ? (language === 'bn' ? 'বিনামূল্যে' : 'Free') : formatCurrency(fare)}
           </div>
           <div style={{ fontSize: '0.72rem', color: 'var(--taupe)', textTransform: 'uppercase' }}>
-            Estimated Fare
+            {language === 'bn' ? 'আনুমানিক ভাড়া' : 'Estimated Fare'}
           </div>
         </div>
       </div>
@@ -116,11 +119,11 @@ export default function TransportCard({
         }}
       >
         <div>
-          <strong>{formatDuration(durationMinutes)}</strong> travel time
+          <strong>{formatDuration(durationMinutes)}</strong> {language === 'bn' ? 'যাত্রার সময়' : 'travel time'}
         </div>
         <div>•</div>
         <div>
-          <strong>{formatDistance(distanceMeters)}</strong> distance
+          <strong>{formatDistance(distanceMeters)}</strong> {language === 'bn' ? 'দূরত্ব' : 'distance'}
         </div>
       </div>
 

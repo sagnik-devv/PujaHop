@@ -2,13 +2,14 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { Pandal, MetroStation, FoodStall } from '../lib/types';
+import { Pandal, MetroStation } from '../lib/types';
 import { GENERATED_FOOD_STALLS } from '../lib/generated-food';
 import { GENERATED_PANDAL_EATERIES } from '../lib/generated-eateries';
 import { formatDistance } from '../lib/format';
 import { calculateDistance, estimateWalkMinutes } from '../lib/geo';
 import { detectUserLocation } from '../lib/location-service';
 import { useToast } from '../lib/toast-context';
+import { useLanguage } from '../lib/language-context';
 import {
   IconMetro,
   IconNavigation,
@@ -16,11 +17,11 @@ import {
   IconWalk,
   IconEye,
   IconRoute,
-  IconMapPin,
   IconChevronRight,
 } from './Icons';
 import CrowdBadge from './CrowdBadge';
 import LeafletMap from './LeafletMap';
+import PandalCard from './PandalCard';
 
 interface MetroPujaPlannerProps {
   metroStations: MetroStation[];
@@ -29,10 +30,10 @@ interface MetroPujaPlannerProps {
 }
 
 export default function MetroPujaPlanner({ metroStations, pandals, compact = false }: MetroPujaPlannerProps) {
+  const { language, tMetroName, tPandalName, tRegion, t } = useLanguage();
   const [selectedLine, setSelectedLine] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedStationId, setSelectedStationId] = useState<number>(() => {
-    // Default to Shyambazar (famous North Kolkata hub) or Kalighat
     const defaultStation = metroStations.find(m => m.name.toLowerCase().includes('shyambazar')) || metroStations[0];
     return defaultStation?.id || 1;
   });
@@ -45,7 +46,7 @@ export default function MetroPujaPlanner({ metroStations, pandals, compact = fal
 
   const handleDetectNearestMetro = async () => {
     setDetectingLocation(true);
-    showToast('Locating your position in Kolkata...', 'info');
+    showToast(t('locating', 'Locating your position in Kolkata...'), 'info');
     try {
       const loc = await detectUserLocation();
       setSelectedStationId(loc.nearestMetroId);
@@ -58,7 +59,6 @@ export default function MetroPujaPlanner({ metroStations, pandals, compact = fal
     }
   };
 
-  // Filter stations by selected metro line and search query
   const filteredStations = useMemo(() => {
     return metroStations.filter(m => {
       const matchesLine =
@@ -76,12 +76,10 @@ export default function MetroPujaPlanner({ metroStations, pandals, compact = fal
     });
   }, [metroStations, selectedLine, searchQuery]);
 
-  // Selected station object
   const selectedStation = useMemo(() => {
     return metroStations.find(m => m.id === selectedStationId) || metroStations[0];
   }, [metroStations, selectedStationId]);
 
-  // Pre-calculate surrounding pandals count for all stations
   const stationPandalsCountMap = useMemo(() => {
     const map = new Map<number, number>();
     for (const station of metroStations) {
@@ -94,932 +92,400 @@ export default function MetroPujaPlanner({ metroStations, pandals, compact = fal
     return map;
   }, [metroStations, pandals]);
 
-  // Calculate nearby pandals for the selected station
   const nearbyPandals = useMemo(() => {
     if (!selectedStation) return [];
 
-    const list = pandals
+    const items = pandals
       .map(p => {
-        const directDistKm = calculateDistance(
-          selectedStation.latitude,
-          selectedStation.longitude,
-          p.latitude,
-          p.longitude
-        );
-        const distanceM = Math.round(directDistKm * 1000);
-        const walkMins = estimateWalkMinutes(distanceM);
-        const isOfficiallyNearest = p.nearestMetro.toLowerCase().includes(selectedStation.name.toLowerCase());
+        const distKm = calculateDistance(selectedStation.latitude, selectedStation.longitude, p.latitude, p.longitude);
+        const distM = Math.round(distKm * 1000);
+        const walkMins = estimateWalkMinutes(distM);
+        const isExplicitStation = p.nearestMetro.toLowerCase().includes(selectedStation.name.toLowerCase());
 
         return {
           ...p,
-          directDistKm,
-          distanceM,
-          walkMins,
-          isOfficiallyNearest,
+          calculatedDistanceKm: distKm,
+          calculatedDistanceM: distM,
+          calculatedWalkMins: walkMins,
+          isExplicitStation,
         };
       })
-      .filter(p => p.directDistKm <= maxDistanceKm || p.isOfficiallyNearest);
+      .filter(item => item.calculatedDistanceKm <= maxDistanceKm || item.isExplicitStation);
 
-    if (sortBy === 'distance') {
-      list.sort((a, b) => a.distanceM - b.distanceM);
-    } else {
-      list.sort((a, b) => {
-        if (a.famous && !b.famous) return -1;
-        if (!a.famous && b.famous) return 1;
-        return a.distanceM - b.distanceM;
+    if (sortBy === 'famous') {
+      items.sort((a, b) => {
+        const aScore = (a.famous ? 100 : 0) + a.popularityScore;
+        const bScore = (b.famous ? 100 : 0) + b.popularityScore;
+        return bScore - aScore;
       });
+    } else {
+      items.sort((a, b) => a.calculatedDistanceM - b.calculatedDistanceM);
     }
 
-    return list;
+    return items;
   }, [selectedStation, pandals, maxDistanceKm, sortBy]);
 
-  // Calculate nearby famous food stalls and CSV eateries for the selected station
   const nearbyFoodStalls = useMemo(() => {
     if (!selectedStation) return [];
-
     const seenNames = new Set<string>();
-    const list: Array<{
-      id: string;
-      name: string;
-      bengaliName?: string;
-      category: string;
-      famousDish: string;
-      recommendedItems: string[];
-      description?: string;
-      priceForTwo: string;
-      latitude: number;
-      longitude: number;
-      distanceM: number;
-      walkMins: number;
-    }> = [];
 
-    // 1. Add curated food stalls & cabins
-    for (const stall of GENERATED_FOOD_STALLS) {
-      const directDistKm = calculateDistance(
-        selectedStation.latitude,
-        selectedStation.longitude,
-        stall.latitude,
-        stall.longitude
-      );
-      const distanceM = Math.round(directDistKm * 1000);
-      const walkMins = estimateWalkMinutes(distanceM);
-      const isNamedMetro = stall.nearestMetro.toLowerCase().includes(selectedStation.name.toLowerCase());
+    const mapped = GENERATED_PANDAL_EATERIES.filter(e => {
+      const dist = calculateDistance(selectedStation.latitude, selectedStation.longitude, e.latitude, e.longitude);
+      return dist <= maxDistanceKm;
+    }).map(e => ({
+      id: `eatery-${e.pandalId}-${e.cleanName}`,
+      name: e.cleanName,
+      category: e.cuisineType,
+      famousDish: e.bestRecommendedItem,
+      priceForTwo: `₹${e.budgetForTwo} for two`,
+      distanceM: Math.round(calculateDistance(selectedStation.latitude, selectedStation.longitude, e.latitude, e.longitude) * 1000),
+      latitude: e.latitude,
+      longitude: e.longitude,
+    }));
 
-      if (distanceM <= 2800 || isNamedMetro) {
-        const key = stall.name.toLowerCase().trim();
+    const curated = GENERATED_FOOD_STALLS.filter(s => {
+      const dist = calculateDistance(selectedStation.latitude, selectedStation.longitude, s.latitude, s.longitude);
+      return dist <= maxDistanceKm || (s.nearestMetro && s.nearestMetro.toLowerCase().includes(selectedStation.name.toLowerCase()));
+    }).map(s => ({
+      id: s.id,
+      name: s.name,
+      category: s.category,
+      famousDish: s.famousDish,
+      priceForTwo: s.priceForTwo,
+      distanceM: Math.round(calculateDistance(selectedStation.latitude, selectedStation.longitude, s.latitude, s.longitude) * 1000),
+      latitude: s.latitude,
+      longitude: s.longitude,
+    }));
+
+    const combined = [];
+    for (const item of [...mapped, ...curated]) {
+      const key = item.name.toLowerCase();
+      if (!seenNames.has(key)) {
         seenNames.add(key);
-        list.push({
-          id: stall.id,
-          name: stall.name,
-          bengaliName: stall.bengaliName,
-          category: stall.category,
-          famousDish: stall.famousDish,
-          recommendedItems: stall.recommendedItems,
-          description: stall.description,
-          priceForTwo: stall.priceForTwo,
-          latitude: stall.latitude,
-          longitude: stall.longitude,
-          distanceM,
-          walkMins,
-        });
+        combined.push(item);
       }
     }
 
-    // 2. Add all unique eateries from the CSV dataset within 2.5 km
-    for (const eatery of GENERATED_PANDAL_EATERIES) {
-      const key = eatery.cleanName.toLowerCase().trim();
-      if (seenNames.has(key)) continue;
+    combined.sort((a, b) => a.distanceM - b.distanceM);
+    return combined;
+  }, [selectedStation, maxDistanceKm]);
 
-      const directDistKm = calculateDistance(
-        selectedStation.latitude,
-        selectedStation.longitude,
-        eatery.latitude,
-        eatery.longitude
-      );
-      const distanceM = Math.round(directDistKm * 1000);
-      if (distanceM <= 2500) {
-        seenNames.add(key);
-        list.push({
-          id: `csv-${eatery.pandalId}-${eatery.cleanName}`,
-          name: eatery.cleanName,
-          bengaliName: '',
-          category: eatery.cuisineType,
-          famousDish: eatery.bestRecommendedItem,
-          recommendedItems: [eatery.bestRecommendedItem],
-          description: `Popular dining destination located near ${eatery.pandalName}.`,
-          priceForTwo: `₹${eatery.budgetForTwo} for two`,
-          latitude: eatery.latitude,
-          longitude: eatery.longitude,
-          distanceM,
-          walkMins: estimateWalkMinutes(distanceM),
-        });
-      }
-    }
-
-    list.sort((a, b) => a.distanceM - b.distanceM);
-    return list;
-  }, [selectedStation]);
-
-  const displayedPandals = compact ? nearbyPandals.slice(0, 4) : nearbyPandals;
-  const displayedFoodStalls = compact ? nearbyFoodStalls.slice(0, 4) : nearbyFoodStalls;
-
-  const getLineBadgeColor = (code: string) => {
-    switch (code) {
-      case 'BLUE':
-        return { bg: '#E3F2FD', text: '#155799', border: '#90CAF9' };
-      case 'GREEN':
-        return { bg: '#E8F5E9', text: '#2E7D32', border: '#A5D6A7' };
-      case 'PURPLE':
-        return { bg: '#F3E5F5', text: '#7B1FA2', border: '#CE93D8' };
-      case 'ORANGE':
-        return { bg: '#FFF3E0', text: '#E65100', border: '#FFCC80' };
-      default:
-        return { bg: '#FAF7F2', text: '#756D65', border: '#E5DED5' };
-    }
-  };
-
-  const selectedLineBadge = selectedStation ? getLineBadgeColor(selectedStation.lineCode) : null;
+  if (!selectedStation) return null;
 
   return (
-    <section
-      id="metro-planner-section"
-      style={{
-        padding: compact ? '64px 0' : '80px 0',
-        background: '#FAF7F2',
-        borderTop: '1px solid var(--border-gold)',
-        borderBottom: '1px solid var(--border-gold)',
-      }}
-    >
+    <section style={{ padding: compact ? '60px 0' : '40px 0 60px', background: compact ? '#FFFDF9' : 'transparent', borderTop: compact ? '1px solid var(--border-gold)' : 'none' }}>
       <div className="container">
         {/* Section Header */}
-        <div style={{ textAlign: 'center', maxWidth: compact ? '720px' : '840px', margin: '0 auto 28px' }}>
+        <div style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto 36px' }}>
           <div className="eyebrow" style={{ justifyContent: 'center' }}>
-            {compact ? 'Fast Festive Transit' : 'Station-by-Station Hopping Guide'}
+            <IconMetro size={15} color="#155799" />
+            <span>{t('metro_guide_title', 'Kolkata Metro Puja Network Guide')}</span>
           </div>
-          <h2 style={{ fontSize: compact ? 'clamp(1.8rem, 3.5vw, 2.4rem)' : 'clamp(2rem, 4vw, 2.8rem)', marginBottom: '8px', fontFamily: 'var(--font-serif)' }}>
-            Plan Puja with Kolkata Metro
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.8rem, 4vw, 2.8rem)' }}>
+            {language === 'bn' ? 'মেট্রো স্টেশন নির্বাচন করে নিকটবর্তী প্যান্ডেল দেখুন' : 'Explore Pandals Accessible From Any Metro Station'}
           </h2>
-          <div className="hero-accent-line" style={{ margin: '10px auto 14px' }} />
-          <p style={{ color: 'var(--taupe)', fontSize: compact ? '0.9rem' : '0.98rem', lineHeight: 1.5 }}>
-            {compact
-              ? 'Tap the Metro station you are on to discover nearest pandals and famous food stalls within walking distance with direct Google Maps navigation.'
-              : 'Select the Metro station you are currently at or arriving in. Instantly discover iconic pandals and legendary food cabins with curated "What to Have" dishes and direct Google Maps directions.'}
+          <p style={{ color: 'var(--taupe)', marginTop: '8px', fontSize: '0.95rem' }}>
+            {t('metro_guide_subtitle', 'Complete station-by-station map, operational timings, interchange connections, and nearest famous pandals.')}
           </p>
         </div>
 
-        {/* Metro Line Filter Tabs */}
+        {/* Line Filter & Auto GPS Locator Bar */}
         <div
           style={{
+            background: '#FFF',
+            border: '1px solid var(--border-gold)',
+            borderRadius: '8px',
+            padding: '16px 20px',
+            marginBottom: '28px',
+            boxShadow: '0 4px 16px rgba(23,18,15,0.04)',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
+            justifyContent: 'space-between',
             flexWrap: 'wrap',
-            marginBottom: '20px',
+            gap: '14px',
           }}
         >
-          {[
-            { id: 'ALL', label: `All Metros (${metroStations.length})` },
-            { id: 'BLUE', label: '🔵 Blue Line (North-South)' },
-            { id: 'GREEN', label: '🟢 Green Line (East-West)' },
-            { id: 'PURPLE', label: '🟣 Purple Line' },
-            { id: 'ORANGE', label: '🟠 Orange Line' },
-          ].map(line => {
-            const isActive = selectedLine === line.id;
-            return (
-              <button
-                key={line.id}
-                type="button"
-                onClick={() => setSelectedLine(line.id)}
-                style={{
-                  padding: compact ? '6px 14px' : '8px 16px',
-                  borderRadius: '20px',
-                  border: isActive ? '1.5px solid #B3261E' : '1px solid var(--border)',
-                  background: isActive ? '#B3261E' : '#FFF',
-                  color: isActive ? '#FFF' : 'var(--foreground)',
-                  fontWeight: 600,
-                  fontSize: compact ? '0.75rem' : '0.8rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  boxShadow: isActive ? '0 4px 12px rgba(179,38,30,0.25)' : 'none',
-                }}
-              >
-                {line.label}
-              </button>
-            );
-          })}
+          {/* Metro Lines Selector Chips */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--taupe)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              {language === 'bn' ? 'লাইন:' : 'Line:'}
+            </span>
+            {[
+              { id: 'ALL', label: language === 'bn' ? 'সব লাইন (৪৬ স্টেশন)' : 'All Lines (46 Stations)' },
+              { id: 'BLUE', label: language === 'bn' ? '🔵 ব্লু লাইন' : '🔵 Blue Line' },
+              { id: 'GREEN', label: language === 'bn' ? '🟢 গ্রিন লাইন' : '🟢 Green Line' },
+              { id: 'PURPLE', label: language === 'bn' ? '🟣 পার্পল লাইন' : '🟣 Purple Line' },
+              { id: 'ORANGE', label: language === 'bn' ? '🟠 অরেঞ্জ লাইন' : '🟠 Orange Line' },
+            ].map(line => {
+              const isActive = selectedLine === line.id;
+              return (
+                <button
+                  key={line.id}
+                  type="button"
+                  onClick={() => setSelectedLine(line.id)}
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: '20px',
+                    border: isActive ? '1.5px solid #155799' : '1px solid var(--border)',
+                    background: isActive ? '#155799' : '#FFF',
+                    color: isActive ? '#FFF' : 'var(--foreground)',
+                    fontWeight: isActive ? 700 : 500,
+                    fontSize: '0.78rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {line.label}
+                </button>
+              );
+            })}
+          </div>
 
-          {/* Nearest Metro to User Location Button */}
+          {/* Detect Nearest Station Button */}
           <button
             type="button"
             onClick={handleDetectNearestMetro}
             disabled={detectingLocation}
-            style={{
-              padding: compact ? '6px 14px' : '8px 16px',
-              borderRadius: '20px',
-              border: '1.5px solid #B08D57',
-              background: '#FFFDF9',
-              color: '#8D5B00',
-              fontWeight: 700,
-              fontSize: compact ? '0.75rem' : '0.8rem',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              boxShadow: '0 2px 8px rgba(176,141,87,0.15)',
-              transition: 'all 0.2s ease',
-            }}
+            className="btn btn-vermilion btn-sm"
+            style={{ fontSize: '0.78rem', padding: '7px 14px' }}
           >
-            <IconNavigation size={12} color="#B3261E" />
-            <span>{detectingLocation ? 'Locating...' : '📍 Nearest Metro to Me'}</span>
+            <IconNavigation size={13} />
+            <span>{detectingLocation ? (language === 'bn' ? 'খোঁজা হচ্ছে...' : 'Locating...') : (language === 'bn' ? '📍 নিকটতম মেট্রো খুঁজুন' : 'Find Nearest Metro to Me')}</span>
           </button>
         </div>
 
-        {/* Search Bar for Stations */}
-        {!compact && (
-          <div style={{ maxWidth: '540px', margin: '0 auto 24px' }}>
-            <div className="input-field-wrapper" style={{ background: '#FFF', padding: '10px 16px', borderRadius: '24px', boxShadow: '0 2px 10px rgba(0,0,0,0.04)' }}>
-              <IconMetro size={16} color="#155799" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Search station (e.g. Kalighat, Shyambazar, Sovabazar, Dum Dum, Sealdah)..."
-                style={{ fontSize: '0.88rem' }}
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery('')}
-                  style={{ background: 'none', border: 'none', color: '#999', cursor: 'pointer', fontSize: '0.8rem' }}
-                >
-                  ✕
-                </button>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Scrollable / Grid Metro Stations Selector */}
-        <div
-          style={{
-            display: 'flex',
-            gap: '8px',
-            overflowX: 'auto',
-            paddingBottom: '12px',
-            marginBottom: '20px',
-            scrollbarWidth: 'thin',
-          }}
-        >
-          {filteredStations.map(station => {
-            const isSelected = station.id === selectedStationId;
-            const count = stationPandalsCountMap.get(station.id) || 0;
-            const badgeStyle = getLineBadgeColor(station.lineCode);
-
-            return (
-              <button
-                key={station.id}
-                type="button"
-                onClick={() => setSelectedStationId(station.id)}
-                style={{
-                  flex: '0 0 auto',
-                  minWidth: compact ? '150px' : '170px',
-                  padding: compact ? '8px 12px' : '10px 14px',
-                  borderRadius: '6px',
-                  border: isSelected ? '2px solid #B3261E' : '1px solid var(--border)',
-                  background: isSelected ? '#FFFDF9' : '#FFF',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  boxShadow: isSelected
-                    ? '0 4px 14px rgba(179,38,30,0.15)'
-                    : '0 2px 4px rgba(0,0,0,0.02)',
-                  transition: 'all 0.2s ease',
-                  position: 'relative',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                  <span
-                    style={{
-                      display: 'inline-block',
-                      width: '7px',
-                      height: '7px',
-                      borderRadius: '50%',
-                      background: badgeStyle.text,
-                    }}
-                  />
-                  <span
-                    style={{
-                      fontSize: '0.65rem',
-                      fontWeight: 700,
-                      padding: '1px 5px',
-                      borderRadius: '3px',
-                      background: count > 0 ? 'rgba(179,38,30,0.08)' : '#F0EDE8',
-                      color: count > 0 ? '#B3261E' : 'var(--taupe)',
-                    }}
-                  >
-                    {count} {count === 1 ? 'Puja' : 'Pujas'}
-                  </span>
-                </div>
-
-                <div style={{ fontWeight: isSelected ? 700 : 600, fontSize: compact ? '0.84rem' : '0.9rem', color: isSelected ? '#7F1712' : 'var(--foreground)' }}>
-                  {station.name}
-                </div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--taupe)', marginTop: '1px' }}>
-                  {station.bengaliName}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Active Selected Station Banner */}
-        {selectedStation && (
-          <div
-            style={{
-              background: '#FFF',
-              border: '1px solid var(--border-gold)',
-              borderRadius: '8px',
-              padding: compact ? '16px 20px' : '22px 24px',
-              marginBottom: '20px',
-              boxShadow: '0 4px 16px rgba(23,18,15,0.05)',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div
-                  style={{
-                    width: compact ? '38px' : '44px',
-                    height: compact ? '38px' : '44px',
-                    borderRadius: '50%',
-                    background: selectedLineBadge?.bg || '#E3F2FD',
-                    color: selectedLineBadge?.text || '#155799',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: compact ? '1rem' : '1.2rem',
-                    fontWeight: 900,
-                    border: `1.5px solid ${selectedLineBadge?.border || '#90CAF9'}`,
-                  }}
-                >
-                  🚇
-                </div>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                    <h3 style={{ fontSize: compact ? '1.2rem' : '1.35rem', fontWeight: 700, margin: 0 }}>
-                      {selectedStation.name} Metro Station
-                    </h3>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--taupe)' }}>
-                      ({selectedStation.bengaliName})
-                    </span>
-                    <span
-                      style={{
-                        fontSize: '0.68rem',
-                        fontWeight: 600,
-                        padding: '2px 7px',
-                        borderRadius: '4px',
-                        background: selectedLineBadge?.bg,
-                        color: selectedLineBadge?.text,
-                        border: `1px solid ${selectedLineBadge?.border}`,
-                      }}
-                    >
-                      {selectedStation.line}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--taupe)', marginTop: '3px' }}>
-                    First Train: <strong>{selectedStation.opensAt}</strong> • Last Train:{' '}
-                    <strong>{selectedStation.closesAt}</strong> • Found{' '}
-                    <strong style={{ color: 'var(--vermilion)' }}>{nearbyPandals.length} pandals</strong> &amp;{' '}
-                    <strong style={{ color: '#B08D57' }}>{nearbyFoodStalls.length} famous food stalls</strong>
-                  </div>
-                </div>
-              </div>
-
-              {/* View & Filter Actions (Full mode) or Simple link (Compact mode) */}
-              {!compact ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                  {/* Distance Filter */}
-                  {categoryTab === 'pandals' && (
-                    <select
-                      value={maxDistanceKm}
-                      onChange={e => setMaxDistanceKm(parseFloat(e.target.value))}
-                      style={{
-                        padding: '7px 10px',
-                        borderRadius: '6px',
-                        border: '1px solid var(--border)',
-                        fontSize: '0.78rem',
-                        fontWeight: 600,
-                        background: '#FFF',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      <option value={1.0}>🚶 Walking Only (≤ 1.0 km)</option>
-                      <option value={2.5}>🚶 + 🛺 Walking &amp; Toto (≤ 2.5 km)</option>
-                      <option value={4.0}>🌐 Extended Radius (≤ 4.0 km)</option>
-                    </select>
-                  )}
-
-                  {/* View Mode Toggle */}
-                  {categoryTab === 'pandals' && (
-                    <div style={{ display: 'flex', background: '#F0EDE8', padding: '3px', borderRadius: '6px' }}>
-                      <button
-                        type="button"
-                        onClick={() => setViewMode('cards')}
-                        style={{
-                          padding: '5px 10px',
-                          fontSize: '0.75rem',
-                          fontWeight: 600,
-                          borderRadius: '4px',
-                          border: 'none',
-                          cursor: 'pointer',
-                          background: viewMode === 'cards' ? '#FFF' : 'transparent',
-                          color: viewMode === 'cards' ? 'var(--foreground)' : 'var(--taupe)',
-                          boxShadow: viewMode === 'cards' ? '0 2px 4px rgba(0,0,0,0.06)' : 'none',
-                        }}
-                      >
-                        📋 Cards
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setViewMode('map')}
-                        style={{
-                          padding: '5px 10px',
-                          fontSize: '0.75rem',
-                          fontWeight: 600,
-                          borderRadius: '4px',
-                          border: 'none',
-                          cursor: 'pointer',
-                          background: viewMode === 'map' ? '#FFF' : 'transparent',
-                          color: viewMode === 'map' ? 'var(--foreground)' : 'var(--taupe)',
-                          boxShadow: viewMode === 'map' ? '0 2px 4px rgba(0,0,0,0.06)' : 'none',
-                        }}
-                      >
-                        🗺️ Map
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <Link
-                  href={`/metro?station=${selectedStation.id}`}
-                  className="btn btn-secondary btn-sm"
-                  style={{ fontSize: '0.76rem', padding: '6px 12px' }}
-                >
-                  View All on Metro Guide →
-                </Link>
-              )}
-            </div>
-
-            {/* TAB SWITCHER: PANDALS VS FOOD STALLS */}
+        {/* Main Grid: Station Sidebar + Accessible Pandals Display */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '28px' }}>
+          {/* LEFT COLUMN: Station Picker Sidebar */}
+          <div>
             <div
               style={{
-                display: 'flex',
-                gap: '8px',
-                marginTop: '16px',
-                paddingTop: '14px',
-                borderTop: '1px solid var(--border-subtle)',
+                background: '#FFF',
+                border: '1px solid var(--border-gold)',
+                borderRadius: '8px',
+                padding: '16px',
+                boxShadow: '0 4px 16px rgba(23,18,15,0.04)',
+                position: 'sticky',
+                top: '90px',
               }}
             >
-              <button
-                type="button"
-                onClick={() => setCategoryTab('pandals')}
-                style={{
-                  padding: '7px 16px',
-                  borderRadius: '20px',
-                  border: categoryTab === 'pandals' ? '1.5px solid #B3261E' : '1px solid var(--border)',
-                  background: categoryTab === 'pandals' ? '#B3261E' : '#FFF',
-                  color: categoryTab === 'pandals' ? '#FFF' : 'var(--foreground)',
-                  fontSize: '0.78rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  boxShadow: categoryTab === 'pandals' ? '0 3px 8px rgba(179,38,30,0.2)' : 'none',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                <span>🪔</span>
-                <span>Nearby Pandals ({nearbyPandals.length})</span>
-              </button>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--foreground)' }}>
+                  {language === 'bn' ? 'মেট্রো স্টেশন নির্বাচন করুন' : 'Select Metro Station'} ({filteredStations.length})
+                </div>
+              </div>
 
-              <button
-                type="button"
-                onClick={() => setCategoryTab('food')}
-                style={{
-                  padding: '7px 16px',
-                  borderRadius: '20px',
-                  border: categoryTab === 'food' ? '1.5px solid #B08D57' : '1px solid var(--border)',
-                  background: categoryTab === 'food' ? '#B08D57' : '#FFF',
-                  color: categoryTab === 'food' ? '#FFF' : 'var(--foreground)',
-                  fontSize: '0.78rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  boxShadow: categoryTab === 'food' ? '0 3px 8px rgba(176,141,87,0.2)' : 'none',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                <span>🍢</span>
-                <span>Famous Food Stalls &amp; Cabins ({nearbyFoodStalls.length})</span>
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* 1. VIEW: PANDALS (CARDS OR MAP) */}
-        {categoryTab === 'pandals' && (
-          <>
-            {!compact && viewMode === 'map' && selectedStation && (
-              <div
-                style={{
-                  background: '#FFF',
-                  border: '1px solid var(--border-gold)',
-                  borderRadius: '8px',
-                  overflow: 'hidden',
-                  marginBottom: '28px',
-                  boxShadow: '0 6px 24px rgba(23,18,15,0.06)',
-                }}
-              >
-                <LeafletMap
-                  pandals={nearbyPandals}
-                  metroStations={[selectedStation]}
-                  center={[selectedStation.latitude, selectedStation.longitude]}
-                  zoom={15}
-                  height="460px"
-                  userLocation={[selectedStation.latitude, selectedStation.longitude]}
+              {/* Station Search Input */}
+              <div className="input-field-wrapper" style={{ background: 'var(--warm-cream)', padding: '6px 12px', marginBottom: '12px' }}>
+                <input
+                  type="text"
+                  placeholder={language === 'bn' ? 'স্টেশনের নাম দিয়ে খুঁজুন (যেমন শ্যামবাজার)...' : 'Search station (e.g. Shyambazar)...'}
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  style={{ fontSize: '0.8rem' }}
                 />
-                <div style={{ padding: '14px 20px', background: '#FFFDF9', borderTop: '1px solid var(--border-subtle)', fontSize: '0.8rem', color: 'var(--taupe)' }}>
-                  Blue pin indicates <strong>{selectedStation.name} Metro Station</strong>. Red and gold pins indicate surrounding pandals with clickable Google Maps directions.
-                </div>
               </div>
-            )}
 
-            {displayedPandals.length === 0 ? (
-              <div
-                style={{
-                  background: '#FFF',
-                  border: '1px dashed var(--border-gold)',
-                  borderRadius: '8px',
-                  padding: '48px 24px',
-                  textAlign: 'center',
-                  color: 'var(--taupe)',
-                }}
-              >
-                <div style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--foreground)', marginBottom: '6px' }}>
-                  No pandals found within {maxDistanceKm} km of {selectedStation?.name}
-                </div>
-                <p style={{ fontSize: '0.85rem', marginBottom: '16px' }}>
-                  Try selecting &quot;Walking &amp; Toto (≤ 2.5 km)&quot; or &quot;Extended Radius (≤ 4.0 km)&quot;.
-                </p>
-                {!compact && (
-                  <button
-                    type="button"
-                    onClick={() => setMaxDistanceKm(4.0)}
-                    className="btn btn-secondary btn-sm"
-                  >
-                    Expand Radius to 4.0 km
-                  </button>
-                )}
-              </div>
-            ) : (
-              <div className={`metro-cards-grid ${compact ? 'compact' : ''}`}>
-                {displayedPandals.map(p => {
-                  const isShortWalk = p.distanceM <= 900;
-                  const googleMapsNavUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(
-                    selectedStation.name + ' Metro Station, Kolkata'
-                  )}&destination=${p.latitude},${p.longitude}`;
+              {/* Scrollable List of Metro Stations */}
+              <div style={{ maxHeight: '420px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '4px', paddingRight: '4px' }}>
+                {filteredStations.map(st => {
+                  const isSelected = st.id === selectedStationId;
+                  const pandalsCount = stationPandalsCountMap.get(st.id) || 0;
 
                   return (
                     <div
-                      key={p.id}
+                      key={st.id}
+                      onClick={() => setSelectedStationId(st.id)}
+                      style={{
+                        padding: '10px 12px',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        background: isSelected ? 'rgba(21, 87, 153, 0.08)' : '#FFF',
+                        border: isSelected ? '1.5px solid #155799' : '1px solid var(--border-subtle)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontWeight: isSelected ? 700 : 600, fontSize: '0.86rem', color: isSelected ? '#155799' : 'var(--foreground)' }}>
+                          {tMetroName(st)}
+                        </div>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--taupe)' }}>
+                          {st.line} • {st.opensAt} - {st.closesAt}
+                        </div>
+                      </div>
+
+                      <div style={{ textAlign: 'right' }}>
+                        <span
+                          className="badge"
+                          style={{
+                            background: isSelected ? '#155799' : 'var(--warm-cream)',
+                            color: isSelected ? '#FFF' : '#333',
+                            fontSize: '0.68rem',
+                            fontWeight: 700,
+                          }}
+                        >
+                          {pandalsCount} {language === 'bn' ? 'পুজো' : 'Pujas'}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT COLUMN: Station Showcase */}
+          <div style={{ gridColumn: 'span 2' }}>
+            {/* Active Station Banner */}
+            <div
+              style={{
+                background: 'linear-gradient(135deg, #155799 0%, #0D3866 100%)',
+                color: '#FFF',
+                borderRadius: '8px',
+                padding: '24px',
+                marginBottom: '20px',
+                boxShadow: '0 8px 24px rgba(21,87,153,0.25)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                flexWrap: 'wrap',
+                gap: '16px',
+              }}
+            >
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                  <span className="badge" style={{ background: 'rgba(255,255,255,0.15)', color: '#FFF', borderColor: 'rgba(255,255,255,0.3)', fontSize: '0.7rem' }}>
+                    {selectedStation.line} Line
+                  </span>
+                  {selectedStation.isInterchange && (
+                    <span className="badge" style={{ background: '#D99A25', color: '#FFF', fontSize: '0.7rem', fontWeight: 700 }}>
+                      ⚡ {t('interchange', 'Interchange Station')}
+                    </span>
+                  )}
+                </div>
+
+                <h3 style={{ fontSize: '1.8rem', color: '#FFF', margin: '4px 0 4px', fontFamily: 'var(--font-serif)' }}>
+                  {tMetroName(selectedStation)}
+                </h3>
+
+                <div style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.85)', display: 'flex', gap: '14px', flexWrap: 'wrap', marginTop: '6px' }}>
+                  <span>🕒 {t('first_train', 'First Train')}: <strong>{selectedStation.opensAt}</strong></span>
+                  <span>🌙 {t('last_train', 'Last Train')}: <strong>{selectedStation.closesAt}</strong></span>
+                </div>
+              </div>
+
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#D4B77A' }}>
+                  {nearbyPandals.length}
+                </div>
+                <div style={{ fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.8)' }}>
+                  {language === 'bn' ? 'নিকটবর্তী বিখ্যাত প্যান্ডেল' : 'Accessible Pandals'}
+                </div>
+              </div>
+            </div>
+
+            {/* Filter Tabs (Pandals vs Food) */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', gap: '6px', background: '#EDE5DB', padding: '4px', borderRadius: '6px' }}>
+                <button
+                  type="button"
+                  onClick={() => setCategoryTab('pandals')}
+                  style={{
+                    padding: '6px 14px',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    borderRadius: '4px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    background: categoryTab === 'pandals' ? '#FFF' : 'transparent',
+                    color: categoryTab === 'pandals' ? 'var(--foreground)' : 'var(--taupe)',
+                  }}
+                >
+                  🪔 {t('explore_pandals', 'Puja Pandals')} ({nearbyPandals.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCategoryTab('food')}
+                  style={{
+                    padding: '6px 14px',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    borderRadius: '4px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    background: categoryTab === 'food' ? '#FFF' : 'transparent',
+                    color: categoryTab === 'food' ? 'var(--foreground)' : 'var(--taupe)',
+                  }}
+                >
+                  🍢 {t('heritage_food_spots', 'Food Stalls')} ({nearbyFoodStalls.length})
+                </button>
+              </div>
+            </div>
+
+            {/* Category 1: Nearby Pandals List */}
+            {categoryTab === 'pandals' && (
+              <div>
+                {nearbyPandals.length === 0 ? (
+                  <div style={{ padding: '40px 20px', textAlign: 'center', background: '#FFF', borderRadius: '6px', border: '1px dashed var(--border)' }}>
+                    <p style={{ color: 'var(--taupe)', margin: 0 }}>
+                      {language === 'bn' ? 'এই মেট্রো স্টেশনের ২.৫ কিমির মধ্যে কোনো প্যান্ডেল মিলেনি।' : 'No pandals found within 2.5km of this metro station.'}
+                    </p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '18px' }}>
+                    {nearbyPandals.map(p => (
+                      <PandalCard key={p.id} pandal={p} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Category 2: Nearby Food Stalls List */}
+            {categoryTab === 'food' && (
+              <div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '16px' }}>
+                  {nearbyFoodStalls.map(s => (
+                    <div
+                      key={s.id}
                       style={{
                         background: '#FFF',
                         border: '1px solid var(--border-gold)',
                         borderRadius: '8px',
-                        padding: compact ? '16px' : '20px',
-                        boxShadow: '0 4px 16px rgba(23,18,15,0.05)',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'space-between',
-                        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                        padding: '16px',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
                       }}
-                      className="card-luxury"
                     >
-                      <div>
-                        {/* Card Top: Region & Badges */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                          <span className="badge badge-region" style={{ fontSize: '0.65rem' }}>
-                            {p.region}
-                          </span>
-                          <div style={{ display: 'flex', gap: '4px' }}>
-                            {p.famous && (
-                              <span className="badge badge-famous" style={{ fontSize: '0.62rem', padding: '2px 5px' }}>
-                                ★ Iconic
-                              </span>
-                            )}
-                            <CrowdBadge level={p.crowdLevel} />
-                          </div>
-                        </div>
-
-                        {/* Pandal Name */}
-                        <h4 style={{ fontSize: compact ? '1.05rem' : '1.18rem', fontWeight: 700, margin: '2px 0 4px', fontFamily: 'var(--font-serif)' }}>
-                          <Link href={`/pandal/${p.id}`} style={{ color: 'var(--foreground)' }}>
-                            {p.name}
-                          </Link>
-                        </h4>
-
-                        {/* Walking Distance / Duration Highlight */}
-                        <div
-                          style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '5px',
-                            background: isShortWalk ? 'rgba(46, 125, 50, 0.08)' : 'rgba(217, 154, 37, 0.08)',
-                            color: isShortWalk ? '#1B5E20' : '#8D5B00',
-                            border: `1px solid ${isShortWalk ? 'rgba(46, 125, 50, 0.2)' : 'rgba(217, 154, 37, 0.2)'}`,
-                            padding: '3px 8px',
-                            borderRadius: '14px',
-                            fontSize: '0.74rem',
-                            fontWeight: 700,
-                            margin: '4px 0 8px',
-                          }}
-                        >
-                          {isShortWalk ? <IconWalk size={12} /> : <IconNavigation size={12} />}
-                          <span>
-                            {formatDistance(p.distanceM)} ({isShortWalk ? `~${p.walkMins}m walk` : 'Toto/Auto'})
-                          </span>
-                        </div>
-
-                        {/* Theme */}
-                        <p style={{ fontSize: '0.78rem', color: '#4A423B', margin: '4px 0 12px', lineHeight: 1.4 }}>
-                          <strong>Theme:</strong> {p.theme || 'Traditional Sabeki Pratima'}
-                        </p>
+                      <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--foreground)' }}>
+                        {s.name}
                       </div>
-
-                      {/* Card Bottom CTA Actions */}
-                      <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '10px', marginTop: '6px' }}>
-                        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: compact ? '0' : '6px' }}>
-                          <a
-                            href={googleMapsNavUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="btn btn-vermilion btn-sm"
-                            style={{ flex: '1 1 auto', justifyContent: 'center', fontSize: '0.72rem', padding: '6px 10px' }}
-                            title={`Navigate from ${selectedStation.name} Metro to ${p.name} in Google Maps`}
-                          >
-                            <IconNavigation size={12} /> Directions in Google Maps
-                          </a>
-
-                          {compact && (
-                            <Link
-                              href={`/pandal/${p.id}`}
-                              className="btn btn-secondary btn-sm"
-                              style={{ fontSize: '0.72rem', padding: '6px 8px' }}
-                              title="View Pandal"
-                            >
-                              <IconEye size={12} />
-                            </Link>
-                          )}
-                        </div>
-
-                        {!compact && (
-                          <div style={{ display: 'flex', gap: '6px', justifyContent: 'space-between' }}>
-                            <Link
-                              href={`/pandal/${p.id}`}
-                              className="btn btn-secondary btn-sm"
-                              style={{ flex: 1, justifyContent: 'center', fontSize: '0.72rem', padding: '5px 8px' }}
-                            >
-                              <IconEye size={12} /> View Details
-                            </Link>
-
-                            <Link
-                              href={`/route?to=${p.id}&fromName=${encodeURIComponent(selectedStation.name + ' Metro Station')}&lat=${selectedStation.latitude}&lon=${selectedStation.longitude}`}
-                              className="btn btn-secondary btn-sm"
-                              style={{ flex: 1, justifyContent: 'center', fontSize: '0.72rem', padding: '5px 8px' }}
-                            >
-                              <IconRoute size={12} /> Transit Route
-                            </Link>
-                          </div>
-                        )}
+                      <div style={{ fontSize: '0.76rem', color: 'var(--taupe)', marginBottom: '8px' }}>
+                        {s.category} • {formatDistance(s.distanceM)} {language === 'bn' ? 'হাঁটা' : 'walk'}
                       </div>
+                      <div style={{ background: '#FFFDF9', padding: '8px', borderRadius: '4px', border: '1px solid var(--border-subtle)', marginBottom: '10px' }}>
+                        <div style={{ fontSize: '0.74rem', fontWeight: 700, color: '#B3261E' }}>
+                          ★ Must Have: {s.famousDish}
+                        </div>
+                      </div>
+                      <a
+                        href={`https://www.google.com/maps/dir/?api=1&origin=${selectedStation.latitude},${selectedStation.longitude}&destination=${s.latitude},${s.longitude}&travelmode=walking`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-secondary btn-sm"
+                        style={{ width: '100%', justifyContent: 'center', fontSize: '0.72rem' }}
+                      >
+                        <IconNavigation size={12} /> Google Maps
+                      </a>
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </>
-        )}
-
-        {/* 2. VIEW: FAMOUS FOOD STALLS */}
-        {categoryTab === 'food' && (
-          <div>
-            {displayedFoodStalls.length === 0 ? (
-              <div
-                style={{
-                  background: '#FFF',
-                  border: '1px dashed var(--border-gold)',
-                  borderRadius: '8px',
-                  padding: '48px 24px',
-                  textAlign: 'center',
-                  color: 'var(--taupe)',
-                }}
-              >
-                <div style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--foreground)', marginBottom: '6px' }}>
-                  No famous food stalls registered within 2.5 km of {selectedStation?.name}
+                  ))}
                 </div>
-                <p style={{ fontSize: '0.85rem' }}>
-                  Try exploring heritage stations like <strong>Sovabazar, Shyambazar, College Street / MG Road, Esplanade, or Kalighat</strong> for historic food stalls.
-                </p>
-              </div>
-            ) : (
-              <div className={`metro-cards-grid ${compact ? 'compact' : ''}`}>
-                {displayedFoodStalls.map(stall => {
-                  const googleMapsFoodUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(
-                    selectedStation.name + ' Metro Station, Kolkata'
-                  )}&destination=${stall.latitude},${stall.longitude}`;
-
-                  return (
-                    <div
-                      key={stall.id}
-                      style={{
-                        background: '#FFF',
-                        border: '1px solid #B08D57',
-                        borderRadius: '8px',
-                        padding: compact ? '16px' : '20px',
-                        boxShadow: '0 4px 16px rgba(23,18,15,0.05)',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'space-between',
-                        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                      }}
-                      className="card-luxury"
-                    >
-                      <div>
-                        {/* Stall Header: Category & Price */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                          <span
-                            className="badge"
-                            style={{
-                              background: '#FFF8E1',
-                              color: '#B78103',
-                              border: '1px solid #FFE082',
-                              fontSize: '0.68rem',
-                              fontWeight: 700,
-                            }}
-                          >
-                            🍢 {stall.category}
-                          </span>
-                          <span style={{ fontSize: '0.72rem', color: 'var(--taupe)', fontWeight: 600 }}>
-                            {stall.priceForTwo}
-                          </span>
-                        </div>
-
-                        {/* Stall Name */}
-                        <h4 style={{ fontSize: compact ? '1.08rem' : '1.22rem', fontWeight: 700, margin: '2px 0', fontFamily: 'var(--font-serif)' }}>
-                          {stall.name}
-                        </h4>
-                        {stall.bengaliName && (
-                          <div style={{ fontSize: '0.74rem', color: 'var(--taupe)', marginBottom: '6px' }}>
-                            {stall.bengaliName}
-                          </div>
-                        )}
-
-                        {/* Distance from Station */}
-                        <div
-                          style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '5px',
-                            background: 'rgba(21, 87, 153, 0.08)',
-                            color: '#155799',
-                            border: '1px solid rgba(21, 87, 153, 0.2)',
-                            padding: '3px 8px',
-                            borderRadius: '14px',
-                            fontSize: '0.74rem',
-                            fontWeight: 700,
-                            margin: '4px 0 10px',
-                          }}
-                        >
-                          <IconWalk size={12} />
-                          <span>
-                            {formatDistance(stall.distanceM)} from {selectedStation.name} (~{stall.walkMins}m walk)
-                          </span>
-                        </div>
-
-                        {/* WHAT TO HAVE / RECOMMENDED ITEMS BOX */}
-                        <div
-                          style={{
-                            background: 'linear-gradient(135deg, #FFFDF9 0%, #FAF6EE 100%)',
-                            border: '1px solid #E8D9C0',
-                            borderRadius: '6px',
-                            padding: '10px 12px',
-                            margin: '6px 0 12px',
-                          }}
-                        >
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#B3261E', fontWeight: 700, fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                            <span>★</span>
-                            <span>Must Have:</span>
-                          </div>
-                          <div style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--foreground)', marginTop: '2px' }}>
-                            {stall.famousDish}
-                          </div>
-                          <div style={{ fontSize: '0.74rem', color: '#666', marginTop: '4px', lineHeight: 1.4 }}>
-                            <strong>Also try:</strong> {stall.recommendedItems.slice(0, 3).join(' • ')}
-                          </div>
-                        </div>
-
-                        {/* Description & Vibe */}
-                        <p style={{ fontSize: '0.78rem', color: '#4A423B', margin: '4px 0 12px', lineHeight: 1.4 }}>
-                          {stall.description}
-                        </p>
-                      </div>
-
-                      {/* Card Bottom CTA Actions */}
-                      <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '12px', marginTop: '6px' }}>
-                        <a
-                          href={googleMapsFoodUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn btn-vermilion btn-sm"
-                          style={{ width: '100%', justifyContent: 'center', fontSize: '0.75rem', padding: '7px 12px' }}
-                          title={`Navigate from ${selectedStation.name} Metro to ${stall.name} in Google Maps`}
-                        >
-                          <IconNavigation size={13} /> Directions to Stall in Google Maps
-                        </a>
-                      </div>
-                    </div>
-                  );
-                })}
               </div>
             )}
           </div>
-        )}
-
-        {/* Bottom Banner */}
-        {compact ? (
-          <div
-            style={{
-              marginTop: '32px',
-              background: '#FFF',
-              border: '1.5px solid var(--border-gold)',
-              borderRadius: '8px',
-              padding: '18px 24px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: '14px',
-              boxShadow: '0 4px 16px rgba(176,141,87,0.1)',
-            }}
-          >
-            <div>
-              <div style={{ fontWeight: 700, fontSize: '0.98rem', color: 'var(--foreground)' }}>
-                Showing top near {selectedStation?.name} Metro ({nearbyPandals.length} Pujas • {nearbyFoodStalls.length} Food Stalls)
-              </div>
-              <div style={{ fontSize: '0.8rem', color: 'var(--taupe)', marginTop: '2px' }}>
-                Discover all 45+ Kolkata Metro stations, famous food cabins, and all-night Puja schedules.
-              </div>
-            </div>
-
-            <Link
-              href={`/metro?station=${selectedStation?.id}`}
-              className="btn btn-gold btn-sm"
-              style={{ fontWeight: 700 }}
-            >
-              <IconMetro size={15} /> Explore Full Metro Hopping &amp; Food Guide →
-            </Link>
-          </div>
-        ) : (
-          <div
-            style={{
-              marginTop: '44px',
-              background: 'linear-gradient(135deg, rgba(179,38,30,0.06) 0%, rgba(176,141,87,0.1) 100%)',
-              border: '1px solid var(--border-gold)',
-              borderRadius: '8px',
-              padding: '24px 28px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: '16px',
-            }}
-          >
-            <div>
-              <div style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--foreground)' }}>
-                Want to combine pandal hopping with Kolkata’s famous food cabins in one night?
-              </div>
-              <div style={{ fontSize: '0.85rem', color: 'var(--taupe)', marginTop: '4px' }}>
-                Our Intelligent Hop Planner automatically includes famous food stalls and pitstops around your saved pandals.
-              </div>
-            </div>
-
-            <Link href="/planner" className="btn btn-gold btn-sm">
-              <IconSparkles size={14} /> Open Multi-Pandal &amp; Food Planner
-            </Link>
-          </div>
-        )}
+        </div>
       </div>
     </section>
   );

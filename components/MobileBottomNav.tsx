@@ -10,16 +10,18 @@ import {
   IconBus,
   IconUsers,
 } from './Icons';
+import { useLanguage } from '../lib/language-context';
 
 export default function MobileBottomNav() {
   const pathname = usePathname();
+  const { t } = useLanguage();
 
   const items = [
-    { label: 'Explore', href: '/explore', icon: <IconEye size={20} /> },
-    { label: 'Route', href: '/route', icon: <IconRoute size={20} /> },
-    { label: 'Metro', href: '/metro', icon: <IconMetro size={20} /> },
-    { label: 'Bus', href: '/bus', icon: <IconBus size={20} /> },
-    { label: 'Hop', href: '/hop', icon: <IconUsers size={20} /> },
+    { label: t('explore_now', 'Explore'), href: '/explore', icon: <IconEye size={20} /> },
+    { label: t('smart_route', 'Route'), href: '/route', icon: <IconRoute size={20} /> },
+    { label: t('metro_guide', 'Metro'), href: '/metro', icon: <IconMetro size={20} /> },
+    { label: t('bus_routes', 'Bus'), href: '/bus', icon: <IconBus size={20} /> },
+    { label: t('hop_room', 'Hop'), href: '/hop', icon: <IconUsers size={20} /> },
   ];
 
   return (

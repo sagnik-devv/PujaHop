@@ -1,10 +1,13 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   getTrendingPandals,
   getMetroStations,
   getPandals,
 } from '../lib/api';
+import { Pandal, MetroStation } from '../lib/types';
 import PandalCard from '../components/PandalCard';
 import TransportCard from '../components/TransportCard';
 import {
@@ -12,17 +15,30 @@ import {
   IconRoute,
   IconCalendar,
   IconMapPin,
-  IconMetro,
   IconSparkles,
   IconShield,
 } from '../components/Icons';
 import HeroSearchWidget from './HeroSearchWidget';
 import MetroPujaPlanner from '../components/MetroPujaPlanner';
+import { useLanguage } from '../lib/language-context';
 
-export default async function HomePage() {
-  const trendingPandals = await getTrendingPandals(6);
-  const allPandals = await getPandals();
-  const metroStations = await getMetroStations();
+export default function HomePage() {
+  const { language, t } = useLanguage();
+  const [trendingPandals, setTrendingPandals] = useState<Pandal[]>([]);
+  const [allPandals, setAllPandals] = useState<Pandal[]>([]);
+  const [metroStations, setMetroStations] = useState<MetroStation[]>([]);
+
+  useEffect(() => {
+    async function loadData() {
+      const tp = await getTrendingPandals(6);
+      const ap = await getPandals();
+      const ms = await getMetroStations();
+      setTrendingPandals(tp);
+      setAllPandals(ap);
+      setMetroStations(ms);
+    }
+    loadData();
+  }, []);
 
   return (
     <>
@@ -46,18 +62,18 @@ export default async function HomePage() {
 
         <div className="container hero-content">
           <div className="eyebrow hero-eyebrow">
-            Kolkata’s Premier Festival Transit & Discovery
+            {t('hero_subtitle', 'Kolkata’s Premier Festival Transit & Discovery')}
           </div>
 
           <h1 className="hero-title">
-            Your Puja. Your Route.{' '}
-            <span className="vermilion-text">Your Hop.</span>
+            {language === 'bn' ? 'আপনার পুজো। আপনার রুট। ' : 'Your Puja. Your Route. '}
+            <span className="vermilion-text">{language === 'bn' ? 'আপনার পরিক্রমা।' : 'Your Hop.'}</span>
           </h1>
 
           <div className="hero-accent-line" />
 
           <p className="hero-subtitle">
-            Discover Kolkata’s 248+ verified pandals, calculate the smartest Metro and walking routes, beat the festive rush, and curate your dream Puja night.
+            {t('hero_title', 'Discover Kolkata’s 248+ verified pandals, calculate the smartest Metro and walking routes, beat the festive rush, and curate your dream Puja night.')}
           </p>
 
           {/* Interactive Route Search Widget */}
@@ -75,13 +91,13 @@ export default async function HomePage() {
             }}
           >
             <Link href="/explore" className="btn btn-secondary btn-sm" style={{ borderColor: 'rgba(255,255,255,0.3)', color: '#FFF' }}>
-              <IconEye size={15} color="#D4B77A" /> Explore 248 Pandals
+              <IconEye size={15} color="#D4B77A" /> {t('explore_now', 'Explore 248 Pandals')}
             </Link>
             <Link href="/planner" className="btn btn-gold btn-sm">
-              <IconCalendar size={15} /> Plan Puja Itinerary
+              <IconCalendar size={15} /> {t('plan_my_night', 'Plan Puja Itinerary')}
             </Link>
             <Link href="/nearby" className="btn btn-secondary btn-sm" style={{ borderColor: 'rgba(255,255,255,0.3)', color: '#FFF' }}>
-              <IconMapPin size={15} color="#D4B77A" /> Pandals Near Me
+              <IconMapPin size={15} color="#D4B77A" /> {t('near_me', 'Pandals Near Me')}
             </Link>
           </div>
         </div>
@@ -92,37 +108,37 @@ export default async function HomePage() {
         <div className="container home-stats-grid">
           <div>
             <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2.2rem', fontWeight: 700, color: 'var(--foreground)' }}>
-              248+
+              ২৪৮+
             </div>
             <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--taupe)', fontWeight: 600 }}>
-              Geo-Tagged Pandals
+              {t('quick_stats_pandals', 'Geo-Tagged Pandals')}
             </div>
           </div>
 
           <div>
             <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2.2rem', fontWeight: 700, color: '#155799' }}>
-              {metroStations.length}
+              {metroStations.length || 46}
             </div>
             <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--taupe)', fontWeight: 600 }}>
-              Kolkata Metro Stations
+              {t('quick_stats_metros', 'Kolkata Metro Stations')}
             </div>
           </div>
 
           <div>
             <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2.2rem', fontWeight: 700, color: 'var(--vermilion)' }}>
-              0%
+              ০%
             </div>
             <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--taupe)', fontWeight: 600 }}>
-              Traffic Delay with Metro Express
+              {language === 'bn' ? 'মেট্রো এক্সপ্রেসের সাথে যানজট মুক্ত' : 'Traffic Delay with Metro Express'}
             </div>
           </div>
 
           <div>
             <div style={{ fontFamily: 'var(--font-serif)', fontSize: '2.2rem', fontWeight: 700, color: 'var(--antique-gold)' }}>
-              100%
+              ১০০%
             </div>
             <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--taupe)', fontWeight: 600 }}>
-              Verified Geographic Data
+              {language === 'bn' ? 'যাচাইকৃত ভৌগোলিক উপাত্ত' : 'Verified Geographic Data'}
             </div>
           </div>
         </div>
@@ -133,17 +149,17 @@ export default async function HomePage() {
         <div className="container">
           <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginBottom: '40px' }}>
             <div>
-              <div className="eyebrow">Iconic Selections</div>
+              <div className="eyebrow">{language === 'bn' ? 'সেরা নির্বাচন' : 'Iconic Selections'}</div>
               <h2 style={{ fontFamily: 'var(--font-serif)' }}>
-                Trending & Famous Pandals
+                {t('trending_pandals', 'Trending & Famous Pandals')}
               </h2>
               <p style={{ color: 'var(--taupe)', fontSize: '0.92rem', marginTop: '6px' }}>
-                Kolkata’s legendary club pujas with artisanal clay craft, heritage architecture and grand illumination.
+                {language === 'bn' ? 'ঐতিহ্যবাহী মৃৎশিল্প, ঐতিহ্য স্থাপত্য এবং জাঁকজমক আলোকসজ্জা সমৃদ্ধ ঐতিহ্যবাহী ক্লাব পূজো।' : 'Kolkata’s legendary club pujas with artisanal clay craft, heritage architecture and grand illumination.'}
               </p>
             </div>
 
             <Link href="/explore?filter=famous" className="btn btn-secondary btn-sm">
-              View All Iconic Pandals →
+              {t('view_all', 'View All Iconic Pandals')} →
             </Link>
           </div>
 
@@ -162,14 +178,14 @@ export default async function HomePage() {
         <div className="container" style={{ position: 'relative', zIndex: 10 }}>
           <div style={{ textAlign: 'center', maxWidth: '780px', margin: '0 auto 48px' }}>
             <div className="eyebrow hero-eyebrow" style={{ justifyContent: 'center' }}>
-              The Sacred Visual Heritage
+              {language === 'bn' ? 'পবিত্র দৃশ্যমান ঐতিহ্য' : 'The Sacred Visual Heritage'}
             </div>
             <h2 style={{ color: '#FFF', fontSize: 'clamp(2rem, 4.5vw, 3.2rem)' }}>
-              The Artistry, Clay & Sindoor of Kolkata
+              {language === 'bn' ? 'কলকাতার শিল্পকলা, মাটি ও সিঁদুর' : 'The Artistry, Clay & Sindoor of Kolkata'}
             </h2>
             <div className="hero-accent-line" style={{ margin: '16px auto 20px' }} />
             <p style={{ color: 'var(--stone)', fontSize: '1rem', lineHeight: 1.6 }}>
-              From the sacred clay shaping along the riverbanks of Kumartuli to the radiant vermilion sindoor and all-night dhaak rhythms, experience the divine cultural soul of Bengal.
+              {language === 'bn' ? 'কুমারটুলির গঙ্গার পলিমাটি দিয়ে প্রতিমা গড়া থেকে শুরু করে রাতের ঢাকের তাল ও সিঁদুর খেলা—বাংলার সাংস্কৃতিক রূপ দেখুন।' : 'From the sacred clay shaping along the riverbanks of Kumartuli to the radiant vermilion sindoor and all-night dhaak rhythms, experience the divine cultural soul of Bengal.'}
             </p>
           </div>
 
@@ -204,13 +220,13 @@ export default async function HomePage() {
               
               <div style={{ position: 'relative', zIndex: 2 }}>
                 <span className="badge badge-famous" style={{ marginBottom: '8px' }}>
-                  <IconSparkles size={11} /> Divine Expression
+                  <IconSparkles size={11} /> {language === 'bn' ? 'দেবী রূপ' : 'Divine Expression'}
                 </span>
                 <h3 style={{ color: '#FFF', fontSize: '1.4rem', fontFamily: 'var(--font-serif)', marginBottom: '4px' }}>
-                  Chokkhu Daan & Divine Eyes
+                  {language === 'bn' ? 'চক্ষুদান ও দেবী নয়ন' : 'Chokkhu Daan & Divine Eyes'}
                 </h3>
                 <p style={{ color: 'var(--stone)', fontSize: '0.82rem', lineHeight: 1.4 }}>
-                  The sacred ritual where master artisans paint the expressive, all-seeing eyes on Mahalaya morning.
+                  {language === 'bn' ? 'মহালয়ার প্রভাতে শিল্পীদের তুলিতে প্রতিমার চোখ আঁকার মহিমান্বিত মুহূর্ত।' : 'The sacred ritual where master artisans paint the expressive, all-seeing eyes on Mahalaya morning.'}
                 </p>
               </div>
             </div>
@@ -245,13 +261,13 @@ export default async function HomePage() {
               
               <div style={{ position: 'relative', zIndex: 2 }}>
                 <span className="badge badge-famous" style={{ marginBottom: '8px' }}>
-                  <IconSparkles size={11} /> Sabeki Heritage
+                  <IconSparkles size={11} /> {language === 'bn' ? 'সাবেকি ঐতিহ্য' : 'Sabeki Heritage'}
                 </span>
                 <h3 style={{ color: '#FFF', fontSize: '1.4rem', fontFamily: 'var(--font-serif)', marginBottom: '4px' }}>
-                  Shobhabazar & Rajbari Glory
+                  {language === 'bn' ? 'শোভাবাজার রাজবাড়ীর ঐতিহ্য' : 'Shobhabazar & Rajbari Glory'}
                 </h3>
                 <p style={{ color: 'var(--stone)', fontSize: '0.82rem', lineHeight: 1.4 }}>
-                  Antique daker saaj gold ornamentation, traditional chalchitra backdrops, and centuries of aristocratic warmth.
+                  {language === 'bn' ? 'ডাকের সাজে সজ্জিত সাবেকি একচালা প্রতিমা এবং রাজবাড়ির ঐতিহ্যবাহী পুজো।' : 'Antique daker saaj gold ornamentation, traditional chalchitra backdrops, and centuries of aristocratic warmth.'}
                 </p>
               </div>
             </div>
@@ -286,13 +302,13 @@ export default async function HomePage() {
               
               <div style={{ position: 'relative', zIndex: 2 }}>
                 <span className="badge badge-famous" style={{ marginBottom: '8px' }}>
-                  <IconSparkles size={11} /> Kumartuli Potters
+                  <IconSparkles size={11} /> {language === 'bn' ? 'কুমারটুলির মৃৎশিল্পী' : 'Kumartuli Potters'}
                 </span>
                 <h3 style={{ color: '#FFF', fontSize: '1.4rem', fontFamily: 'var(--font-serif)', marginBottom: '4px' }}>
-                  Ganga Clay & Straw Sculpting
+                  {language === 'bn' ? 'গঙ্গার মাটি ও খড়ের ভাস্কর্য' : 'Ganga Clay & Straw Sculpting'}
                 </h3>
                 <p style={{ color: 'var(--stone)', fontSize: '0.82rem', lineHeight: 1.4 }}>
-                  Meticulously hand-sculpted using holy Ganga alluvial clay, bamboo framing, and organic natural pigments.
+                  {language === 'bn' ? 'গঙ্গার পবিত্র পলিমাটি ও বাঁশের কাঠামো দিয়ে মৃৎশিল্পীদের হাতে গড়া মা দুর্গার রূপ।' : 'Meticulously hand-sculpted using holy Ganga alluvial clay, bamboo framing, and organic natural pigments.'}
                 </p>
               </div>
             </div>
@@ -327,13 +343,13 @@ export default async function HomePage() {
               
               <div style={{ position: 'relative', zIndex: 2 }}>
                 <span className="badge badge-famous" style={{ marginBottom: '8px' }}>
-                  <IconSparkles size={11} /> All-Night Hopping
+                  <IconSparkles size={11} /> {language === 'bn' ? 'সারারাত প্যান্ডেল হপিং' : 'All-Night Hopping'}
                 </span>
                 <h3 style={{ color: '#FFF', fontSize: '1.4rem', fontFamily: 'var(--font-serif)', marginBottom: '4px' }}>
-                  Dhunuchi Dance & Chandernagore Lights
+                  {language === 'bn' ? 'ধুনুচি নাচ ও আলোকসজ্জা' : 'Dhunuchi Dance & Chandernagore Lights'}
                 </h3>
                 <p style={{ color: 'var(--stone)', fontSize: '0.82rem', lineHeight: 1.4 }}>
-                  Rhythmic dhaak pulses, aromatic dhuno smoke, and dazzling light gates guiding nocturnal hoppers.
+                  {language === 'bn' ? 'ঢাকের আওয়াজ, ধুনোর সুবাস এবং চন্দননগরের আলোয় রঙিন পূজোর রাত।' : 'Rhythmic dhaak pulses, aromatic dhuno smoke, and dazzling light gates guiding nocturnal hoppers.'}
                 </p>
               </div>
             </div>
@@ -345,50 +361,49 @@ export default async function HomePage() {
       <section style={{ padding: '80px 0', background: 'var(--warm-white)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
         <div className="container">
           <div style={{ textAlign: 'center', maxWidth: '720px', margin: '0 auto 48px' }}>
-            <div className="eyebrow" style={{ justifyContent: 'center' }}>Festive Mobility Breakdown</div>
-            <h2>Why Metro + Walk Beats Road Cabs</h2>
+            <div className="eyebrow" style={{ justifyContent: 'center' }}>{language === 'bn' ? 'পরিবহন তুলনা' : 'Festive Mobility Breakdown'}</div>
+            <h2>{language === 'bn' ? 'ক্যাব বা গাড়ির চেয়ে মেট্রো + হাঁটা কেন সেরা?' : 'Why Metro + Walk Beats Road Cabs'}</h2>
             <p style={{ color: 'var(--taupe)', marginTop: '8px' }}>
-              During Durga Puja peak evenings (6 PM – 3 AM), Kolkata Police closes major arteries to vehicles.
-              Here is how transit modes compare in real festive conditions.
+              {language === 'bn' ? 'পূজোর ব্যস্ত দিনগুলোতে (সন্ধ্যা ৬টা – রাত ৩টে) যানজট এড়িয়ে কীভাবে সহজেই প্যান্ডেলে পৌঁছাবেন।' : 'During Durga Puja peak evenings (6 PM – 3 AM), Kolkata Police closes major arteries to vehicles. Here is how transit modes compare in real festive conditions.'}
             </p>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))', gap: '24px' }}>
             <TransportCard
               mode="metro"
-              title="Kolkata Metro Express"
-              subtitle="North-South Blue & East-West Green Lines"
+              title={language === 'bn' ? 'কলকাতা মেট্রো এক্সপ্রেস' : 'Kolkata Metro Express'}
+              subtitle={language === 'bn' ? 'উত্তর-দক্ষিণ ব্লু ও পূর্ব-পশ্চিম গ্রিন লাইন' : 'North-South Blue & East-West Green Lines'}
               durationMinutes={18}
               distanceMeters={6500}
               fare={10}
               isRecommended={true}
-              notes="Bypasses all surface road blocks. Trains run every 6-8 mins till late night during Puja."
+              notes={language === 'bn' ? 'রাস্তার তীব্র যানজট এড়ায়। পূজোর রাতে ট্রেন চলে নির্দিষ্ট সময় পর্যন্ত।' : 'Bypasses all surface road blocks. Trains run every 6-8 mins till late night during Puja.'}
             />
 
             <TransportCard
               mode="walk"
-              title="Designated Pedestrian Hop"
-              subtitle="Between adjacent neighborhood pandals"
+              title={language === 'bn' ? 'পদব্রজে প্যান্ডেল হপ' : 'Designated Pedestrian Hop'}
+              subtitle={language === 'bn' ? 'আশেপাশের প্রতিবেশী প্যান্ডেলের মধ্যে' : 'Between adjacent neighborhood pandals'}
               durationMinutes={12}
               distanceMeters={900}
               fare={0}
-              notes="Best suited inside heritage clusters like Shyambazar, Baghbazar, and Hatibagan."
+              notes={language === 'bn' ? 'শ্যামবাজার, বাগবাজার এবং হাতিবাগানের ঐতিহ্যবাহী পুজোর জন্য সবচেয়ে সুবিধাজনক।' : 'Best suited inside heritage clusters like Shyambazar, Baghbazar, and Hatibagan.'}
             />
 
             <TransportCard
               mode="cab"
-              title="Yellow Taxi / App Cab"
-              subtitle="Subject to heavy Puja police diversions"
+              title={language === 'bn' ? 'হলুদ ট্যাক্সি / অ্যাপ ক্যাব' : 'Yellow Taxi / App Cab'}
+              subtitle={language === 'bn' ? 'পূজোর ট্রাফিক ডাইভারশন সাপেক্ষ' : 'Subject to heavy Puja police diversions'}
               durationMinutes={58}
               distanceMeters={7200}
               fare={240}
-              notes="Vehicles blocked 300-800m away from famous pandals. Expect 3x festive congestion."
+              notes={language === 'bn' ? 'বিখ্যাত প্যান্ডেল থেকে ৩০০-৮০০ মিটার দূরে গাড়ি আটকানো হয়।' : 'Vehicles blocked 300-800m away from famous pandals. Expect 3x festive congestion.'}
             />
           </div>
 
           <div style={{ textAlign: 'center', marginTop: '36px' }}>
             <Link href="/route" className="btn btn-primary">
-              <IconRoute size={16} /> Open Smart Route Finder
+              <IconRoute size={16} /> {t('smart_route_calc', 'Open Smart Route Finder')}
             </Link>
           </div>
         </div>
@@ -415,21 +430,21 @@ export default async function HomePage() {
         <div className="container responsive-split-grid" style={{ position: 'relative', zIndex: 10, alignItems: 'center' }}>
           <div>
             <div className="eyebrow" style={{ color: 'var(--soft-gold)' }}>
-              Intelligent Itinerary Generator
+              {language === 'bn' ? 'স্মার্ট রুট জেনারেটর' : 'Intelligent Itinerary Generator'}
             </div>
             <h2 style={{ color: '#FFF', fontSize: 'clamp(2rem, 4vw, 3rem)', marginBottom: '18px' }}>
-              Plan Your Ultimate Puja Night in 60 Seconds
+              {language === 'bn' ? '৬০ সেকেন্ডে তৈরি করুন সেরা পূজা প্ল্যান' : 'Plan Your Ultimate Puja Night in 60 Seconds'}
             </h2>
             <p style={{ color: 'var(--stone)', fontSize: '1rem', lineHeight: 1.6, marginBottom: '28px' }}>
-              Select your favourite pandals, starting station, and budget. Pujo Navigation calculates the best estimated visiting sequence, timing milestones, and transit transfers so you spend less walking and more time celebrating.
+              {language === 'bn' ? 'পছন্দের প্যান্ডেল, শুরুর স্টেশন ও সময় নির্বাচন করুন। পূজো নেভিগেশন আপনার জন্য সেরা ভ্রমণক্রম তৈরি করবে।' : 'Select your favourite pandals, starting station, and budget. Pujo Navigation calculates the best estimated visiting sequence, timing milestones, and transit transfers so you spend less walking and more time celebrating.'}
             </p>
 
             <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
               <Link href="/planner" className="btn btn-gold btn-lg">
-                <IconSparkles size={18} /> Generate My Puja Plan
+                <IconSparkles size={18} /> {t('plan_my_night', 'Generate My Puja Plan')}
               </Link>
               <Link href="/explore" className="btn btn-secondary btn-lg" style={{ color: '#FFF', borderColor: 'rgba(255,255,255,0.4)' }}>
-                Browse All Pandals
+                {t('explore_pandals', 'Browse All Pandals')}
               </Link>
             </div>
           </div>
@@ -438,41 +453,41 @@ export default async function HomePage() {
           <div style={{ background: '#FFFDF9', color: 'var(--foreground)', padding: '24px', borderRadius: '8px', border: '1px solid var(--border-gold)', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '12px' }}>
               <div>
-                <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>Sample 4-Pandal Evening Plan</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--taupe)' }}>North Kolkata Heritage Trail • 4.2 km</div>
+                <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>{language === 'bn' ? 'নমুনা ৪-প্যান্ডেল ভ্রমণ রুট' : 'Sample 4-Pandal Evening Plan'}</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--taupe)' }}>{language === 'bn' ? 'উত্তর কলকাতা ঐতিহ্যবাহী রুট • ৪.২ কিমি' : 'North Kolkata Heritage Trail • 4.2 km'}</div>
               </div>
-              <span className="badge badge-famous">Best Route</span>
+              <span className="badge badge-famous">{language === 'bn' ? 'সেরা রুট' : 'Best Route'}</span>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '0.82rem' }}>
               <div style={{ display: 'flex', gap: '10px' }}>
                 <span style={{ fontWeight: 700, color: 'var(--vermilion)', minWidth: '46px' }}>17:30</span>
                 <div>
-                  <strong>Baghbazar Sarbojanin</strong>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--taupe)' }}>Shyambazar Metro (400m walk)</div>
+                  <strong>{language === 'bn' ? 'বাগবাজার সর্বজনীন' : 'Baghbazar Sarbojanin'}</strong>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--taupe)' }}>{language === 'bn' ? 'শ্যামবাজার মেট্রো (৪০০ মি হাঁটা)' : 'Shyambazar Metro (400m walk)'}</div>
                 </div>
               </div>
 
               <div style={{ display: 'flex', gap: '10px' }}>
                 <span style={{ fontWeight: 700, color: 'var(--vermilion)', minWidth: '46px' }}>18:45</span>
                 <div>
-                  <strong>Kumartuli Park Sarbojanin</strong>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--taupe)' }}>700m Walk via Kumartuli Ghat lane</div>
+                  <strong>{language === 'bn' ? 'কুমারটুলী পার্ক সর্বজনীন' : 'Kumartuli Park Sarbojanin'}</strong>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--taupe)' }}>{language === 'bn' ? '৭০০ মি হাঁটা কুমারটুলী গলি দিয়ে' : '700m Walk via Kumartuli Ghat lane'}</div>
                 </div>
               </div>
 
               <div style={{ display: 'flex', gap: '10px' }}>
                 <span style={{ fontWeight: 700, color: 'var(--vermilion)', minWidth: '46px' }}>20:00</span>
                 <div>
-                  <strong>Ahiritola Jubak Brinda</strong>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--taupe)' }}>Shobhabazar Metro exit</div>
+                  <strong>{language === 'bn' ? 'আহিরীটোলা যুবক বৃন্দ' : 'Ahiritola Jubak Brinda'}</strong>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--taupe)' }}>{language === 'bn' ? 'শোভাবাজার মেট্রো নিকটবর্তী' : 'Shobhabazar Metro exit'}</div>
                 </div>
               </div>
             </div>
 
             <div style={{ marginTop: '18px', paddingTop: '12px', borderTop: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: 'var(--taupe)' }}>
-              <span>Total Est. Fare: ₹30</span>
-              <span style={{ color: 'var(--success)', fontWeight: 600 }}>✓ Low Traffic Delay</span>
+              <span>{language === 'bn' ? 'মোট আনুমানিক খরচ: ₹৩০' : 'Total Est. Fare: ₹30'}</span>
+              <span style={{ color: 'var(--success)', fontWeight: 600 }}>✓ {language === 'bn' ? 'কম যানজট বিলম্ব' : 'Low Traffic Delay'}</span>
             </div>
           </div>
         </div>
@@ -486,13 +501,13 @@ export default async function HomePage() {
               <IconShield size={18} />
             </div>
             <div>
-              <div style={{ fontWeight: 700, fontSize: '0.92rem' }}>Kolkata Police & Puja Safety Helpline: 1090 / 112</div>
-              <div style={{ fontSize: '0.78rem', color: 'var(--taupe)' }}>24x7 Active Control Rooms, Medical Response & Lost and Found Desks.</div>
+              <div style={{ fontWeight: 700, fontSize: '0.92rem' }}>{t('police_helpline', 'Kolkata Police & Puja Safety Helpline')}: 1090 / 112</div>
+              <div style={{ fontSize: '0.78rem', color: 'var(--taupe)' }}>{language === 'bn' ? '২৪x৭ সক্রিয় কন্ট্রোল রুম, মেডিকেল রেসপন্স ও সহায়তা ডেক্স' : '24x7 Active Control Rooms, Medical Response & Lost and Found Desks.'}</div>
             </div>
           </div>
 
           <Link href="/emergency" className="btn btn-vermilion btn-sm">
-            View All Helplines & Safety Contacts →
+            {t('emergency_title', 'View All Helplines & Safety Contacts')} →
           </Link>
         </div>
       </section>

@@ -455,6 +455,44 @@ button {
   background: #FFF;
 }
 
+.lang-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 38px;
+  padding: 0 11px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--antique-gold);
+  background: var(--warm-white);
+  color: var(--foreground);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: inherit;
+  user-select: none;
+}
+
+.lang-toggle-btn:hover {
+  background: var(--warm-cream);
+  border-color: var(--vermilion);
+}
+
+.lang-toggle-btn .lang-opt {
+  opacity: 0.55;
+  transition: opacity 0.2s ease;
+}
+
+.lang-toggle-btn .lang-opt.active {
+  opacity: 1;
+  font-weight: 700;
+  color: var(--vermilion);
+}
+
+body.lang-bn {
+  font-family: 'Noto Serif Bengali', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
 .fav-badge-count {
   position: absolute;
   top: -4px;
@@ -1477,6 +1515,18 @@ img.leaflet-tile {
 }
 
 @media (max-width: 820px) {
+  .desktop-only {
+    display: none !important;
+  }
+
+  .mobile-only {
+    display: flex !important;
+  }
+
+  .navbar-brand-text {
+    display: none !important;
+  }
+
   .navbar-links {
     display: none !important;
   }
@@ -1498,12 +1548,19 @@ img.leaflet-tile {
   }
 
   .navbar-actions {
-    gap: 8px;
+    gap: 6px;
   }
 
   .nav-action-btn {
     width: 36px;
     height: 36px;
+  }
+
+  .lang-toggle-btn {
+    height: 36px;
+    padding: 0 8px;
+    font-size: 0.76rem;
+    gap: 3px;
   }
 
   .search-inputs-grid {

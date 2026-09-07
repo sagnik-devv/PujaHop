@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { BusRoute, BusStop, Pandal, MetroStation } from '../../lib/types';
 import LeafletMap from '../../components/LeafletMap';
 import PandalCard from '../../components/PandalCard';
+import { useLanguage } from '../../lib/language-context';
 import {
   IconBus,
   IconMetro,
@@ -33,6 +34,7 @@ export default function BusPageClient({
   initialBusNumber,
   initialStopName,
 }: BusPageClientProps) {
+  const { language, t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [operatorFilter, setOperatorFilter] = useState<'ALL' | 'HOT' | 'AC' | 'WBTC' | 'PRIVATE' | 'MINI'>('ALL');
   const [sortBy, setSortBy] = useState<'HOT' | 'TOTAL' | 'NUMBER'>('HOT');
@@ -202,7 +204,7 @@ export default function BusPageClient({
                 transition: 'all 0.2s ease',
               }}
             >
-              <IconMetro size={15} /> Metro Guide
+              <IconMetro size={15} /> {t('metro_guide')}
             </Link>
             <div
               style={{
@@ -218,7 +220,7 @@ export default function BusPageClient({
                 boxShadow: '0 2px 8px rgba(27,94,32,0.4)',
               }}
             >
-              <IconBus size={15} /> Bus Routes Guide
+              <IconBus size={15} /> {t('bus_routes')}
             </div>
           </div>
 
@@ -231,7 +233,7 @@ export default function BusPageClient({
               lineHeight: 1.15,
             }}
           >
-            Kolkata Bus Durga Puja Route Navigator
+            {language === 'bn' ? 'কলকাতা বাস দুর্গাপূজা রুট নেভিগেটর' : 'Kolkata Bus Durga Puja Route Navigator'}
           </h1>
 
           <div className="hero-accent-line" style={{ margin: '0 auto 20px' }} />
@@ -245,7 +247,9 @@ export default function BusPageClient({
               margin: '0 auto 32px',
             }}
           >
-            Explore 180 verified Kolkata bus routes and 54 key transit hubs mapped directly to all 248 Durga Puja pandals. Search any bus number or corridor to view origin-to-destination stops and accessible pujas with direct walking directions.
+            {language === 'bn' 
+              ? '১৮০টি কলকাতা বাস রুট এবং ৫৪টি প্রধান ট্রানজিট হাব সরাসরি ২৪৮টি দুর্গাপূজা প্যান্ডেলের সাথে সংযুক্ত। যেকোনো বাসের নম্বর বা রুট দিয়ে খুঁজুন।'
+              : 'Explore 180 verified Kolkata bus routes and 54 key transit hubs mapped directly to all 248 Durga Puja pandals. Search any bus number or corridor to view origin-to-destination stops and accessible pujas with direct walking directions.'}
           </p>
 
           {/* Quick Metrics Bar */}
@@ -259,19 +263,19 @@ export default function BusPageClient({
           >
             <div style={{ background: 'rgba(255,255,255,0.06)', padding: '12px 16px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)' }}>
               <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--soft-gold)' }}>180</div>
-              <div style={{ fontSize: '0.74rem', color: 'var(--stone)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Bus Routes</div>
+              <div style={{ fontSize: '0.74rem', color: 'var(--stone)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('bus_routes')}</div>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.06)', padding: '12px 16px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)' }}>
               <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#FF7043' }}>🔥 {hotBuses.length}+</div>
-              <div style={{ fontSize: '0.74rem', color: 'var(--stone)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Hot Hop Lines</div>
+              <div style={{ fontSize: '0.74rem', color: 'var(--stone)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{language === 'bn' ? 'জনপ্রিয় রুট' : 'Hot Hop Lines'}</div>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.06)', padding: '12px 16px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)' }}>
               <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#81C784' }}>54</div>
-              <div style={{ fontSize: '0.74rem', color: 'var(--stone)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Bus Stop Hubs</div>
+              <div style={{ fontSize: '0.74rem', color: 'var(--stone)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{language === 'bn' ? 'বাস স্টপ হাব' : 'Bus Stop Hubs'}</div>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.06)', padding: '12px 16px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.08)' }}>
               <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#FFB74D' }}>248</div>
-              <div style={{ fontSize: '0.74rem', color: 'var(--stone)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pandals Connected</div>
+              <div style={{ fontSize: '0.74rem', color: 'var(--stone)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{language === 'bn' ? 'সংযুক্ত প্যান্ডেল' : 'Pandals Connected'}</div>
             </div>
           </div>
         </div>
@@ -295,7 +299,7 @@ export default function BusPageClient({
               </div>
               <div>
                 <h2 style={{ fontSize: '1.05rem', fontWeight: 800, margin: 0, color: 'var(--foreground)' }}>
-                  Hot Bus Routes • Top Iconic Durga Puja Hopping Lines
+                  {language === 'bn' ? 'হট বাস রুট • সেরা দুর্গাপূজা পরিক্রমার লাইন' : 'Hot Bus Routes • Top Iconic Durga Puja Hopping Lines'}
                 </h2>
                 <p style={{ fontSize: '0.78rem', color: 'var(--taupe)', margin: '2px 0 0' }}>
                   Routes connecting the highest density of famous, award-winning pandals. Tap any line to inspect route stops & puja pandals.

@@ -6,6 +6,7 @@ import { Pandal } from '../lib/types';
 import { IconMapPin, IconRoute, IconNavigation } from '../components/Icons';
 import { useToast } from '../lib/toast-context';
 import { detectUserLocation } from '../lib/location-service';
+import { useLanguage } from '../lib/language-context';
 
 interface HeroSearchWidgetProps {
   pandals: Pandal[];
@@ -14,7 +15,9 @@ interface HeroSearchWidgetProps {
 export default function HeroSearchWidget({ pandals }: HeroSearchWidgetProps) {
   const router = useRouter();
   const { showToast } = useToast();
-  const [fromOption, setFromOption] = useState('Current Location');
+  const { language, tPandalName, tRegion, t } = useLanguage();
+
+  const [fromOption, setFromOption] = useState(language === 'bn' ? 'বর্তমান অবস্থান' : 'Current Location');
   const [selectedPandalId, setSelectedPandalId] = useState<number>(
     pandals.length > 0 ? pandals[0].id : 1
   );
@@ -23,17 +26,17 @@ export default function HeroSearchWidget({ pandals }: HeroSearchWidgetProps) {
 
   const handleGetLocation = async () => {
     setLocating(true);
-    showToast('Detecting your location in Kolkata...', 'info');
+    showToast(t('locating', 'Detecting your location in Kolkata...'), 'info');
 
     try {
       const loc = await detectUserLocation();
       setUserCoords({ lat: loc.lat, lon: loc.lon });
-      setFromOption(`My Location (${loc.landmark})`);
-      showToast(`📍 Location pinned: ${loc.landmark}!`, 'success');
+      setFromOption(language === 'bn' ? `আমার অবস্থান (${loc.landmark})` : `My Location (${loc.landmark})`);
+      showToast(`📍 ${t('location_detected', 'Location pinned')}: ${loc.landmark}!`, 'success');
     } catch (err) {
       console.warn('Geo error', err);
       showToast('Could not access GPS. Using Central Kolkata / Esplanade as origin.', 'warning');
-      setFromOption('Central Kolkata (Esplanade)');
+      setFromOption(language === 'bn' ? 'মধ্য কলকাতা (এসপ্ল্যানেড)' : 'Central Kolkata (Esplanade)');
     } finally {
       setLocating(false);
     }
@@ -63,14 +66,14 @@ export default function HeroSearchWidget({ pandals }: HeroSearchWidgetProps) {
           {/* FROM FIELD */}
           <div className="input-field-group">
             <label className="input-field-label">
-              <IconMapPin size={13} color="#B08D57" /> From (Origin)
+              <IconMapPin size={13} color="#B08D57" /> {t('origin', 'From (Origin)')}
             </label>
             <div className="input-field-wrapper">
               <input
                 type="text"
                 value={fromOption}
                 onChange={e => setFromOption(e.target.value)}
-                placeholder="Current Location / Metro Station"
+                placeholder={language === 'bn' ? 'বর্তমান অবস্থান / মেট্রো স্টেশন' : 'Current Location / Metro Station'}
               />
               <button
                 type="button"
@@ -79,7 +82,7 @@ export default function HeroSearchWidget({ pandals }: HeroSearchWidgetProps) {
                 style={{ cursor: 'pointer', whiteSpace: 'nowrap', border: 'none' }}
                 title="Detect GPS Location"
               >
-                <IconNavigation size={12} /> {locating ? 'Locating...' : 'GPS'}
+                <IconNavigation size={12} /> {locating ? (language === 'bn' ? 'খোঁজা হচ্ছে...' : 'Locating...') : 'GPS'}
               </button>
             </div>
           </div>
@@ -87,7 +90,7 @@ export default function HeroSearchWidget({ pandals }: HeroSearchWidgetProps) {
           {/* TO FIELD */}
           <div className="input-field-group">
             <label className="input-field-label">
-              <IconRoute size={13} color="#B3261E" /> To (Destination Pandal)
+              <IconRoute size={13} color="#B3261E" /> {t('destination', 'To (Destination Pandal)')}
             </label>
             <div className="input-field-wrapper">
               <select
@@ -97,7 +100,7 @@ export default function HeroSearchWidget({ pandals }: HeroSearchWidgetProps) {
               >
                 {pandals.map(p => (
                   <option key={p.id} value={p.id}>
-                    {p.name} ({p.region}) • 🚇 {p.nearestMetro}
+                    {tPandalName(p)} ({tRegion(p.region)}) • 🚇 {p.nearestMetro}
                   </option>
                 ))}
               </select>
@@ -111,7 +114,7 @@ export default function HeroSearchWidget({ pandals }: HeroSearchWidgetProps) {
               className="btn btn-vermilion"
               style={{ height: '46px', width: '100%', whiteSpace: 'nowrap' }}
             >
-              <IconRoute size={16} /> Find Best Route
+              <IconRoute size={16} /> {t('calculate_route', 'Find Best Route')}
             </button>
           </div>
         </div>
