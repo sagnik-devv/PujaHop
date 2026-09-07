@@ -68,7 +68,7 @@ export default function Navbar() {
 
   const navLinks = [
     { name: t('home', 'Home'), href: '/' },
-    { name: t('hop_room', 'Hop Room 📡'), href: '/hop' },
+    { name: t('hop_room', 'Hop Room'), href: '/hop' },
     { name: t('explore_pandals', 'Explore Pandals'), href: '/explore' },
     { name: t('smart_route', 'Smart Route'), href: '/route' },
     { name: t('hop_planner', 'Hop Planner'), href: '/planner' },

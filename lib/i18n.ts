@@ -4,7 +4,7 @@ export const translations: Record<Language, Record<string, string>> = {
   en: {
     // Navigation
     home: 'Home',
-    hop_room: 'Hop Room 📡',
+    hop_room: 'Hop Room',
     explore_pandals: 'Explore Pandals',
     smart_route: 'Smart Route',
     hop_planner: 'Hop Planner',
@@ -20,6 +20,11 @@ export const translations: Record<Language, Record<string, string>> = {
     quick_search: 'Instant Kolkata Puja Search',
     popular_searches: 'Popular Searches:',
     saved_pandals: 'Saved Pandals',
+    nav_explore: 'Explore',
+    nav_route: 'Route',
+    nav_bus: 'Bus',
+    nav_metro: 'Metro',
+    nav_hop_room: 'Hop Room',
 
     // Hero & Home
     hero_title: 'Navigate Kolkata’s Durga Puja 2026 Like a Native',
@@ -224,7 +229,7 @@ export const translations: Record<Language, Record<string, string>> = {
   bn: {
     // Navigation
     home: 'হোম',
-    hop_room: 'হপ রুম 📡',
+    hop_room: 'হপ রুম',
     explore_pandals: 'প্যান্ডেল দেখুন',
     smart_route: 'স্মার্ট রুট',
     hop_planner: 'হপ প্ল্যানার',
@@ -240,6 +245,11 @@ export const translations: Record<Language, Record<string, string>> = {
     quick_search: 'তাৎক্ষণিক কলকাতা পূজা অনুসন্ধান',
     popular_searches: 'জনপ্রিয় অনুসন্ধান:',
     saved_pandals: 'সংরক্ষিত প্যান্ডেল',
+    nav_explore: 'প্যান্ডেল',
+    nav_route: 'রুট',
+    nav_bus: 'বাস',
+    nav_metro: 'মেট্রো',
+    nav_hop_room: 'হপ রুম',
 
     // Hero & Home
     hero_title: 'কলকাতার দুর্গাপূজা ২০২৬ পরিক্রমা করুন স্থানীয়দের মতো',
