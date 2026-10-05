@@ -17,6 +17,7 @@ import {
   IconMapPin,
   IconSparkles,
   IconShield,
+  IconToilet,
 } from '../components/Icons';
 import HeroSearchWidget from './HeroSearchWidget';
 import MetroPujaPlanner from '../components/MetroPujaPlanner';
@@ -105,6 +106,9 @@ export default function HomePage() {
             </Link>
             <Link href="/nearby" className="btn btn-sm hero-action-chip">
               <IconMapPin size={15} color="#D4B77A" /> {t('near_me', 'Pandals Near Me')}
+            </Link>
+            <Link href="/nearby-toilets" className="btn btn-sm hero-action-chip">
+              <IconToilet size={15} color="#D4B77A" /> {language === 'bn' ? 'কাছের টয়লেট' : 'Nearby Toilets'}
             </Link>
           </div>
         </div>

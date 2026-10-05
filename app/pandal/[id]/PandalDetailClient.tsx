@@ -15,6 +15,7 @@ import {
   IconNavigation,
   IconAward,
   IconPalette,
+  IconToilet,
 } from '../../../components/Icons';
 import CrowdBadge from '../../../components/CrowdBadge';
 import FavoriteButton from '../../../components/FavoriteButton';
@@ -447,10 +448,38 @@ export default function PandalDetailClient({
 
           {/* NEARBY PUBLIC TOILETS */}
           {nearbyToilets && nearbyToilets.length > 0 && (
-            <section>
-              <h3 style={{ fontFamily: 'var(--font-serif)', marginBottom: '16px' }}>
-                🚻 {language === 'bn' ? 'পাবলিক টয়লেট' : 'Nearby Toilets'}
-              </h3>
+            <section style={{ marginTop: '28px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+                <h3 style={{ fontFamily: 'var(--font-serif)', margin: 0 }}>
+                  🚻 {language === 'bn' ? 'নিকটবর্তী পাবলিক টয়লেট' : 'Nearby Public Toilets'}
+                </h3>
+                <Link
+                  href="/nearby-toilets"
+                  className="btn btn-secondary btn-sm"
+                  style={{ fontSize: '0.78rem', padding: '4px 10px' }}
+                >
+                  {language === 'bn' ? 'সব টয়লেট দেখুন' : 'City Toilets'} →
+                </Link>
+              </div>
+
+              {/* Mobile-first Toilet Visual Spotlight */}
+              <div className="toilet-pandal-banner">
+                <img
+                  src="/images/toilet.png"
+                  alt="Illuminated Kolkata Puja Public Toilet Pod"
+                  className="toilet-pandal-banner-img"
+                />
+                <div className="toilet-pandal-banner-overlay">
+                  <div className="toilet-pandal-banner-badge">
+                    <IconToilet size={12} color="#FFF" />
+                    <span>{language === 'bn' ? 'আলোকিত স্মার্ট টয়লেট পড' : 'Illuminated Puja Smart Pod'}</span>
+                  </div>
+                  <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#FFF', textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>
+                    {language === 'bn' ? 'কেএমসি ও পুজো কমিটি দ্বারা পরিচালিত নিরাপদ বায়ো-টয়লেট' : 'Verified safe bio-toilets with night illumination & clean cabins'}
+                  </div>
+                </div>
+              </div>
+
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {nearbyToilets.map((toilet) => {
                   const isFemaleFriendly = toilet.femaleFriendly === 'Yes' || toilet.genderAccess === 'Female';
