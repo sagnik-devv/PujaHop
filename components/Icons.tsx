@@ -173,6 +173,18 @@ export const IconChevronRight = ({ size = 18, color = 'currentColor', strokeWidt
   </svg>
 );
 
+export const IconChevronDown = ({ size = 18, color = 'currentColor', strokeWidth = 2 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+    <path d="m6 9 6 6 6-6" />
+  </svg>
+);
+
+export const IconCheck = ({ size = 18, color = 'currentColor', strokeWidth = 2 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+);
+
 export const IconShare = ({ size = 18, color = 'currentColor', strokeWidth = 2 }: IconProps) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
     <circle cx="18" cy="5" r="3" />

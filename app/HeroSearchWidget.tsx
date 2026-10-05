@@ -7,6 +7,7 @@ import { IconMapPin, IconRoute, IconNavigation } from '../components/Icons';
 import { useToast } from '../lib/toast-context';
 import { detectUserLocation } from '../lib/location-service';
 import { useLanguage } from '../lib/language-context';
+import PandalSearchSelect from '../components/PandalSearchSelect';
 
 interface HeroSearchWidgetProps {
   pandals: Pandal[];
@@ -92,19 +93,12 @@ export default function HeroSearchWidget({ pandals }: HeroSearchWidgetProps) {
             <label className="input-field-label">
               <IconRoute size={13} color="#B3261E" /> {t('destination', 'To (Destination Pandal)')}
             </label>
-            <div className="input-field-wrapper">
-              <select
-                value={selectedPandalId}
-                onChange={e => setSelectedPandalId(parseInt(e.target.value, 10))}
-                style={{ cursor: 'pointer' }}
-              >
-                {pandals.map(p => (
-                  <option key={p.id} value={p.id}>
-                    {tPandalName(p)} ({tRegion(p.region)}) • 🚇 {p.nearestMetro}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <PandalSearchSelect
+              pandals={pandals}
+              selectedId={selectedPandalId}
+              onSelect={id => setSelectedPandalId(id)}
+              variant="hero"
+            />
           </div>
 
           {/* SUBMIT ACTION */}

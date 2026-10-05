@@ -15,6 +15,7 @@ import LeafletMap from '../../components/LeafletMap';
 import { IconMapPin, IconRoute, IconNavigation, IconSparkles } from '../../components/Icons';
 import { useToast } from '../../lib/toast-context';
 import { useLanguage } from '../../lib/language-context';
+import PandalSearchSelect from '../../components/PandalSearchSelect';
 
 interface RouteClientProps {
   pandals: Pandal[];
@@ -312,19 +313,12 @@ export default function RouteClient({
                 </label>
               </div>
 
-              <div className="route-input-box">
-                <select
-                  value={selectedToId}
-                  onChange={e => setSelectedToId(parseInt(e.target.value, 10))}
-                  className="route-select"
-                >
-                  {pandals.map(p => (
-                    <option key={p.id} value={p.id}>
-                      {tPandalName(p)} ({tRegion(p.region)}) • 🚇 {p.nearestMetro}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <PandalSearchSelect
+                pandals={pandals}
+                selectedId={selectedToId}
+                onSelect={id => setSelectedToId(id)}
+                variant="light"
+              />
             </div>
 
             {/* Find Route Action Button */}
