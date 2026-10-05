@@ -189,31 +189,23 @@ export default function RouteClient({
         </div>
 
         {/* Origin & Destination Bar */}
-        <div
-          style={{
-            background: '#FFFDF9',
-            border: '1px solid var(--border-gold)',
-            borderRadius: '8px',
-            padding: '24px',
-            boxShadow: '0 8px 24px rgba(23,18,15,0.06)',
-            marginBottom: '32px',
-          }}
-        >
-          <div className="search-inputs-grid" style={{ alignItems: 'flex-end' }}>
+        <div className="route-search-card">
+          <div className="route-inputs-grid">
             {/* FROM: Dynamic Autocomplete & GPS */}
-            <div className="input-field-group" style={{ position: 'relative' }} ref={dropdownRef}>
-              <label className="input-field-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>
-                  <IconMapPin size={13} color="#B08D57" /> {t('origin', 'From (Your Origin Point)')}
-                </span>
+            <div className="route-field-group" ref={dropdownRef}>
+              <div className="route-field-label-row">
+                <label className="route-field-label">
+                  <IconMapPin size={14} color="var(--vermilion)" />
+                  <span>{t('origin', 'Starting Location')}</span>
+                </label>
                 {userCoords.lat && userCoords.lon && (
-                  <span style={{ fontSize: '0.7rem', color: '#155799', fontWeight: 600 }}>
+                  <span className="route-gps-pill">
                     GPS: {userCoords.lat.toFixed(3)}°, {userCoords.lon.toFixed(3)}°
                   </span>
                 )}
-              </label>
+              </div>
 
-              <div className="input-field-wrapper" style={{ background: '#FFF' }}>
+              <div className="route-input-box">
                 <input
                   type="text"
                   value={fromName}
@@ -236,11 +228,11 @@ export default function RouteClient({
                   type="button"
                   onClick={handleLocateMe}
                   disabled={locating}
-                  className="badge badge-region"
-                  style={{ cursor: 'pointer', border: 'none', background: locating ? '#E5DED5' : undefined }}
+                  className="route-gps-btn"
                   title="Detect My Location via GPS"
                 >
-                  <IconNavigation size={12} /> {locating ? (language === 'bn' ? 'খোঁজা হচ্ছে...' : 'Locating...') : 'GPS'}
+                  <IconNavigation size={13} />
+                  <span>{locating ? (language === 'bn' ? 'খোঁজা হচ্ছে...' : 'Locating...') : 'GPS'}</span>
                 </button>
               </div>
 
@@ -255,9 +247,9 @@ export default function RouteClient({
                     zIndex: 150,
                     background: '#FFF',
                     border: '1px solid var(--border-gold)',
-                    borderRadius: '6px',
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-                    marginTop: '4px',
+                    borderRadius: '10px',
+                    boxShadow: '0 12px 32px rgba(0,0,0,0.12)',
+                    marginTop: '6px',
                     maxHeight: '260px',
                     overflowY: 'auto',
                   }}
@@ -273,7 +265,7 @@ export default function RouteClient({
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        fontSize: '0.82rem',
+                        fontSize: '0.85rem',
                         transition: 'background 0.15s ease',
                       }}
                       onMouseEnter={e => (e.currentTarget.style.background = 'var(--warm-cream)')}
@@ -287,7 +279,7 @@ export default function RouteClient({
                           {s.type === 'pandal' && '🪔 '}
                           {s.name}
                         </div>
-                        <div style={{ fontSize: '0.72rem', color: 'var(--taupe)' }}>
+                        <div style={{ fontSize: '0.74rem', color: 'var(--taupe)' }}>
                           {s.subtitle}
                         </div>
                       </div>
@@ -295,10 +287,12 @@ export default function RouteClient({
                         className="badge"
                         style={{
                           fontSize: '0.65rem',
-                          padding: '2px 6px',
+                          padding: '3px 8px',
+                          borderRadius: '8px',
                           textTransform: 'uppercase',
                           background: s.type === 'metro' ? '#E3F2FD' : '#FAF7F2',
                           color: s.type === 'metro' ? '#155799' : 'var(--taupe)',
+                          fontWeight: 700,
                         }}
                       >
                         {s.type}
@@ -310,15 +304,19 @@ export default function RouteClient({
             </div>
 
             {/* TO: Destination Pandal */}
-            <div className="input-field-group">
-              <label className="input-field-label">
-                <IconRoute size={13} color="#B3261E" /> {t('destination', 'To (Destination Pandal)')}
-              </label>
-              <div className="input-field-wrapper" style={{ background: '#FFF' }}>
+            <div className="route-field-group">
+              <div className="route-field-label-row">
+                <label className="route-field-label">
+                  <IconRoute size={14} color="#B3261E" />
+                  <span>{t('destination', 'Destination Pandal')}</span>
+                </label>
+              </div>
+
+              <div className="route-input-box">
                 <select
                   value={selectedToId}
                   onChange={e => setSelectedToId(parseInt(e.target.value, 10))}
-                  style={{ cursor: 'pointer' }}
+                  className="route-select"
                 >
                   {pandals.map(p => (
                     <option key={p.id} value={p.id}>
@@ -335,107 +333,61 @@ export default function RouteClient({
                 type="button"
                 onClick={handleResolveCustomOrigin}
                 disabled={loading}
-                className="btn btn-vermilion"
-                style={{ height: '46px', width: '100%', whiteSpace: 'nowrap', padding: '0 20px', justifyContent: 'center' }}
+                className="btn btn-vermilion route-calc-btn"
               >
-                <IconSparkles size={16} /> {t('calculate_route', 'Find Route')}
+                <IconSparkles size={16} />
+                <span>{language === 'bn' ? 'অনুকূল রুট গণনা করুন' : 'CALCULATE OPTIMAL ROUTE'}</span>
               </button>
             </div>
           </div>
 
           {/* Quick Origin Hub Chips */}
-          <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--border-subtle)' }}>
+          <div style={{ marginTop: '18px', paddingTop: '16px', borderTop: '1px solid var(--border-subtle)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--taupe)' }}>
-                {language === 'bn' ? 'প্রধান প্রারম্ভিক হাবসমূহ:' : 'Popular Starting Hubs:'}
+              <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--taupe)' }}>
+                {language === 'bn' ? 'জনপ্রিয় শুরুর স্থান:' : 'Popular Starting Hubs:'}
               </span>
 
               <button
                 type="button"
                 onClick={handleLocateMe}
-                style={{
-                  fontSize: '0.72rem',
-                  fontWeight: 600,
-                  padding: '4px 10px',
-                  borderRadius: '16px',
-                  border: '1px solid #B3261E',
-                  background: 'rgba(179, 38, 30, 0.08)',
-                  color: '#B3261E',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                }}
+                className="popular-hub-chip"
+                style={{ borderColor: 'var(--vermilion)', color: 'var(--vermilion)', background: 'rgba(179,38,30,0.06)' }}
               >
-                <IconNavigation size={11} /> {language === 'bn' ? 'আমার বর্তমান অবস্থান' : 'My Current Location'}
+                <IconNavigation size={12} />
+                <span>{language === 'bn' ? 'আমার বর্তমান অবস্থান' : 'My Current Location'}</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleSelectQuickHub('Esplanade Metro Station', 22.5649, 88.3517)}
-                style={{
-                  fontSize: '0.72rem',
-                  fontWeight: 500,
-                  padding: '4px 10px',
-                  borderRadius: '16px',
-                  border: '1px solid var(--border)',
-                  background: '#FFF',
-                  color: 'var(--foreground)',
-                  cursor: 'pointer',
-                }}
+                className="popular-hub-chip"
               >
-                🚇 এসপ্ল্যানেড (সেন্ট্রাল)
+                🚇 {language === 'bn' ? 'এসপ্ল্যানেড (সেন্ট্রাল)' : 'Esplanade (Central)'}
               </button>
 
               <button
                 type="button"
                 onClick={() => handleSelectQuickHub('Howrah Railway Station', 22.5855, 88.3433)}
-                style={{
-                  fontSize: '0.72rem',
-                  fontWeight: 500,
-                  padding: '4px 10px',
-                  borderRadius: '16px',
-                  border: '1px solid var(--border)',
-                  background: '#FFF',
-                  color: 'var(--foreground)',
-                  cursor: 'pointer',
-                }}
+                className="popular-hub-chip"
               >
-                🚆 হাওড়া স্টেশন
+                🚆 {language === 'bn' ? 'হাওড়া স্টেশন' : 'Howrah Station'}
               </button>
 
               <button
                 type="button"
                 onClick={() => handleSelectQuickHub('Sealdah Railway Station', 22.5670, 88.3715)}
-                style={{
-                  fontSize: '0.72rem',
-                  fontWeight: 500,
-                  padding: '4px 10px',
-                  borderRadius: '16px',
-                  border: '1px solid var(--border)',
-                  background: '#FFF',
-                  color: 'var(--foreground)',
-                  cursor: 'pointer',
-                }}
+                className="popular-hub-chip"
               >
-                🚆 শিয়ালদহ স্টেশন
+                🚆 {language === 'bn' ? 'শিয়ালদহ স্টেশন' : 'Sealdah Station'}
               </button>
 
               <button
                 type="button"
                 onClick={() => handleSelectQuickHub('Shyambazar 5-Point Crossing', 22.6022, 88.3714)}
-                style={{
-                  fontSize: '0.72rem',
-                  fontWeight: 500,
-                  padding: '4px 10px',
-                  borderRadius: '16px',
-                  border: '1px solid var(--border)',
-                  background: '#FFF',
-                  color: 'var(--foreground)',
-                  cursor: 'pointer',
-                }}
+                className="popular-hub-chip"
               >
-                🪔 শ্যামবাজার (উত্তর)
+                🪔 {language === 'bn' ? 'শ্যামবাজার (উত্তর)' : 'Shyambazar (North)'}
               </button>
             </div>
           </div>

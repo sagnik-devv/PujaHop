@@ -363,8 +363,8 @@ export default function ExploreClient({
         )}
 
         {/* Search Input */}
-        <div className="input-field-wrapper" style={{ background: '#FFF', padding: '10px 14px', marginBottom: '14px' }}>
-          <IconSearch size={18} color="#B08D57" />
+        <div className="explore-search-bar-wrap">
+          <IconSearch size={18} color="var(--vermilion)" />
           <input
             type="text"
             placeholder={
@@ -374,65 +374,77 @@ export default function ExploreClient({
             }
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            style={{ fontSize: '0.86rem' }}
+            className="explore-search-input"
           />
           {searchQuery && (
-            <button onClick={() => setSearchQuery('')} style={{ color: '#888' }}>✕</button>
+            <button onClick={() => setSearchQuery('')} className="explore-search-clear">✕</button>
           )}
         </div>
 
-        {/* Filters Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px', marginBottom: '14px' }}>
-          {/* Region */}
-          <div className="input-field-group">
-            <label className="input-field-label">{t('filter_by_region', 'Region')}</label>
-            <div className="input-field-wrapper" style={{ padding: '6px 10px' }}>
-              <select value={selectedRegion} onChange={e => setSelectedRegion(e.target.value)}>
-                <option value="ALL">{t('all_regions', 'All Regions')}</option>
-                {regions.map(r => (
-                  <option key={r} value={r}>{tRegion(r)}</option>
-                ))}
-              </select>
+        {/* Filters Card */}
+        <div className="explore-filter-card">
+          <div className="explore-filter-grid">
+            {/* Region */}
+            <div className="filter-select-group">
+              <label className="filter-select-label">
+                <span style={{ color: '#D97706' }}>📍</span>
+                <span>{t('filter_by_region', 'Region')}</span>
+              </label>
+              <div className="filter-select-wrap">
+                <select value={selectedRegion} onChange={e => setSelectedRegion(e.target.value)}>
+                  <option value="ALL">{t('all_regions', 'All Regions')}</option>
+                  {regions.map(r => (
+                    <option key={r} value={r}>{tRegion(r)}</option>
+                  ))}
+                </select>
+              </div>
             </div>
-          </div>
 
-          {/* Metro Station */}
-          <div className="input-field-group">
-            <label className="input-field-label">
-              <IconMetro size={12} color="#155799" /> {t('nearest_metro', 'Near Metro')}
-            </label>
-            <div className="input-field-wrapper" style={{ padding: '6px 10px' }}>
-              <select value={selectedMetro} onChange={e => setSelectedMetro(e.target.value)}>
-                <option value="ALL">{t('all_metros', 'All Stations')}</option>
-                {presentMetros.map(m => (
-                  <option key={m} value={m}>{m}</option>
-                ))}
-              </select>
+            {/* Metro Station */}
+            <div className="filter-select-group">
+              <label className="filter-select-label">
+                <span style={{ color: '#2563EB' }}>🚇</span>
+                <span>{t('nearest_metro', 'Near Metro')}</span>
+              </label>
+              <div className="filter-select-wrap">
+                <select value={selectedMetro} onChange={e => setSelectedMetro(e.target.value)}>
+                  <option value="ALL">{t('all_metros', 'All Stations')}</option>
+                  {presentMetros.map(m => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
+                </select>
+              </div>
             </div>
-          </div>
 
-          {/* Crowd Level */}
-          <div className="input-field-group">
-            <label className="input-field-label">{t('crowd_level', 'Crowd Level')}</label>
-            <div className="input-field-wrapper" style={{ padding: '6px 10px' }}>
-              <select value={selectedCrowd} onChange={e => setSelectedCrowd(e.target.value)}>
-                <option value="ALL">{t('all_crowd_levels', 'Any Crowd')}</option>
-                <option value="Low">{t('Low', 'Low Crowd')}</option>
-                <option value="Moderate">{t('Moderate', 'Moderate')}</option>
-                <option value="High">{t('High', 'Heavy Rush')}</option>
-              </select>
+            {/* Crowd Level */}
+            <div className="filter-select-group">
+              <label className="filter-select-label">
+                <span style={{ color: '#DC2626' }}>👥</span>
+                <span>{t('crowd_level', 'Crowd Level')}</span>
+              </label>
+              <div className="filter-select-wrap">
+                <select value={selectedCrowd} onChange={e => setSelectedCrowd(e.target.value)}>
+                  <option value="ALL">{t('all_crowd_levels', 'Any Crowd')}</option>
+                  <option value="Low">{t('Low', 'Low Crowd')}</option>
+                  <option value="Moderate">{t('Moderate', 'Moderate')}</option>
+                  <option value="High">{t('High', 'Heavy Rush')}</option>
+                </select>
+              </div>
             </div>
-          </div>
 
-          {/* Sort By */}
-          <div className="input-field-group">
-            <label className="input-field-label">{t('sort_by', 'Sort By')}</label>
-            <div className="input-field-wrapper" style={{ padding: '6px 10px' }}>
-              <select value={sortBy} onChange={e => setSortBy(e.target.value as any)}>
-                <option value="popularity">{t('sort_popularity', 'Popularity Score')}</option>
-                <option value="name">{t('sort_name', 'Name (A-Z)')}</option>
-                <option value="nearest_metro">{t('sort_nearest_metro', 'Nearest Metro')}</option>
-              </select>
+            {/* Sort By */}
+            <div className="filter-select-group">
+              <label className="filter-select-label">
+                <span style={{ color: '#7C3AED' }}>⚡</span>
+                <span>{t('sort_by', 'Sort By')}</span>
+              </label>
+              <div className="filter-select-wrap">
+                <select value={sortBy} onChange={e => setSortBy(e.target.value as any)}>
+                  <option value="popularity">{t('sort_popularity', 'Popularity Score')}</option>
+                  <option value="name">{t('sort_name', 'Name (A-Z)')}</option>
+                  <option value="nearest_metro">{t('sort_nearest_metro', 'Nearest Metro')}</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
