@@ -97,13 +97,13 @@ export default function HomePage() {
               marginTop: '28px',
             }}
           >
-            <Link href="/explore" className="btn btn-secondary btn-sm" style={{ borderColor: 'rgba(255,255,255,0.3)', color: '#FFF' }}>
+            <Link href="/explore" className="btn btn-sm hero-action-chip">
               <IconEye size={15} color="#D4B77A" /> {t('explore_now', 'Explore 248 Pandals')}
             </Link>
-            <Link href="/planner" className="btn btn-gold btn-sm">
-              <IconCalendar size={15} /> {t('plan_my_night', 'Plan Puja Itinerary')}
+            <Link href="/planner" className="btn btn-sm hero-action-chip-gold">
+              <IconCalendar size={15} color="#FFF" /> {t('plan_my_night', 'Plan Puja Itinerary')}
             </Link>
-            <Link href="/nearby" className="btn btn-secondary btn-sm" style={{ borderColor: 'rgba(255,255,255,0.3)', color: '#FFF' }}>
+            <Link href="/nearby" className="btn btn-sm hero-action-chip">
               <IconMapPin size={15} color="#D4B77A" /> {t('near_me', 'Pandals Near Me')}
             </Link>
           </div>

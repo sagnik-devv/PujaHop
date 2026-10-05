@@ -266,6 +266,19 @@ export interface SearchResultGroup {
   areas: string[];
 }
 
+export interface Toilet {
+  id: string;
+  toiletName: string;
+  locationAddress: string;
+  latitude: number;
+  longitude: number;
+  cleanlinessScore: number;
+  genderAccess: string;
+  femaleFriendly: string;
+  nearestPandal: string;
+  distanceToPandalMeters: number;
+}
+
 export interface FilterState {
   searchQuery: string;
   region: string;

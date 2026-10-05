@@ -21,7 +21,9 @@ import {
   SearchResultGroup,
   FilterState,
   TransportMode,
+  Toilet,
 } from './types';
+import { GENERATED_TOILETS } from './generated-toilets';
 import { getRealWorldMultiRoute, getRealWorldLeg } from './routing-service';
 import {
   calculateDistance,
@@ -959,6 +961,17 @@ export function findNearbyFoodStalls(
     .filter(f => f.distanceM <= radiusKm * 1000)
     .sort((a, b) => a.distanceM - b.distanceM)
     .slice(0, limit);
+}
+
+export async function getToiletsForPandal(pandalName: string): Promise<Toilet[]> {
+  if (!pandalName) return [];
+  const nameLower = pandalName.toLowerCase();
+  return GENERATED_TOILETS.filter(t => t.nearestPandal.toLowerCase() === nameLower)
+    .sort((a, b) => a.distanceToPandalMeters - b.distanceToPandalMeters);
+}
+
+export async function getAllToilets(): Promise<Toilet[]> {
+  return GENERATED_TOILETS;
 }
 
 export async function getEateriesForPandal(pandalId: number): Promise<PandalEatery[]> {

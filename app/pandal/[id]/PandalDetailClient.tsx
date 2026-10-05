@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Pandal, MetroStation, BusStop, PandalBusConnectivity, CrowdInfo, PandalEatery, PandalArtDetails } from '../../../lib/types';
+import { Pandal, MetroStation, BusStop, PandalBusConnectivity, CrowdInfo, PandalEatery, PandalArtDetails, Toilet } from '../../../lib/types';
 import { formatDistance, formatDuration } from '../../../lib/format';
 import {
   IconMetro,
@@ -33,6 +33,7 @@ interface PandalDetailClientProps {
   crowdInfo: CrowdInfo;
   nearbyEateries: PandalEatery[];
   artDetails: PandalArtDetails | null;
+  nearbyToilets: Toilet[];
 }
 
 export default function PandalDetailClient({
@@ -45,6 +46,7 @@ export default function PandalDetailClient({
   crowdInfo,
   nearbyEateries,
   artDetails,
+  nearbyToilets,
 }: PandalDetailClientProps) {
   const { language, tPandalName, tRegion, t } = useLanguage();
 
@@ -226,205 +228,175 @@ export default function PandalDetailClient({
         </div>
       </section>
 
-      {/* 2.5. ART, PHILOSOPHY & CULTURAL HERITAGE */}
-      {artDetails && (
-        <section className="container" style={{ marginTop: '56px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '12px' }}>
-            <div>
-              <div className="eyebrow" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <IconPalette size={14} color="#B08D57" />
-                <span>{t('art_culture', 'Curated Cultural & Art Dossier')}</span>
-              </div>
-              <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.8rem, 3.5vw, 2.5rem)', margin: '4px 0 0' }}>
-                {language === 'bn' ? 'শিল্পকলা, স্থাপত্য ও থিম ভাবনা' : 'Art, Architecture & Philosophy'}
-              </h2>
-            </div>
-          </div>
-
-          <p style={{ color: 'var(--taupe)', fontSize: '0.94rem', marginBottom: '28px' }}>
-            {displayName} {language === 'bn' ? 'মণ্ডপের শৈল্পিক ভাবনা ও কারুশিল্প।' : 'thematic narrative, master artisans, and creative vision.'}
-          </p>
-
-          {/* Artistic Philosophy Highlight Banner */}
-          <div
-            className="philosophy-quote-banner"
-            style={{
-              background: 'linear-gradient(135deg, #2B1810 0%, #17120F 100%)',
-              borderRadius: '12px',
-              color: '#FFF',
-              border: '1px solid rgba(176,141,87,0.35)',
-              boxShadow: '0 12px 40px rgba(0,0,0,0.18)',
-              marginBottom: '32px',
-              position: 'relative',
-              overflow: 'hidden',
-            }}
-          >
-            <div style={{ position: 'absolute', top: '-20px', right: '-20px', opacity: 0.05, fontSize: '10rem', fontFamily: 'serif', pointerEvents: 'none' }}>
-              “
-            </div>
-            <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: '#D4B77A', fontWeight: 700, marginBottom: '8px' }}>
-              ✦ {t('philosophy', 'Creative Philosophy & Mandap Vision')}
-            </div>
-            <div style={{ fontSize: 'clamp(1.1rem, 2.2vw, 1.4rem)', fontFamily: 'var(--font-serif)', lineHeight: 1.6, color: '#FFFDF8', fontStyle: 'italic', maxWidth: '900px' }}>
-              "{artDetails.artPhilosophy}"
-            </div>
-            <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '16px', fontSize: '0.82rem', color: '#D5CEC5' }}>
-              <div><strong>{language === 'bn' ? 'শিল্পের ধরন:' : 'Genre:'}</strong> {artDetails.pandalArtType}</div>
-              <div>•</div>
-              <div><strong>{language === 'bn' ? 'প্রতিষ্ঠার সময়:' : 'Heritage Era:'}</strong> {artDetails.establishedEra}</div>
-            </div>
-          </div>
-
-          {/* Grid: Themes, Sculptures, Craftsmanship & Details */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px', marginBottom: '32px' }}>
-            {/* Card 1: Themes */}
-            <div
-              style={{
-                background: '#FFF',
-                border: '1px solid var(--border-gold)',
-                borderRadius: '10px',
-                padding: '28px',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
-                <IconCalendar size={18} color="#B3261E" />
-                <h3 style={{ fontSize: '1.2rem', fontFamily: 'var(--font-serif)', margin: 0 }}>
-                  {language === 'bn' ? 'সাম্প্রতিক ও বিগত থিমসমূহ' : 'Recent & Past Themes'}
-                </h3>
-              </div>
-              
-              <div style={{ marginBottom: '18px' }}>
-                <div style={{ fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--taupe)', fontWeight: 700, marginBottom: '6px' }}>
-                  {language === 'bn' ? 'বর্তমান সংস্করণ' : 'Current Edition'}
-                </div>
-                <div style={{ fontSize: '0.9rem', color: '#2B2520', lineHeight: 1.55 }}>
-                  {artDetails.recentAndCurrentThemes}
-                </div>
-              </div>
-
-              {artDetails.pastNotableThemes && (
-                <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '14px' }}>
-                  <div style={{ fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--taupe)', fontWeight: 700, marginBottom: '6px' }}>
-                    {language === 'bn' ? 'ঐতিহাসিক থিমসমূহ' : 'Historical Themes'}
+      {/* TWO COLUMN LAYOUT: MAIN CONTENT + SIDEBAR UTILITIES */}
+      <div className="container pandal-layout-grid">
+        {/* LEFT COLUMN: MAIN CONTENT */}
+        <div className="main-content" style={{ display: 'flex', flexDirection: 'column', gap: '56px' }}>
+          
+          {/* 2.5. ART, PHILOSOPHY & CULTURAL HERITAGE */}
+          {artDetails && (
+            <section>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '12px' }}>
+                <div>
+                  <div className="eyebrow" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <IconPalette size={14} color="#B08D57" />
+                    <span>{t('art_culture', 'Curated Cultural & Art Dossier')}</span>
                   </div>
-                  <div style={{ fontSize: '0.86rem', color: '#554D45', lineHeight: 1.5 }}>
-                    {artDetails.pastNotableThemes}
+                  <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.8rem, 3.5vw, 2.5rem)', margin: '4px 0 0' }}>
+                    {language === 'bn' ? 'শিল্পকলা, স্থাপত্য ও থিম ভাবনা' : 'Art, Architecture & Philosophy'}
+                  </h2>
+                </div>
+              </div>
+
+              <p style={{ color: 'var(--taupe)', fontSize: '0.94rem', marginBottom: '28px' }}>
+                {displayName} {language === 'bn' ? 'মণ্ডপের শৈল্পিক ভাবনা ও কারুশিল্প।' : 'thematic narrative, master artisans, and creative vision.'}
+              </p>
+
+              {/* Artistic Philosophy Highlight Banner */}
+              <div
+                className="philosophy-quote-banner"
+                style={{
+                  background: 'linear-gradient(135deg, #2B1810 0%, #17120F 100%)',
+                  borderRadius: '12px',
+                  color: '#FFF',
+                  border: '1px solid rgba(176,141,87,0.35)',
+                  boxShadow: '0 12px 40px rgba(0,0,0,0.18)',
+                  marginBottom: '32px',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  padding: '32px'
+                }}
+              >
+                <div style={{ position: 'absolute', top: '-20px', right: '-20px', opacity: 0.05, fontSize: '10rem', fontFamily: 'serif', pointerEvents: 'none' }}>
+                  “
+                </div>
+                <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: '#D4B77A', fontWeight: 700, marginBottom: '8px' }}>
+                  ✦ {t('philosophy', 'Creative Philosophy & Mandap Vision')}
+                </div>
+                <div style={{ fontSize: 'clamp(1.1rem, 2.2vw, 1.4rem)', fontFamily: 'var(--font-serif)', lineHeight: 1.6, color: '#FFFDF8', fontStyle: 'italic', maxWidth: '900px' }}>
+                  "{artDetails.artPhilosophy}"
+                </div>
+                <div style={{ marginTop: '20px', display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '16px', fontSize: '0.82rem', color: '#D5CEC5' }}>
+                  <div><strong>{language === 'bn' ? 'শিল্পের ধরন:' : 'Genre:'}</strong> {artDetails.pandalArtType}</div>
+                  <div>•</div>
+                  <div><strong>{language === 'bn' ? 'প্রতিষ্ঠার সময়:' : 'Heritage Era:'}</strong> {artDetails.establishedEra}</div>
+                </div>
+              </div>
+
+              {/* Grid: Themes, Sculptures, Craftsmanship & Details */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
+                {/* Card 1: Themes */}
+                <div
+                  style={{
+                    background: '#FFF',
+                    border: '1px solid var(--border-gold)',
+                    borderRadius: '10px',
+                    padding: '24px',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
+                    <IconCalendar size={18} color="#B3261E" />
+                    <h3 style={{ fontSize: '1.2rem', fontFamily: 'var(--font-serif)', margin: 0 }}>
+                      {language === 'bn' ? 'সাম্প্রতিক ও বিগত থিমসমূহ' : 'Recent & Past Themes'}
+                    </h3>
                   </div>
-                </div>
-              )}
-            </div>
-
-            {/* Card 2: Sculpture */}
-            <div
-              style={{
-                background: '#FFF',
-                border: '1px solid var(--border-gold)',
-                borderRadius: '10px',
-                padding: '28px',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
-                <IconSparkles size={18} color="#B08D57" />
-                <h3 style={{ fontSize: '1.2rem', fontFamily: 'var(--font-serif)', margin: 0 }}>
-                  {language === 'bn' ? 'প্রতিমা ও রূপায়ণ' : 'Pratima & Divine Sculpture'}
-                </h3>
-              </div>
-
-              <div style={{ fontSize: '0.9rem', color: '#2B2520', lineHeight: 1.6, marginBottom: '18px' }}>
-                {artDetails.idolSculptureStyle}
-              </div>
-
-              <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '14px' }}>
-                <div style={{ fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--taupe)', fontWeight: 700, marginBottom: '6px' }}>
-                  {t('craftsmanship', 'Craftsmanship & Materials Used')}
-                </div>
-                <div style={{ fontSize: '0.86rem', color: '#554D45', lineHeight: 1.55 }}>
-                  {artDetails.craftsmanshipAndMaterials}
-                </div>
-              </div>
-            </div>
-
-            {/* Card 3: Cultural Story */}
-            <div
-              style={{
-                background: '#FFF',
-                border: '1px solid var(--border-gold)',
-                borderRadius: '10px',
-                padding: '28px',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
-                <IconMapPin size={18} color="#B3261E" />
-                <h3 style={{ fontSize: '1.2rem', fontFamily: 'var(--font-serif)', margin: 0 }}>
-                  {language === 'bn' ? 'সাংস্কৃতিক পটভূমি ও ইতিহাস' : 'Cultural Story & Community'}
-                </h3>
-              </div>
-
-              <div style={{ fontSize: '0.9rem', color: '#2B2520', lineHeight: 1.6, marginBottom: '18px' }}>
-                {artDetails.detailedCulturalDescription}
-              </div>
-
-              {artDetails.awardsAndAccolades && (
-                <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '14px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#8D5B00', fontWeight: 700, marginBottom: '6px' }}>
-                    <IconAward size={13} color="#B08D57" />
-                    <span>{t('awards', 'Awards & Honors')}</span>
+                  
+                  <div style={{ marginBottom: '18px' }}>
+                    <div style={{ fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--taupe)', fontWeight: 700, marginBottom: '6px' }}>
+                      {language === 'bn' ? 'বর্তমান সংস্করণ' : 'Current Edition'}
+                    </div>
+                    <div style={{ fontSize: '0.9rem', color: '#2B2520', lineHeight: 1.55 }}>
+                      {artDetails.recentAndCurrentThemes}
+                    </div>
                   </div>
-                  <div style={{ fontSize: '0.86rem', color: '#3E342B', fontWeight: 600 }}>
-                    {artDetails.awardsAndAccolades}
+
+                  {artDetails.pastNotableThemes && (
+                    <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '14px' }}>
+                      <div style={{ fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--taupe)', fontWeight: 700, marginBottom: '6px' }}>
+                        {language === 'bn' ? 'ঐতিহাসিক থিমসমূহ' : 'Historical Themes'}
+                      </div>
+                      <div style={{ fontSize: '0.86rem', color: '#554D45', lineHeight: 1.5 }}>
+                        {artDetails.pastNotableThemes}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Card 2: Sculpture */}
+                <div
+                  style={{
+                    background: '#FFF',
+                    border: '1px solid var(--border-gold)',
+                    borderRadius: '10px',
+                    padding: '24px',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
+                    <IconSparkles size={18} color="#B08D57" />
+                    <h3 style={{ fontSize: '1.2rem', fontFamily: 'var(--font-serif)', margin: 0 }}>
+                      {language === 'bn' ? 'প্রতিমা ও রূপায়ণ' : 'Pratima & Divine Sculpture'}
+                    </h3>
+                  </div>
+
+                  <div style={{ fontSize: '0.9rem', color: '#2B2520', lineHeight: 1.6, marginBottom: '18px' }}>
+                    {artDetails.idolSculptureStyle}
+                  </div>
+
+                  <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '14px' }}>
+                    <div style={{ fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--taupe)', fontWeight: 700, marginBottom: '6px' }}>
+                      {t('craftsmanship', 'Craftsmanship & Materials Used')}
+                    </div>
+                    <div style={{ fontSize: '0.86rem', color: '#554D45', lineHeight: 1.55 }}>
+                      {artDetails.craftsmanshipAndMaterials}
+                    </div>
                   </div>
                 </div>
-              )}
-            </div>
-          </div>
-        </section>
-      )}
 
-      {/* 3. HOW TO REACH & TRANSIT CARDS */}
-      <section className="container" style={{ marginTop: '56px' }}>
-        <div className="eyebrow">{language === 'bn' ? 'যাতায়াত ব্যবস্থা' : 'Smart Mobility Guide'}</div>
-        <h2 style={{ fontFamily: 'var(--font-serif)', marginBottom: '8px' }}>
-          {language === 'bn' ? `কীভাবে পৌঁছাবেন ${displayName}-এ` : `How to Reach ${displayName}`}
-        </h2>
+                {/* Card 3: Cultural Story */}
+                <div
+                  style={{
+                    background: '#FFF',
+                    border: '1px solid var(--border-gold)',
+                    borderRadius: '10px',
+                    padding: '24px',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
+                    <IconMapPin size={18} color="#B3261E" />
+                    <h3 style={{ fontSize: '1.2rem', fontFamily: 'var(--font-serif)', margin: 0 }}>
+                      {language === 'bn' ? 'সাংস্কৃতিক পটভূমি ও ইতিহাস' : 'Cultural Story & Community'}
+                    </h3>
+                  </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginTop: '24px' }}>
-          <TransportCard
-            mode="metro"
-            title={`${nearestMetro ? nearestMetro.name : pandal.nearestMetro} Metro Station`}
-            subtitle={nearestMetro ? `${nearestMetro.line} Line` : 'Kolkata Metro Network'}
-            durationMinutes={walkingMinutes}
-            distanceMeters={walkingMeters}
-            fare={10}
-            isRecommended={true}
-            notes={language === 'bn' ? 'মেট্রো স্টেশন থেকে হাঁটার দূরত্বের মধ্যে।' : 'Recommended transit stop. Direct walking route available.'}
-          />
+                  <div style={{ fontSize: '0.9rem', color: '#2B2520', lineHeight: 1.6, marginBottom: '18px' }}>
+                    {artDetails.detailedCulturalDescription}
+                  </div>
 
-          {busConnectivity && (
-            <TransportCard
-              mode="bus"
-              title={`${busConnectivity.cleanStopName || pandal.nearestBusStop} Bus Stop`}
-              subtitle={`${busConnectivity.busCount} connecting bus lines`}
-              durationMinutes={5}
-              distanceMeters={250}
-              fare={15}
-              notes={`Available buses: ${busConnectivity.buses.slice(0, 4).map(b => b.busNumber).join(', ')}`}
-            />
+                  {artDetails.awardsAndAccolades && (
+                    <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '14px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#8D5B00', fontWeight: 700, marginBottom: '6px' }}>
+                        <IconAward size={13} color="#B08D57" />
+                        <span>{t('awards', 'Awards & Honors')}</span>
+                      </div>
+                      <div style={{ fontSize: '0.86rem', color: '#3E342B', fontWeight: 600 }}>
+                        {artDetails.awardsAndAccolades}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
           )}
-        </div>
-      </section>
 
-      {/* 4. MAP & NEARBY EATERIES */}
-      <section className="container" style={{ marginTop: '56px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '32px' }}>
-          {/* Map */}
-          <div>
+          {/* 4. MAP */}
+          <section>
             <h3 style={{ fontFamily: 'var(--font-serif)', marginBottom: '16px' }}>
               📍 {language === 'bn' ? 'প্যান্ডেলের অবস্থান ম্যাপ' : 'Interactive Map Location'}
             </h3>
-            <div style={{ height: '360px', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-gold)' }}>
+            <div style={{ height: '400px', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-gold)' }}>
               <LeafletMap
                 pandals={[pandal]}
                 selectedPandalId={pandal.id}
@@ -433,46 +405,192 @@ export default function PandalDetailClient({
                 zoom={16}
               />
             </div>
-          </div>
+          </section>
 
-          {/* Nearby Heritage Food */}
-          {nearbyEateries.length > 0 && (
-            <div>
+        </div>
+
+        {/* RIGHT COLUMN: SIDEBAR UTILITIES */}
+        <div className="sidebar" style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
+          
+          {/* 3. HOW TO REACH & TRANSIT CARDS */}
+          <section>
+            <div className="eyebrow" style={{ marginBottom: '8px' }}>{language === 'bn' ? 'যাতায়াত ব্যবস্থা' : 'Smart Mobility'}</div>
+            <h3 style={{ fontFamily: 'var(--font-serif)', marginBottom: '16px' }}>
+              {language === 'bn' ? `কীভাবে পৌঁছাবেন` : `How to Reach`}
+            </h3>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <TransportCard
+                mode="metro"
+                title={`${nearestMetro ? nearestMetro.name : pandal.nearestMetro} Metro Station`}
+                subtitle={nearestMetro ? `${nearestMetro.line} Line` : 'Kolkata Metro Network'}
+                durationMinutes={walkingMinutes}
+                distanceMeters={walkingMeters}
+                fare={10}
+                isRecommended={true}
+                notes={language === 'bn' ? 'হাঁটার দূরত্বের মধ্যে।' : 'Direct walking route.'}
+              />
+
+              {busConnectivity && (
+                <TransportCard
+                  mode="bus"
+                  title={`${busConnectivity.cleanStopName || pandal.nearestBusStop} Bus Stop`}
+                  subtitle={`${busConnectivity.busCount} connecting bus lines`}
+                  durationMinutes={5}
+                  distanceMeters={250}
+                  fare={15}
+                  notes={`Buses: ${busConnectivity.buses.slice(0, 4).map(b => b.busNumber).join(', ')}`}
+                />
+              )}
+            </div>
+          </section>
+
+          {/* NEARBY PUBLIC TOILETS */}
+          {nearbyToilets && nearbyToilets.length > 0 && (
+            <section>
               <h3 style={{ fontFamily: 'var(--font-serif)', marginBottom: '16px' }}>
-                🍔 {t('nearby_food', 'Heritage Eateries Nearby')}
+                🚻 {language === 'bn' ? 'পাবলিক টয়লেট' : 'Nearby Toilets'}
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {nearbyToilets.map((toilet) => {
+                  const isFemaleFriendly = toilet.femaleFriendly === 'Yes' || toilet.genderAccess === 'Female';
+                  const mapUrl = `https://www.google.com/maps/search/?api=1&query=${toilet.latitude},${toilet.longitude}`;
+                  
+                  const renderStars = (score: number) => {
+                    const filledStars = Math.floor(score);
+                    const hasHalfStar = score % 1 >= 0.5;
+                    const emptyStars = 5 - filledStars - (hasHalfStar ? 1 : 0);
+                    return (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <div style={{ display: 'flex', color: '#F59E0B', fontSize: '1rem' }}>
+                          {[...Array(filledStars)].map((_, i) => (
+                            <span key={`f-${i}`}>★</span>
+                          ))}
+                          {hasHalfStar && (
+                            <span style={{ position: 'relative' }}>
+                              <span style={{ position: 'absolute', overflow: 'hidden', width: '50%', color: '#F59E0B' }}>★</span>
+                              <span style={{ color: '#E5E7EB' }}>★</span>
+                            </span>
+                          )}
+                          {[...Array(emptyStars)].map((_, i) => (
+                            <span key={`e-${i}`} style={{ color: '#E5E7EB' }}>★</span>
+                          ))}
+                        </div>
+                        <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--foreground)' }}>
+                          {score.toFixed(1)} / 5
+                        </span>
+                      </div>
+                    );
+                  };
+
+                  return (
+                    <div
+                      key={toilet.id}
+                      style={{
+                        background: '#FFF',
+                        padding: '12px',
+                        borderRadius: '8px',
+                        border: isFemaleFriendly ? '2px solid #F9A8D4' : '1px solid var(--border)',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.03)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '8px'
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
+                        <div>
+                          <h4 style={{ margin: '0 0 2px', fontSize: '0.95rem', color: 'var(--foreground)' }}>
+                            {toilet.toiletName}
+                          </h4>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--taupe)' }}>
+                            {formatDistance(toilet.distanceToPandalMeters)} {language === 'bn' ? 'দূরে' : 'away'}
+                          </div>
+                        </div>
+                        {isFemaleFriendly && (
+                          <span
+                            style={{
+                              background: '#FCE7F3',
+                              color: '#BE185D',
+                              border: '1px solid #FBCFE8',
+                              padding: '2px 6px',
+                              borderRadius: '8px',
+                              fontSize: '0.65rem',
+                              fontWeight: 700,
+                              whiteSpace: 'nowrap'
+                            }}
+                          >
+                            Female Friendly
+                          </span>
+                        )}
+                      </div>
+                      
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        {renderStars(toilet.cleanlinessScore)}
+                        <a
+                          href={mapUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn btn-secondary"
+                          style={{ 
+                            padding: '6px 10px',
+                            background: isFemaleFriendly ? '#FDF2F8' : 'var(--background)',
+                            color: isFemaleFriendly ? '#BE185D' : 'var(--foreground)',
+                            borderColor: isFemaleFriendly ? '#FBCFE8' : 'var(--border)',
+                            fontSize: '0.75rem'
+                          }}
+                        >
+                          <IconMapPin size={12} /> {t('google_maps', 'Maps')}
+                        </a>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* NEARBY EATERIES */}
+          {nearbyEateries.length > 0 && (
+            <section>
+              <h3 style={{ fontFamily: 'var(--font-serif)', marginBottom: '16px' }}>
+                🍔 {t('nearby_food', 'Heritage Eateries')}
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {nearbyEateries.slice(0, 4).map((e, idx) => (
                   <div
                     key={idx}
                     style={{
                       background: '#FFF',
-                      padding: '12px 16px',
-                      borderRadius: '6px',
+                      padding: '12px',
+                      borderRadius: '8px',
                       border: '1px solid var(--border)',
                       display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
+                      flexDirection: 'column',
+                      gap: '4px'
                     }}
                   >
-                    <div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>{e.eateryName}</div>
-                      <div style={{ fontSize: '0.76rem', color: 'var(--taupe)' }}>
-                        {e.cuisineType} • {formatDistance(e.distanceM)}
+                      <div style={{ fontSize: '0.75rem', color: 'var(--taupe)' }}>
+                        {formatDistance(e.distanceM)}
                       </div>
                     </div>
+                    <div style={{ fontSize: '0.76rem', color: 'var(--taupe)' }}>
+                      {e.cuisineType}
+                    </div>
                     {e.bestRecommendedItem && (
-                      <span className="badge badge-region" style={{ fontSize: '0.68rem' }}>
+                      <span className="badge badge-region" style={{ fontSize: '0.68rem', alignSelf: 'flex-start', marginTop: '4px' }}>
                         ★ {e.bestRecommendedItem}
                       </span>
                     )}
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
           )}
+
         </div>
-      </section>
+      </div>
 
       {/* 5. NEARBY PANDALS */}
       {nearbyPandals.length > 0 && (

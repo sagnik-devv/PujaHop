@@ -13,6 +13,7 @@ import {
   IconClose,
   IconChevronRight,
   IconSparkles,
+  IconDroplet,
 } from './Icons';
 import { useFavorites } from '../lib/favorites-context';
 import { useToast } from '../lib/toast-context';
@@ -74,6 +75,7 @@ export default function Navbar() {
     { name: t('hop_planner', 'Hop Planner'), href: '/planner' },
     { name: t('metro_guide', 'Metro Guide'), href: '/metro' },
     { name: t('bus_routes', 'Bus Routes'), href: '/bus' },
+    { name: t('nav_toilets', 'Toilets'), href: '/nearby-toilets' },
     { name: t('near_me', 'Near Me'), href: '/nearby' },
   ];
 
@@ -134,6 +136,16 @@ export default function Navbar() {
               aria-label="Locate me"
             >
               <IconMapPin size={19} />
+            </button>
+
+            {/* Nearby Toilets */}
+            <button
+              onClick={() => router.push('/nearby-toilets')}
+              className="nav-action-btn desktop-only"
+              title={t('nearby_toilets', 'Nearby Toilets')}
+              aria-label="Nearby toilets"
+            >
+              <IconDroplet size={19} />
             </button>
 
             {/* Saved Favorites */}

@@ -11,6 +11,7 @@ import {
   getCrowdData,
   getEateriesForPandal,
   getPandalArtDetails,
+  getToiletsForPandal,
 } from '../../../lib/api';
 import PandalDetailClient from './PandalDetailClient';
 
@@ -31,7 +32,7 @@ export default async function PandalDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  const [metroStations, busStops, busConnectivity, nearestMetroInfo, nearbyPandals, crowdInfo, nearbyEateries, artDetails] =
+  const [metroStations, busStops, busConnectivity, nearestMetroInfo, nearbyPandals, crowdInfo, nearbyEateries, artDetails, nearbyToilets] =
     await Promise.all([
       getMetroStations(),
       getBusStops(),
@@ -41,6 +42,7 @@ export default async function PandalDetailPage({ params }: PageProps) {
       getCrowdData(pandal.id),
       getEateriesForPandal(pandal.id),
       getPandalArtDetails(pandal.id),
+      getToiletsForPandal(pandal.name),
     ]);
 
   return (
@@ -54,6 +56,7 @@ export default async function PandalDetailPage({ params }: PageProps) {
       crowdInfo={crowdInfo}
       nearbyEateries={nearbyEateries}
       artDetails={artDetails}
+      nearbyToilets={nearbyToilets}
     />
   );
 }

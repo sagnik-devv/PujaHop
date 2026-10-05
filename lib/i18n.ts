@@ -22,9 +22,14 @@ export const translations: Record<Language, Record<string, string>> = {
     saved_pandals: 'Saved Pandals',
     nav_explore: 'Explore',
     nav_route: 'Route',
+    nav_transit: 'Transit',
     nav_bus: 'Bus',
     nav_metro: 'Metro',
+    nav_toilets: 'Toilets',
     nav_hop_room: 'Hop Room',
+    transit_selector_title: 'Kolkata Public Transit',
+    transit_metro_desc: '45 Stations • Blue, Green, Purple & Orange',
+    transit_bus_desc: '180+ Routes • 54 Transit Hubs',
 
     // Hero & Home
     hero_title: 'Navigate Kolkata’s Durga Puja 2026 Like a Native',
@@ -247,9 +252,14 @@ export const translations: Record<Language, Record<string, string>> = {
     saved_pandals: 'সংরক্ষিত প্যান্ডেল',
     nav_explore: 'প্যান্ডেল',
     nav_route: 'রুট',
+    nav_transit: 'ট্রানজিট',
     nav_bus: 'বাস',
     nav_metro: 'মেট্রো',
+    nav_toilets: 'টয়লেট',
     nav_hop_room: 'হপ রুম',
+    transit_selector_title: 'কলকাতা গণপরিবহন',
+    transit_metro_desc: '৪৫টি স্টেশন • ব্লু, গ্রীন, পার্পল ও অরেঞ্জ লাইন',
+    transit_bus_desc: '১৮০+ বাস রুট • ৫৪টি প্রধান ট্রানজিট হাব',
 
     // Hero & Home
     hero_title: 'কলকাতার দুর্গাপূজা ২০২৬ পরিক্রমা করুন স্থানীয়দের মতো',

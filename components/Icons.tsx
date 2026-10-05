@@ -100,6 +100,22 @@ export const IconClose = ({ size = 24, color = 'currentColor', strokeWidth = 2 }
   </svg>
 );
 
+export const IconAccessibility = ({ size = 20, color = 'currentColor', strokeWidth = 2 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="16" cy="4" r="1" />
+    <path d="m18 19 1-7-6 1" />
+    <path d="m5 8 3-3 5.5 3-2.36 3.5" />
+    <path d="M4.24 14.5a5 5 0 0 0 6.88 6" />
+    <path d="M13.76 17.5a5 5 0 0 0-6.88-6" />
+  </svg>
+);
+
+export const IconDroplet = ({ size = 20, color = 'currentColor', strokeWidth = 2 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z" />
+  </svg>
+);
+
 export const IconWalk = ({ size = 20, color = 'currentColor', strokeWidth = 2 }: IconProps) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
     <circle cx="13" cy="4" r="2" />
@@ -206,5 +222,28 @@ export const IconUsers = ({ size = 20, color = 'currentColor', strokeWidth = 2 }
     <path d="M16 3.13a4 4 0 0 1 0 7.75" />
   </svg>
 );
+
+export const IconTransit = ({ size = 20, color = 'currentColor', strokeWidth = 1.9 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+    <rect width="16" height="15" x="4" y="3" rx="2.5" />
+    <path d="M4 10h16" />
+    <path d="M12 3v7" />
+    <circle cx="8" cy="14.5" r="1" fill={color} />
+    <circle cx="16" cy="14.5" r="1" fill={color} />
+    <path d="m6 18-1.5 3" />
+    <path d="m18 18 1.5 3" />
+    <path d="M8 21h8" />
+  </svg>
+);
+
+export const IconToilet = ({ size = 20, color = 'currentColor', strokeWidth = 1.9 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M5 10h14" />
+    <path d="M6 10v7a5 5 0 0 0 5 5h2a5 5 0 0 0 5-5v-7" />
+    <path d="M7 3h10v7H7z" />
+    <path d="M10 6.5h4" />
+  </svg>
+);
+
 
 
