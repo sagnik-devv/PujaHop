@@ -433,15 +433,36 @@ export default function PandalDetailClient({
               />
 
               {busConnectivity && (
-                <TransportCard
-                  mode="bus"
-                  title={`${busConnectivity.cleanStopName || pandal.nearestBusStop} Bus Stop`}
-                  subtitle={`${busConnectivity.busCount} connecting bus lines`}
-                  durationMinutes={5}
-                  distanceMeters={250}
-                  fare={15}
-                  notes={`Buses: ${busConnectivity.buses.slice(0, 4).map(b => b.busNumber).join(', ')}`}
-                />
+                <div style={{ marginTop: '8px' }}>
+                  <div className="bus-pandal-banner">
+                    <img
+                      src="/images/bus-route-guide.png"
+                      alt="Durga Puja Kolkata Bus Route Guide"
+                      className="bus-pandal-banner-img"
+                    />
+                    <div className="bus-pandal-banner-overlay">
+                      <div className="bus-pandal-banner-badge">
+                        <IconBus size={12} color="#FFF" />
+                        <span>{language === 'bn' ? 'কলকাতা বাস রুট ও স্টপ' : 'Kolkata Bus Transit Route'}</span>
+                      </div>
+                      <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#FFF', textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>
+                        {language === 'bn' 
+                          ? `${busConnectivity.cleanStopName || pandal.nearestBusStop} স্টপে ${busConnectivity.busCount}টি সংযোগকারী বাস লাইন` 
+                          : `${busConnectivity.busCount} connecting bus routes via ${busConnectivity.cleanStopName || pandal.nearestBusStop} stop`}
+                      </div>
+                    </div>
+                  </div>
+
+                  <TransportCard
+                    mode="bus"
+                    title={`${busConnectivity.cleanStopName || pandal.nearestBusStop} Bus Stop`}
+                    subtitle={`${busConnectivity.busCount} connecting bus lines`}
+                    durationMinutes={5}
+                    distanceMeters={250}
+                    fare={15}
+                    notes={`Buses: ${busConnectivity.buses.slice(0, 4).map(b => b.busNumber).join(', ')}`}
+                  />
+                </div>
               )}
             </div>
           </section>
