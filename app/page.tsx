@@ -85,11 +85,15 @@ export default function HomePage() {
           </p>
 
           {/* Interactive Route Search Widget */}
-          <HeroSearchWidget pandals={allPandals} />
+          <div style={{ position: 'relative', zIndex: 30 }}>
+            <HeroSearchWidget pandals={allPandals} />
+          </div>
 
           {/* Quick Action Chips */}
           <div
             style={{
+              position: 'relative',
+              zIndex: 1,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

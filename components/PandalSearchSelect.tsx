@@ -3,7 +3,16 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Pandal } from '../lib/types';
 import { useLanguage } from '../lib/language-context';
-import { IconSearch, IconClose, IconChevronDown, IconCheck, IconMetro, IconMapPin } from './Icons';
+import {
+  IconSearch,
+  IconClose,
+  IconChevronDown,
+  IconChevronRight,
+  IconCheck,
+  IconMetro,
+  IconMapPin,
+  IconSparkles,
+} from './Icons';
 
 interface PandalSearchSelectProps {
   pandals: Pandal[];
@@ -26,6 +35,7 @@ export default function PandalSearchSelect({
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeRegion, setActiveRegion] = useState<string>('ALL');
+  const [highlightedIndex, setHighlightedIndex] = useState<number>(0);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -70,6 +80,11 @@ export default function PandalSearchSelect({
     });
   }, [pandals, searchQuery, activeRegion]);
 
+  // Reset highlighted index when filter or search changes
+  useEffect(() => {
+    setHighlightedIndex(0);
+  }, [searchQuery, activeRegion]);
+
   // Focus search input when opened
   useEffect(() => {
     if (isOpen) {
@@ -96,16 +111,42 @@ export default function PandalSearchSelect({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen]);
 
-  // Handle escape key
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape' && isOpen) {
-        setIsOpen(false);
+  // Handle keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!isOpen) {
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        setIsOpen(true);
+      }
+      return;
+    }
+
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      setIsOpen(false);
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setHighlightedIndex(prev => Math.min(prev + 1, filteredPandals.length - 1));
+      scrollHighlightedIntoView(highlightedIndex + 1);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHighlightedIndex(prev => Math.max(prev - 1, 0));
+      scrollHighlightedIntoView(highlightedIndex - 1);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (filteredPandals[highlightedIndex]) {
+        handleSelect(filteredPandals[highlightedIndex]);
       }
     }
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen]);
+  };
+
+  const scrollHighlightedIntoView = (index: number) => {
+    if (!listRef.current) return;
+    const items = listRef.current.querySelectorAll('.pandal-select-item');
+    if (items[index]) {
+      (items[index] as HTMLElement).scrollIntoView({ block: 'nearest' });
+    }
+  };
 
   const handleSelect = (pandal: Pandal) => {
     onSelect(pandal.id);
@@ -114,10 +155,21 @@ export default function PandalSearchSelect({
 
   const isHero = variant === 'hero';
 
+  const getCrowdLabel = (crowd?: string) => {
+    if (!crowd) return null;
+    const c = crowd.toLowerCase();
+    if (c === 'low') return { text: language === 'bn' ? 'স্বল্প ভিড়' : 'Low Crowd', color: '#34D399' };
+    if (c === 'moderate') return { text: language === 'bn' ? 'মাঝারি ভিড়' : 'Moderate', color: '#FBBF24' };
+    return { text: language === 'bn' ? 'প্রচণ্ড ভিড়' : 'Heavy Rush', color: '#F87171' };
+  };
+
   return (
     <div
       ref={containerRef}
-      className={`pandal-select-container ${isHero ? 'pandal-select-hero' : 'pandal-select-light'}`}
+      onKeyDown={handleKeyDown}
+      className={`pandal-select-container ${isHero ? 'pandal-select-hero' : 'pandal-select-light'} ${
+        isOpen ? 'popover-active' : ''
+      }`}
     >
       {/* Trigger Button */}
       <button
@@ -135,21 +187,22 @@ export default function PandalSearchSelect({
                 {tPandalName(selectedPandal)}
               </div>
               <div className="pandal-select-trigger-meta">
-                <span>{tRegion(selectedPandal.region)}</span>
-                <span className="dot-divider">•</span>
-                <span className="metro-tag">
+                <span className="trigger-tag tag-region">
+                  <IconMapPin size={11} /> {tRegion(selectedPandal.region)}
+                </span>
+                <span className="trigger-tag tag-metro">
                   🚇 {selectedPandal.nearestMetro}
                 </span>
                 {selectedPandal.famous && (
-                  <span className="famous-star" title="Must Visit Pandal">
-                    ⭐
+                  <span className="trigger-tag tag-famous">
+                    ⭐ {language === 'bn' ? 'জনপ্রিয়' : 'Top Pandal'}
                   </span>
                 )}
               </div>
             </>
           ) : (
             <span className="pandal-select-placeholder">
-              {placeholder || (language === 'bn' ? 'প্যান্ডেল নির্বাচন করুন...' : 'Select Destination Pandal...')}
+              {placeholder || (language === 'bn' ? 'গন্তব্য প্যান্ডেল খুঁজুন...' : 'Select Destination Pandal...')}
             </span>
           )}
         </div>
@@ -165,7 +218,7 @@ export default function PandalSearchSelect({
           {/* Search Header */}
           <div className="pandal-select-header">
             <div className="pandal-select-searchbox">
-              <IconSearch size={16} className="search-icon" />
+              <IconSearch size={17} className="search-icon" />
               <input
                 ref={searchInputRef}
                 type="text"
@@ -173,12 +226,12 @@ export default function PandalSearchSelect({
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder={
                   language === 'bn'
-                    ? 'প্যান্ডেল, এলাকা বা মেট্রো স্টেশন খুঁজুন...'
-                    : 'Search 248 pandals, areas, metro...'
+                    ? 'প্যান্ডেল, মেট্রো বা অঞ্চল খুঁজুন...'
+                    : 'Search 248 pandals, metro, or area...'
                 }
                 className="pandal-select-search-input"
               />
-              {searchQuery && (
+              {searchQuery ? (
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
@@ -187,91 +240,117 @@ export default function PandalSearchSelect({
                 >
                   <IconClose size={14} />
                 </button>
+              ) : (
+                <span className="kbd-shortcut-hint">Esc</span>
               )}
+            </div>
+          </div>
+
+          {/* Subheader: Category Segmented Filters & Count */}
+          <div className="pandal-select-filter-bar">
+            <div className="pandal-select-filters">
+              <button
+                type="button"
+                className={`filter-pill ${activeRegion === 'ALL' ? 'active' : ''}`}
+                onClick={() => setActiveRegion('ALL')}
+              >
+                {language === 'bn' ? 'সকল' : 'All'}
+              </button>
+              <button
+                type="button"
+                className={`filter-pill ${activeRegion === 'FAMOUS' ? 'active' : ''}`}
+                onClick={() => setActiveRegion('FAMOUS')}
+              >
+                ⭐ {language === 'bn' ? 'সেরা আকর্ষণ' : 'Top Hits'}
+              </button>
+              {regions.map(r => (
+                <button
+                  key={r}
+                  type="button"
+                  className={`filter-pill ${activeRegion === r ? 'active' : ''}`}
+                  onClick={() => setActiveRegion(r)}
+                >
+                  {tRegion(r)}
+                </button>
+              ))}
             </div>
 
             <div className="pandal-select-stats">
               <span>
                 {filteredPandals.length}{' '}
-                {language === 'bn' ? 'টি প্যান্ডেল' : filteredPandals.length === 1 ? 'pandal' : 'pandals'}
+                {language === 'bn' ? 'টি' : filteredPandals.length === 1 ? 'pandal' : 'pandals'}
               </span>
             </div>
-          </div>
-
-          {/* Quick Filter Tabs */}
-          <div className="pandal-select-filters">
-            <button
-              type="button"
-              className={`filter-pill ${activeRegion === 'ALL' ? 'active' : ''}`}
-              onClick={() => setActiveRegion('ALL')}
-            >
-              {language === 'bn' ? 'সকল' : 'All'} ({pandals.length})
-            </button>
-            <button
-              type="button"
-              className={`filter-pill ${activeRegion === 'FAMOUS' ? 'active' : ''}`}
-              onClick={() => setActiveRegion('FAMOUS')}
-            >
-              ⭐ {language === 'bn' ? 'জনপ্রিয়' : 'Must Visit'}
-            </button>
-            {regions.map(r => (
-              <button
-                key={r}
-                type="button"
-                className={`filter-pill ${activeRegion === r ? 'active' : ''}`}
-                onClick={() => setActiveRegion(r)}
-              >
-                {tRegion(r)}
-              </button>
-            ))}
           </div>
 
           {/* Pandal List */}
           <div ref={listRef} className="pandal-select-list">
             {filteredPandals.length > 0 ? (
-              filteredPandals.map(p => {
+              filteredPandals.map((p, index) => {
                 const isSelected = p.id === selectedId;
+                const isHighlighted = index === highlightedIndex;
+                const crowd = getCrowdLabel(p.crowdLevel);
+
                 return (
                   <button
                     key={p.id}
                     type="button"
                     onClick={() => handleSelect(p)}
-                    className={`pandal-select-item ${isSelected ? 'selected' : ''}`}
+                    onMouseEnter={() => setHighlightedIndex(index)}
+                    className={`pandal-select-item ${isSelected ? 'selected' : ''} ${
+                      isHighlighted ? 'highlighted' : ''
+                    }`}
                   >
+                    {/* Left Icon Badge */}
                     <div className="pandal-select-item-icon">
                       {isSelected ? (
                         <div className="check-badge">
                           <IconCheck size={14} />
                         </div>
                       ) : (
-                        <div className="bullet-indicator" />
+                        <div className="pin-badge">
+                          <IconMapPin size={13} />
+                        </div>
                       )}
                     </div>
 
+                    {/* Central Content */}
                     <div className="pandal-select-item-info">
-                      <div className="pandal-select-item-name">
-                        <span>{tPandalName(p)}</span>
-                        {p.famous && <span className="mini-famous-badge">⭐ Top</span>}
+                      <div className="pandal-select-item-name-row">
+                        <span className="pandal-item-name">{tPandalName(p)}</span>
+                        {p.famous && (
+                          <span className="mini-famous-badge">
+                            <IconSparkles size={10} /> {language === 'bn' ? 'জনপ্রিয়' : 'Top'}
+                          </span>
+                        )}
                       </div>
 
                       <div className="pandal-select-item-details">
-                        <span className="region-text">
-                          <IconMapPin size={11} /> {tRegion(p.region)}
+                        <span className="tag-chip tag-chip-region">
+                          {tRegion(p.region)}
                         </span>
-                        <span className="dot">•</span>
-                        <span className="metro-text">
-                          <IconMetro size={11} /> {p.nearestMetro}
+                        <span className="tag-chip tag-chip-metro">
+                          🚇 {p.nearestMetro}
                         </span>
-                        {p.crowdLevel && (
-                          <span className={`crowd-dot crowd-${p.crowdLevel.toLowerCase()}`} title={`Crowd: ${p.crowdLevel}`} />
+                        {crowd && (
+                          <span className="tag-chip tag-chip-crowd" style={{ color: crowd.color }}>
+                            <span className="crowd-dot" style={{ backgroundColor: crowd.color }} />
+                            {crowd.text}
+                          </span>
                         )}
                       </div>
+                    </div>
+
+                    {/* Right Hover Arrow */}
+                    <div className="pandal-select-item-arrow">
+                      <IconChevronRight size={15} />
                     </div>
                   </button>
                 );
               })
             ) : (
               <div className="pandal-select-empty">
+                <div className="empty-search-icon">🔍</div>
                 <p>
                   {language === 'bn'
                     ? `"${searchQuery}" এর জন্য কোনো প্যান্ডেল পাওয়া যায়নি`
@@ -285,10 +364,20 @@ export default function PandalSearchSelect({
                   }}
                   className="btn-reset-search"
                 >
-                  {language === 'bn' ? 'ফিল্টার মুছুন' : 'Show All Pandals'}
+                  {language === 'bn' ? 'সব প্যান্ডেল দেখুন' : 'Show All 248 Pandals'}
                 </button>
               </div>
             )}
+          </div>
+
+          {/* Bottom Footer Info */}
+          <div className="pandal-select-footer">
+            <span className="footer-tip">
+              💡 {language === 'bn' ? 'যেকোনো প্যান্ডেলে ক্লিক করে সরাসরি রুট দেখুন' : 'Select any pandal for direct transit & metro routing'}
+            </span>
+            <span className="footer-counter">
+              ২৪৮ {language === 'bn' ? 'টি প্যান্ডেল' : 'Pandals'}
+            </span>
           </div>
         </div>
       )}
