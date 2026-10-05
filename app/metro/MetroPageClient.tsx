@@ -26,185 +26,170 @@ export default function MetroPageClient({
 
   return (
     <div style={{ background: 'var(--background)', minHeight: '100vh', paddingBottom: '80px' }}>
-      {/* 1. HERO BANNER */}
-      <section
-        style={{
-          position: 'relative',
-          padding: '70px 0 60px',
-          background: 'var(--dark-bg)',
-          color: '#FFF',
-          overflow: 'hidden',
-          borderBottom: '1px solid var(--border-gold)',
-        }}
-      >
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundImage: 'url(/images/durga/durga-1.png)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center 30%',
-            opacity: 0.22,
-            filter: 'contrast(1.2) brightness(0.7)',
-          }}
-        />
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background:
-              'linear-gradient(180deg, rgba(23,18,15,0.7) 0%, rgba(23,18,15,0.92) 80%, rgba(23,18,15,0.98) 100%)',
-          }}
-        />
+      {/* 1. HERO BANNER WITH METRO ROUTE GUIDE IMAGE (MOBILE-PRIMARY) */}
+      <section className="metro-hero-section">
+        <div className="metro-hero-bg-art" />
+        <div className="container metro-hero-grid">
+          {/* Visual Showcase Card - On mobile devices (CSS order: -1), this is the FIRST/PRIMARY element */}
+          <div className="metro-hero-visual-card">
+            <img
+              src="/images/metro-route-guide.png"
+              alt="Kolkata Durga Puja Metro Route Guide"
+              className="metro-hero-img"
+            />
 
-        <div className="container" style={{ position: 'relative', zIndex: 10, textAlign: 'center', maxWidth: '840px' }}>
-          {/* Transit Navigator Switcher */}
-          <div
-            style={{
-              display: 'inline-flex',
-              background: 'rgba(255,255,255,0.08)',
-              border: '1px solid rgba(212,183,122,0.3)',
-              borderRadius: '30px',
-              padding: '4px',
-              marginBottom: '20px',
-            }}
-          >
-            <div
-              style={{
-                padding: '6px 18px',
-                borderRadius: '24px',
-                fontSize: '0.82rem',
-                fontWeight: 700,
-                background: '#155799',
-                color: '#FFF',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                boxShadow: '0 2px 8px rgba(21,87,153,0.4)',
-              }}
-            >
-              <IconMetro size={15} /> {t('metro_guide', 'Metro Guide')}
+            {/* Glowing neon pin badge */}
+            <div className="metro-hero-pin-badge">
+              <span
+                style={{
+                  display: 'inline-block',
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  background: '#EF4444',
+                  boxShadow: '0 0 10px #EF4444',
+                }}
+              />
+              <span>{language === 'bn' ? 'কলকাতা মেট্রো রুট গাইড' : 'Kolkata Metro Route Guide'}</span>
             </div>
-            <Link
-              href="/bus"
-              style={{
-                padding: '6px 18px',
-                borderRadius: '24px',
-                fontSize: '0.82rem',
-                fontWeight: 600,
-                color: 'var(--stone)',
-                textDecoration: 'none',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              <IconBus size={15} /> {t('bus_routes', 'Bus Routes Guide')}
-            </Link>
+
+            {/* Bottom info tag */}
+            <div className="metro-hero-bottom-tag">
+              <div>
+                <div style={{ fontSize: '0.9rem', fontWeight: 700 }}>
+                  {language === 'bn' ? 'রবীন্দ্র সদন ও কবি সুভাষ – দক্ষিণেশ্বর করিডোর' : 'Rabindra Sadan & Blue-Green Corridors'}
+                </div>
+                <div style={{ fontSize: '0.72rem', color: '#E5D5C0' }}>
+                  {language === 'bn' ? 'সারারাত ০৪:০০ AM পর্যন্ত পূজা স্পেশাল মেট্রো' : 'All-Night Puja Special Trains till 4:00 AM'}
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(23,18,15,0.7)', padding: '4px 8px', borderRadius: '12px', fontSize: '0.75rem' }}>
+                <span style={{ color: '#90CAF9' }}>🚇</span>
+                <span>{metroStations.length} Stations</span>
+              </div>
+            </div>
           </div>
 
-          <h1
-            style={{
-              color: '#FFF',
-              fontSize: 'clamp(2.4rem, 5vw, 3.4rem)',
-              fontFamily: 'var(--font-serif)',
-              margin: '0 0 16px',
-              lineHeight: 1.15,
-            }}
-          >
-            {t('metro_guide_title', 'Kolkata Metro Durga Puja Guide')}
-          </h1>
-
-          <div className="hero-accent-line" style={{ margin: '0 auto 20px' }} />
-
-          <p
-            style={{
-              color: 'var(--stone)',
-              fontSize: '1.05rem',
-              lineHeight: 1.6,
-              maxWidth: '720px',
-              margin: '0 auto 32px',
-            }}
-          >
-            {t('metro_guide_subtitle', 'During Durga Puja, vehicular roads across Kolkata are heavily barricaded by the police. Kolkata Metro is the fastest, crowd-free way to hop between legendary pandals. Tap any station to explore all pujas within walking distance with 1-click Google Maps navigation.')}
-          </p>
-
-          {/* Quick Metrics Bar */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
-              gap: '12px',
-              textAlign: 'center',
-            }}
-          >
+          {/* Hero Content & Transit Switcher */}
+          <div className="metro-hero-content">
+            {/* Transit Navigator Switcher */}
             <div
               style={{
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.12)',
-                borderRadius: '8px',
-                padding: '16px',
-                backdropFilter: 'blur(4px)',
+                display: 'inline-flex',
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(212,183,122,0.3)',
+                borderRadius: '30px',
+                padding: '4px',
+                marginBottom: '18px',
               }}
             >
-              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.9rem', fontWeight: 700, color: '#90CAF9' }}>
-                {metroStations.length}
+              <div
+                style={{
+                  padding: '6px 18px',
+                  borderRadius: '24px',
+                  fontSize: '0.82rem',
+                  fontWeight: 700,
+                  background: '#155799',
+                  color: '#FFF',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: '0 2px 8px rgba(21,87,153,0.4)',
+                }}
+              >
+                <IconMetro size={15} /> {t('metro_guide', 'Metro Guide')}
               </div>
-              <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--stone)', fontWeight: 600 }}>
-                {t('quick_stats_metros', 'Metro Stations')}
+              <Link
+                href="/bus"
+                style={{
+                  padding: '6px 18px',
+                  borderRadius: '24px',
+                  fontSize: '0.82rem',
+                  fontWeight: 600,
+                  color: 'var(--stone)',
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <IconBus size={15} /> {t('bus_routes', 'Bus Routes Guide')}
+              </Link>
+            </div>
+
+            <h1
+              style={{
+                color: '#FFF',
+                fontSize: 'clamp(2rem, 4.5vw, 3rem)',
+                fontFamily: 'var(--font-serif)',
+                margin: '0 0 14px',
+                lineHeight: 1.18,
+              }}
+            >
+              {language === 'bn' ? 'কলকাতা মেট্রো ' : 'Kolkata Metro '}
+              <span className="vermilion-text">{language === 'bn' ? 'দুর্গাপূজা গাইড' : 'Puja Route Guide'}</span>
+            </h1>
+
+            <p
+              style={{
+                color: 'var(--stone)',
+                fontSize: '0.98rem',
+                lineHeight: 1.6,
+                marginBottom: '22px',
+              }}
+            >
+              {language === 'bn'
+                ? 'যানজট মুক্ত সেরা পূজো ভ্রমণের জন্য কলকাতা মেট্রো ব্যবহার করুন। যেকোনো স্টেশন নির্বাচন করে হাঁটার দূরত্বের মধ্যে সব বিখ্যাত প্যান্ডেল দেখুন।'
+                : 'Bypass road congestion and explore Kolkata’s legendary pandals via Blue, Green, Purple and Orange lines. Select any station to view walking distances.'}
+            </p>
+
+            {/* Quick Metrics Grid */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, 1fr)',
+                gap: '8px',
+                textAlign: 'center',
+                marginBottom: '18px',
+              }}
+            >
+              <div style={{ background: 'rgba(255,255,255,0.06)', padding: '10px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#90CAF9' }}>{metroStations.length}</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--stone)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{t('quick_stats_metros', 'Stations')}</div>
+              </div>
+              <div style={{ background: 'rgba(255,255,255,0.06)', padding: '10px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#A5D6A7' }}>4 Lines</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--stone)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Blue/Green</div>
+              </div>
+              <div style={{ background: 'rgba(255,255,255,0.06)', padding: '10px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#FFD54F' }}>{pandals.length}+</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--stone)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{language === 'bn' ? 'প্যান্ডেল' : 'Pandals'}</div>
+              </div>
+              <div style={{ background: 'rgba(255,255,255,0.06)', padding: '10px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#FF8A80' }}>04:00 AM</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--stone)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{language === 'bn' ? 'সারারাত' : 'All-Night'}</div>
               </div>
             </div>
 
-            <div
-              style={{
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.12)',
-                borderRadius: '8px',
-                padding: '16px',
-                backdropFilter: 'blur(4px)',
-              }}
-            >
-              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.9rem', fontWeight: 700, color: '#A5D6A7' }}>
-                {language === 'bn' ? '৪টি লাইন' : '4 Lines'}
-              </div>
-              <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--stone)', fontWeight: 600 }}>
-                {language === 'bn' ? 'ব্লু, গ্রিন, পার্পল, অরেঞ্জ' : 'Blue, Green, Purple, Orange'}
-              </div>
-            </div>
+            {/* Quick Actions */}
+            <div className="metro-hero-actions" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+              <Link
+                href="/route"
+                className="btn btn-vermilion"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '9px 16px', fontSize: '0.85rem' }}
+              >
+                <IconRoute size={15} color="#FFF" />
+                <span>{language === 'bn' ? 'স্মার্ট মেট্রো রুট প্ল্যানার' : 'Smart Route Planner'}</span>
+              </Link>
 
-            <div
-              style={{
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.12)',
-                borderRadius: '8px',
-                padding: '16px',
-                backdropFilter: 'blur(4px)',
-              }}
-            >
-              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.9rem', fontWeight: 700, color: '#FFD54F' }}>
-                {pandals.length}+
-              </div>
-              <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--stone)', fontWeight: 600 }}>
-                {t('quick_stats_pandals', 'Pandals Accessible')}
-              </div>
-            </div>
-
-            <div
-              style={{
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.12)',
-                borderRadius: '8px',
-                padding: '16px',
-                backdropFilter: 'blur(4px)',
-              }}
-            >
-              <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.9rem', fontWeight: 700, color: '#FF8A80' }}>
-                04:00 AM
-              </div>
-              <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--stone)', fontWeight: 600 }}>
-                {language === 'bn' ? 'সারারাত পূজা স্পেশাল ট্রেন' : 'All-Night Puja Special Trains'}
-              </div>
+              <Link
+                href="/transit"
+                className="btn btn-secondary"
+                style={{ color: '#FFF', borderColor: 'rgba(255,255,255,0.3)', padding: '9px 15px', fontSize: '0.85rem' }}
+              >
+                {language === 'bn' ? 'মেট্রো ও বাস তুলনা' : 'Metro & Bus Switcher'}
+              </Link>
             </div>
           </div>
         </div>

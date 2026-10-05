@@ -421,6 +421,23 @@ export default function PandalDetailClient({
             </h3>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div className="metro-pandal-banner">
+                <img
+                  src="/images/metro-route-guide.png"
+                  alt="Kolkata Durga Puja Metro Route Guide"
+                  className="metro-pandal-banner-img"
+                />
+                <div className="metro-pandal-banner-overlay">
+                  <div className="metro-pandal-banner-badge">
+                    <IconMetro size={12} color="#FFF" />
+                    <span>{language === 'bn' ? 'মেট্রো এক্সপ্রেস রুট' : 'Metro Express Route'}</span>
+                  </div>
+                  <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#FFF', textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>
+                    {nearestMetro ? `${nearestMetro.name} (${nearestMetro.line} Line) • ${walkingMinutes} mins walk` : `${pandal.nearestMetro} Metro`}
+                  </div>
+                </div>
+              </div>
+
               <TransportCard
                 mode="metro"
                 title={`${nearestMetro ? nearestMetro.name : pandal.nearestMetro} Metro Station`}
